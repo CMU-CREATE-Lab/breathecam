@@ -11,14 +11,14 @@ def main
   count = 0
   concat_count = 0
 
-  (Dir.glob("#{ARGV[0]}/image1_*.jpg")+Dir.glob("#{ARGV[0]}/*/image1_*.jpg")).each do |img|
+  (Dir.glob("#{ARGV[0]}/*_image1.jpg")+Dir.glob("#{ARGV[0]}/*/*_image1.jpg")).each do |img|
     count += 1
-    date = File.basename(img, ".*").split("_")[1]
-    unless File.exists?("#{ARGV[0]}/image2_#{date}.jpg") && File.exists?("#{ARGV[0]}/image3_#{date}.jpg") && File.exists?("#{ARGV[0]}/image4_#{date}.jpg")
+    date = File.basename(img, ".*").split("_")[0]
+    unless File.exists?("#{ARGV[0]}/#{date}_image2.jpg") && File.exists?("#{ARGV[0]}/#{date}_image3.jpg") && File.exists?("#{ARGV[0]}/#{date}_image4.jpg")
       next
     end
     path = File.dirname(img)
-    `convert +append #{path}/image1_#{date}.jpg #{path}/image2_#{date}.jpg #{path}/image3_#{date}.jpg #{path}/image4_#{date}.jpg #{path}/full_#{date}.jpg`
+    `convert +append #{path}/#{date}_image1.jpg #{path}/#{date}_image2.jpg #{path}/#{date}_image3.jpg #{path}/#{date}_image4.jpg #{path}/#{date}_full.jpg`
     concat_count += 1
     puts "Concatenated image #{count}"
   end
