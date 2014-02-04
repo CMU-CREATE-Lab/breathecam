@@ -146,7 +146,7 @@ class Compiler
   end
 
   def usage
-    puts "Usage: ruby contat.rb PATH_TO_IMAGES OUTPUT_PATH PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE"
+    puts "Usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE"
     return
   end
 
