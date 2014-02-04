@@ -36,7 +36,7 @@ def main
       next
     end
     path = File.expand_path(File.dirname(img))
-    dir = "#{output_path}/0100-unstitched/#{'%05d' % count}"
+    dir = "#{output_path}/#{'%05d' % count}"
     FileUtils.mkdir_p(dir)
     #logger.debug "Linking ..." if @verbose
     if $RUNNING_WINDOWS
@@ -46,6 +46,7 @@ def main
           s.show_cmd = Win32::Shortcut::SHOWNORMAL
           s.working_directory = Dir.getwd
         end
+        #FileUtils.cp(File.expand_path("#{path}/#{date}_image#{i}.jpg"),"#{dir}/#{date}_image#{i}.jpg")
       end
     else
       for i in 1..4
