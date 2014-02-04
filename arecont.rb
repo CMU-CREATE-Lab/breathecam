@@ -32,7 +32,7 @@ $current_camera = camera3_lense_order
 def get_images
   current_time = Time.now.to_i
   [1,2,3,4].each_with_index do |camera, i|
-    File.open("#{$output_dir}/#{current_time}_image#{$current_camera[i]}.jpg",'w'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
+    File.open("#{$output_dir}/#{current_time}_image#{$current_camera[i]}.jpg",'wb'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
   end
 end
 
