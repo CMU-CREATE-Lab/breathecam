@@ -1,0 +1,2521 @@
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:15:05) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 67ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:15:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 170ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:15:51) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 37ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:16:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 37ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:28:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 60ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:28:50) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 40ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:29:01) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:29:06) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:29:49) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 42ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:38) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 37ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 40ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:41) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 103ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:41) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:41) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:41) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 40ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 42ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 46ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 40ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 38ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 45ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:30:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:34:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 60ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:35:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 41ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:37:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 109ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:37:41) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 41ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:40:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 58ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:42:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 50ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:42:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 49ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:42:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 49ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 41ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:06) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 42ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:07) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 41ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:09) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 41ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:16) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 41ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 49ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 40ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-10 19:43:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 42ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 172.56.11.188 at 2014-01-11 11:50:16) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 323ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 03:14:55) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 664ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 03:15:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 326ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 03:15:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 265ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 03:15:58) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 329ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 03:52:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 583ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 03:53:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 494ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 03:53:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 589ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 04:06:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 392ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 04:06:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 287ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 04:19:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 409ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 04:19:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 332ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 04:31:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 395ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 04:31:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 270ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 04:31:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 332ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:48:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 436ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:48:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 353ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:48:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 275ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:48:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 340ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:50:12) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 275ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:50:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 342ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:52:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 611ms (View: 6, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:52:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 612ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 14:52:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 340ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:10:02) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 383ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:11:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 338ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:21:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 359ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:21:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 389ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:24:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 346ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:26:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 297ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:27:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 348ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:27:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 300ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:28:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 350ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:28:35) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 382ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:31:46) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 379ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:32:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 376ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:36:01) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 380ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:36:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 386ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:37:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 362ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:38:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 396ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:42:06) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 353ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:42:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 285ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:43:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 389ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-12 23:43:53) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 380ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-13 01:48:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 503ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-13 01:50:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 387ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-13 09:36:16) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 841ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-13 09:36:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 290ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-13 09:38:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 345ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-13 09:43:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 406ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-13 10:50:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1507ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 11:36:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 388ms (View: 2, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 12:04:55) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 404ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 12:34:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 317ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 12:35:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 344ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 13:31:12) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 282ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 15:33:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 358ms (View: 2, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:09:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 303ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:15:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 371ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:18:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 275ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:18:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 360ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:20:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 345ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:23:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 297ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:24:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 345ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:25:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 271ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-13 18:37:35) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 364ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:35:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 426ms (View: 5, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:39:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 377ms (View: 5, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:43:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 397ms (View: 5, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:44:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 362ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:45:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 273ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:45:09) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 338ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:45:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 270ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:49:02) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 358ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:52:01) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 380ms (View: 6, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:52:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 332ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:53:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 269ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:55:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 414ms (View: 5, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:56:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 399ms (View: 5, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:57:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 333ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:57:36) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 271ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:57:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 334ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:59:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 269ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:59:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 338ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 00:59:50) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 269ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:01:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 361ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:01:56) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 288ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:03:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 566ms (View: 10, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:03:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 547ms (View: 6, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:03:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 379ms (View: 5, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:04:03) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 332ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:05:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 273ms (View: 1, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:06:12) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 518ms (View: 12, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:06:17) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 338ms (View: 2, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:07:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 399ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:08:19) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 396ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:08:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 334ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:08:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 272ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:09:01) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 338ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:28:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 293ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:29:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 370ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:29:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 271ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:29:17) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 348ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:31:53) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 271ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:31:58) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 350ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:34:07) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 393ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:41:03) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 291ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-14 01:41:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 362ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 09:22:56) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 386ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 12:37:59) [GET]
+
+NoMethodError (private method `scan' called for nil:NilClass):
+  app/controllers/home_controller.rb:13:in `index'
+  passenger (3.0.19) lib/phusion_passenger/rack/request_handler.rb:96:in `process_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:516:in `accept_and_process_next_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:274:in `main_loop'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:321:in `start_request_handler'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `send'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/utils.rb:470:in `safe_fork'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:270:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:180:in `start'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:149:in `start'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:219:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:132:in `lookup_or_add'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:214:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:82:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:213:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:132:in `spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) helper-scripts/passenger-spawn-server:99
+
+Rendering /home/chargecar/breathecam/public/500.html (500 Internal Server Error)
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:39:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 59ms (View: 11, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:39:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 54ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:39:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 123ms (View: 99, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:39:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:40:02) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 26ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:40:12) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 26ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:42:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:44:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 29ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 13:45:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 14:40:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 59ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 15:12:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 75ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 15:13:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 65ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 15:20:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 53ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 15:52:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 206ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 16:13:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 82ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 16:13:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 61ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 16:13:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 131ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 16:13:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 61ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 16:14:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 70ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-14 16:14:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 63ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.179.26 at 2014-01-14 17:03:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 89ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 12:02:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 441ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 12:02:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 390ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.237.204.33 at 2014-01-15 12:21:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 410ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 13:28:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 471ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 13:49:09) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 431ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:05:36) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 445ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:36:49) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 930ms (View: 12, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:36:49) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 948ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:36:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 440ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:37:01) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 436ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:37:05) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 455ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:37:16) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 442ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:37:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 512ms (View: 69, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:38:05) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 449ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:38:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 444ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:38:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 442ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:38:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 439ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:38:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 442ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:39:02) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 507ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:39:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 439ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:40:02) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 518ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:40:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 448ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:41:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 441ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:43:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 441ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:45:12) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 505ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-15 15:45:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 440ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 208.54.40.176 at 2014-01-15 20:03:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 522ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-16 00:16:19) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 636ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-16 03:05:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 608ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-16 03:06:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 678ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-16 03:06:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 680ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-16 03:06:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 609ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 11:35:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 902ms (View: 67, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 11:37:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 805ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 11:46:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 900ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 11:46:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 750ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.237.231.59 at 2014-01-16 11:48:24) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 795ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.237.229.162 at 2014-01-16 11:48:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 756ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 11:52:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 806ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:01:54) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:01:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 852ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:02:05) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:02:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 766ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:03:40) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:03:40) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:03:46) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 819ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:12:46) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 832ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:13:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 902ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:13:07) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 780ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:14:38) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 776ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:35:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 338ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:35:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 329ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:37:02) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:37:07) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 432ms (View: 8, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:41:57) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:41:58) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 12:42:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 351ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 13:44:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 335ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 14:20:38) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 14:20:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 374ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 14:29:10) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 14:29:24) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 14:29:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 379ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 14:43:22) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 14:43:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 317ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 15:16:04) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 15:16:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 405ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 15:21:13) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 15:21:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 364ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 15:21:32) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 15:21:41) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 372ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 15:22:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 361ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-16 15:24:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 364ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 15:25:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 382ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.206 at 2014-01-16 15:27:38) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.206 at 2014-01-16 15:27:48) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.206 at 2014-01-16 15:27:58) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.206 at 2014-01-16 15:28:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 463ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.237.247.149 at 2014-01-16 16:48:55) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 415ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.237.247.149 at 2014-01-16 16:50:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 413ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 16:51:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 377ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 16:51:07) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 388ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 18:47:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 427ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 18:47:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 403ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 18:47:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 402ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 18:47:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 405ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-16 18:50:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 384ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-16 21:57:33) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-16 21:57:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 398ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-17 02:13:58) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 67.165.106.17 at 2014-01-17 02:14:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 377ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 108.32.10.29 at 2014-01-17 06:20:10) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 108.32.10.29 at 2014-01-17 06:20:17) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 406ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 08:53:49) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 391ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 11:49:30) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 11:49:31) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 11:49:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 660ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 12:53:59) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 12:55:07) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 499ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 14:22:58) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 461ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 15:51:58) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 557ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 15:59:49) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 540ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 17:50:46) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 17:50:47) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 17:50:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 493ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 17:50:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 577ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 18:12:19) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 562ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 18:51:52) [GET]
+
+NoMethodError (private method `scan' called for nil:NilClass):
+  app/controllers/home_controller.rb:13:in `index'
+  passenger (3.0.19) lib/phusion_passenger/rack/request_handler.rb:96:in `process_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:516:in `accept_and_process_next_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:274:in `main_loop'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:321:in `start_request_handler'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `send'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/utils.rb:470:in `safe_fork'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:270:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:180:in `start'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:149:in `start'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:219:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:132:in `lookup_or_add'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:214:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:82:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:213:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:132:in `spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) helper-scripts/passenger-spawn-server:99
+
+Rendering /home/chargecar/breathecam/public/500.html (500 Internal Server Error)
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 18:51:53) [GET]
+
+NoMethodError (private method `scan' called for nil:NilClass):
+  app/controllers/home_controller.rb:13:in `index'
+  passenger (3.0.19) lib/phusion_passenger/rack/request_handler.rb:96:in `process_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:516:in `accept_and_process_next_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:274:in `main_loop'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:321:in `start_request_handler'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `send'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/utils.rb:470:in `safe_fork'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:270:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:180:in `start'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:149:in `start'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:219:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:132:in `lookup_or_add'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:214:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:82:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:213:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:132:in `spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) helper-scripts/passenger-spawn-server:99
+
+Rendering /home/chargecar/breathecam/public/500.html (500 Internal Server Error)
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 18:51:53) [GET]
+
+NoMethodError (private method `scan' called for nil:NilClass):
+  app/controllers/home_controller.rb:13:in `index'
+  passenger (3.0.19) lib/phusion_passenger/rack/request_handler.rb:96:in `process_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:516:in `accept_and_process_next_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:274:in `main_loop'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:321:in `start_request_handler'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `send'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/utils.rb:470:in `safe_fork'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:270:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:180:in `start'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:149:in `start'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:219:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:132:in `lookup_or_add'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:214:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:82:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:213:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:132:in `spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) helper-scripts/passenger-spawn-server:99
+
+Rendering /home/chargecar/breathecam/public/500.html (500 Internal Server Error)
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 18:51:53) [GET]
+
+NoMethodError (private method `scan' called for nil:NilClass):
+  app/controllers/home_controller.rb:13:in `index'
+  passenger (3.0.19) lib/phusion_passenger/rack/request_handler.rb:96:in `process_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:516:in `accept_and_process_next_request'
+  passenger (3.0.19) lib/phusion_passenger/abstract_request_handler.rb:274:in `main_loop'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:321:in `start_request_handler'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `send'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/utils.rb:470:in `safe_fork'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:270:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:180:in `start'
+  passenger (3.0.19) lib/phusion_passenger/classic_rails/application_spawner.rb:149:in `start'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:219:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:132:in `lookup_or_add'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:214:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:82:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:213:in `spawn_rails_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:132:in `spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/spawn_manager.rb:275:in `handle_spawn_application'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `__send__'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:357:in `server_main_loop'
+  passenger (3.0.19) lib/phusion_passenger/abstract_server.rb:206:in `start_synchronously'
+  passenger (3.0.19) helper-scripts/passenger-spawn-server:99
+
+Rendering /home/chargecar/breathecam/public/500.html (500 Internal Server Error)
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-17 18:52:35) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 26ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.206 at 2014-01-19 20:34:46) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.206 at 2014-01-19 20:34:53) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 52ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 156.39.10.22 at 2014-01-20 00:52:02) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 156.39.10.22 at 2014-01-20 00:52:10) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 156.39.10.22 at 2014-01-20 00:52:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 139ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 156.39.10.22 at 2014-01-20 00:53:41) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 156.39.10.22 at 2014-01-20 00:53:50) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 44ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 169.130.78.202 at 2014-01-21 10:58:44) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-21 12:11:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 43ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 12:55:08) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 12:55:08) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 12:55:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 53ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 12:55:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 45ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 12:55:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 32ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 12:57:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 66.249.84.146 at 2014-01-21 13:21:59) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:49:04) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:49:09) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 177ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:49:46) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 244ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:50:25) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:50:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 164ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:50:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 239ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:50:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 167ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:51:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 224ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:53:22) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:53:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 165ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:53:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 160ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-21 22:53:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 227ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 66.249.85.15 at 2014-01-21 23:21:16) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:00:55) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:01:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 233ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:01:21) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:01:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 260ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:01:55) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:01:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 178ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:02:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 243ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:02:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 238ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:02:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 178ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:14:47) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 00:14:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 243ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 01:06:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 234ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.194 at 2014-01-22 01:08:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 255ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 66.249.84.146 at 2014-01-22 01:15:19) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 66.249.85.15 at 2014-01-22 02:31:40) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-22 08:41:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 415ms (View: 8, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 12:39:03) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 12:39:04) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 12:39:10) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 848ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 12:39:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 878ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 12:40:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 825ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-23 12:41:40) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 66.249.85.15 at 2014-01-23 13:18:50) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 14:47:52) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 14:48:01) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 856ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 14:51:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1296ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 21:21:25) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 21:21:26) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 21:21:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 957ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-23 21:21:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 864ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-24 12:09:10) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 970ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-24 15:32:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 845ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-24 15:32:24) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 828ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:32:29) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-24 15:33:01) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 843ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:33:05) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:33:11) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:33:24) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:33:37) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:33:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 925ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:33:52) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:34:14) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:34:20) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:34:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 826ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:36:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 849ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:36:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 831ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:36:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1267ms (View: 4, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:36:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1265ms (View: 17, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:36:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 836ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-24 15:36:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 837ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 66.249.85.15 at 2014-01-24 16:16:28) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-24 16:28:53) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1217ms (View: 5, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 216.239.55.196 at 2014-01-24 16:28:53) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1105ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 66.249.82.191 at 2014-01-24 17:22:42) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 24.3.153.185 at 2014-01-25 13:54:53) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 24.3.153.185 at 2014-01-25 13:55:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1244ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 72.21.225.66 at 2014-01-25 15:48:54) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 72.21.225.66 at 2014-01-25 15:49:51) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1253ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 72.21.225.66 at 2014-01-25 15:56:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1303ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 12:28:34) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 12:28:34) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 12:28:49) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 2079ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 12:30:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1852ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 13:16:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1987ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 13:16:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1964ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 14:38:59) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 14:39:13) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 14:39:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 2078ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-27 14:39:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 2045ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-31 11:59:43) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-31 11:59:43) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-31 11:59:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 3560ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-31 12:51:21) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-31 12:51:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 3333ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-31 14:01:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 3354ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-01-31 14:42:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 3506ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-03 13:14:37) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-03 13:14:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 7804ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-04 15:11:34) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 2ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-04 15:11:34) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 2ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-04 15:11:43) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 1ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-04 15:11:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 10719ms (View: 7, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-04 15:43:28) [GET]
+Filter chain halted as [:authenticate] rendered_or_redirected.
+Completed in 2ms (View: 1, DB: 0) | 401 Unauthorized [http://breathecam.cmucreatelab.org/]
+
+
+Processing HomeController#index (for 128.2.134.127 at 2014-02-04 15:43:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 4782ms (View: 3, DB: 0) | 200 OK [http://breathecam.cmucreatelab.org/]

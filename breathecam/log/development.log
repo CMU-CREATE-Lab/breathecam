@@ -1,0 +1,1223 @@
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:41:57) [GET]
+
+ActionView::MissingTemplate (Missing template home/index.erb in view path app/views):
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:43:35) [GET]
+
+ActionView::MissingTemplate (Missing layout layouts/application.erb in view path app/views):
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:43:54) [GET]
+
+ActionView::MissingTemplate (Missing layout layouts/application.erb in view path app/views):
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:43:55) [GET]
+
+ActionView::MissingTemplate (Missing layout layouts/application.erb in view path app/views):
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:44:47) [GET]
+
+ActionView::MissingTemplate (Missing layout layouts/application.erb in view path app/views):
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:44:47) [GET]
+
+ActionView::MissingTemplate (Missing layout layouts/application.erb in view path app/views):
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:46:09) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 9ms (View: 7, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:46:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 2ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:46:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 3ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:47:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 61ms (View: 9, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:47:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 16ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:47:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:49:09) [GET]
+
+TypeError (can't convert String into Array):
+  app/controllers/home_controller.rb:11:in `+'
+  app/controllers/home_controller.rb:11:in `index'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (29.0ms)
+Rendered rescues/_request_and_response (1.0ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:49:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:53:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 72ms (View: 5, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:53:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 15ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:54:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 41ms (View: 30, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:54:17) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 13ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:54:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 16ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:55:05) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 16ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:55:10) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 19ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:55:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 19ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:55:12) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:55:46) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:55:51) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 15ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:02) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 13ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:16) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:24) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:35) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:35) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:56:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 48ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:57:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 16ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:57:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 13ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:57:39) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:57:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:03) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:05) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 17ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:05) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:06) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 16ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:06) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 36ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:06) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:08) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:09) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:09) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 20ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:10) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:12) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:16) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 36ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:17) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:17) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:18) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:19) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 13ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:19) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 14ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 57ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:24) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:24) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:28) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 13ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:32) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:33) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 37ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:35) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:58:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:59:23) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 20ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:59:24) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 31ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:59:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 25ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 17:59:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:00:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 16ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 12ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:11) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 13ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 25ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:27) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 23ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 24ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 24ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:31) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 23ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 24ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 23ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:36) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 23ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 23ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:01:48) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 39ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:04:40) [GET]
+
+TypeError (can't convert Fixnum into Array):
+  app/controllers/home_controller.rb:11:in `-'
+  app/controllers/home_controller.rb:11:in `index'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (20.0ms)
+Rendered rescues/_request_and_response (0.0ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:17) [GET]
+
+NoMethodError (undefined method `to_i' for ["1389395101"]:Array):
+  app/controllers/home_controller.rb:11:in `index'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (20.0ms)
+Rendered rescues/_request_and_response (0.0ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:28) [GET]
+
+TypeError (String can't be coerced into Bignum):
+  app/controllers/home_controller.rb:13:in `+'
+  app/controllers/home_controller.rb:13:in `index'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  C:/Ruby/Ruby187/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (51.0ms)
+Rendered rescues/_request_and_response (0.0ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:38) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 20ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:40) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:45) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:05:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:06:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 30ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:07:50) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 55ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:08:38) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 32ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:08:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 20ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:08:44) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 29ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:08:49) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 19ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:08:53) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 19ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:08:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 28ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:09:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:09:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 20ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:10:15) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 55ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:10:43) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 30ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:10:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 31ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:11:10) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 29ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:11:14) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 20ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:11:20) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 29ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:11:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 28ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:11:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 19ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:11:42) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 51ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:12:19) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 1816ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:20:03) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 55ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:20:21) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 31ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:23:13) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 33ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:23:30) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 24ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:23:37) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 33ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:23:47) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 59ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:24:07) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 29ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:24:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 22ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:24:46) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 23ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:24:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 30ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:24:53) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 30ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:24:56) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 30ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:25:00) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 22ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:25:04) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 21ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:25:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 33ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:25:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 22ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:25:34) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 31ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:25:36) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 22ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:25:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 33ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:19) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 34ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:22) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 21ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:26) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 22ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:29) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 36ms (View: 5, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:51) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 45ms (View: 10, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:52) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 33ms (View: 4, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 30ms (View: 3, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:54) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 27ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:56) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 21ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:57) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 22ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:27:59) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 30ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing HomeController#index (for 127.0.0.1 at 2014-01-10 18:28:25) [GET]
+Rendering template within layouts/application
+Rendering home/index
+Completed in 71ms (View: 4, DB: 0) | 200 OK [http://localhost/]

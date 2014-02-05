@@ -1,0 +1,104 @@
+<% content_for :head do %>
+
+  <%= javascript_include_tag "http://code.jquery.com/jquery-1.10.2.min.js",
+                             "http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.timemachine/js/org/gigapan/postmessage.js"
+  %>
+
+  <style type="text/css">
+    .lens-img {
+      -webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
+      -moz-transform: rotate(180deg);        /* FF */
+      -o-transform: rotate(180deg);          /* Opera */
+      -ms-transform: rotate(180deg);         /* IE9+ */
+      filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1); /* IE 8 and below */
+    }
+  </style>
+
+  <script>
+    var count = 0;
+
+    // Run on page ready
+    $(function() {
+      // If the user is already at the page and happens to
+      // do a hash param to change the view, handle this.
+      $(window).bind('hashchange', function () {
+        setShareView();
+      });
+      $("#time_machine_frame").load(function (){
+        setShareView();
+      });
+    });
+
+    // Grab the hash from the parent URL and send the relevant share portion to the iframe
+    function setShareView() {
+      var hash = window.location.hash.slice(1);
+      var hashVars = unpackVars(hash);
+      if (hashVars && hashVars.v && hashVars.t) {
+        post("timemachine-set-share-view", hashVars);
+      }
+    }
+
+    // Unpack the URL hash into an obj of keys and values
+    function unpackVars(str) {
+      var keyvals = str.split('&');
+      var vars = {};
+
+      if (keyvals.length == 1 && keyvals[0] == "") return null;
+
+      for (var i = 0; i < keyvals.length; i++) {
+        var keyval = keyvals[i].split('=');
+        vars[keyval[0]] = keyval[1];
+      }
+      return vars;
+    }
+
+    // Handles the sending of requests to the currently embedded time machine
+    function post(type,data) {
+      pm({
+        target: window.frames["time_machine_frame"],
+        type: type,
+        data: data,
+        url: "http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.timemachine/view.html", // needed for hash fallback in older browsers
+        origin: "http://g7.gigapan.org"
+      });
+    }
+
+    function resizeImg(img, width, height) {
+      maxHeight = 2752;
+      maxWidth = 3648;
+      if (width > maxWidth) width = maxWidth;
+      img.width = width;
+      count++
+      if (count == 4) {
+        document.getElementById("loading").style.display = 'none';
+        document.getElementById("images").style.visibility = 'visible';
+        count = 0;
+      }
+    }
+  </script>
+<% end %>
+
+<b>Note: WIP - no alignment, equalized brightness/color, etc yet.</b>
+<br/><br/>
+
+<div id="loading">
+  <img src="images/loading.gif">
+</div>
+<div id="images" style="visibility:hidden">
+  <table id="img-table" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><img class="lens-img" src="<%= @img_path %><%= @img1 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
+      <td><img class="lens-img" src="<%= @img_path %><%= @img2 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
+      <td><img class="lens-img" src="<%= @img_path %><%= @img3 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
+      <td><img class="lens-img" src="<%= @img_path %><%= @img4 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
+    </tr>
+  </table>
+
+  Recent as of: <%= @pretty_time %>
+</div>
+
+<br/><br/>
+<iframe name="time_machine_frame" id="time_machine_frame" src="http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.timemachine/view.html" width="835" height="530" frameborder="0"></iframe>
+<br/>
+Recent as of: 01/11/2014
+<br/><br/><br/>
