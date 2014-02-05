@@ -13,7 +13,7 @@ class HomeController < ApplicationController
     lastTime = imageArray.last.scan(/^\d*/)[0].to_i
     useTime = lastTime
     count = imageArray.length - 1
-    # Since we may be currently pulling images and thus not all images are present, always show the one befor the current pull
+    # Since we may be currently pulling images and thus not all images are present, always show the one before the current pull
     while (useTime == lastTime)
       count = count - 1
       useTime = imageArray[count].scan(/^\d*/)[0].to_i
