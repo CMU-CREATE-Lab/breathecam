@@ -15,6 +15,7 @@ $jpegtran_path = $RUNNING_WINDOWS ? "jpegtran.exe" : "jpegtran"
 $nona_path = $RUNNING_WINDOWS ? "nona.exe" : "nona"
 $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "enblend"
 $valid_image_extensions = [".jpg", ".lnk"]
+$default_num_jobs = "4"
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -40,10 +41,19 @@ class Compiler
       usage
     end
 
-    unless $output_path
+    unless $master_alignment_file
       puts "Hugin alignment file not provided."
       usage
     end
+
+    while !ARGV.empty?
+      arg = ARGV.shift
+      if arg == "-j"
+        $num_jobs = ARGV.shift
+      end
+    end
+
+    $num_jobs ||= $default_num_jobs
 
     # Clean up paths if coming from Windows
     $input_path = $input_path.tr('\\', "/").chomp("/")
@@ -136,18 +146,25 @@ class Compiler
       end
       begin
         system("#{$nona_path} -o temp #{%Q{"#{$master_alignment_file}"}} #{%Q{"#{parent_path}/#{date}_image1.jpg"}} #{%Q{"#{parent_path}/#{date}_image2.jpg"}} #{%Q{"#{parent_path}/#{date}_image3.jpg"}} #{%Q{"#{parent_path}/#{date}_image4.jpg"}}")
-        system("#{$enblend_path} -o #{%Q{"#{$stitched_images_path}/#{date}_full.jpg"}} temp0000.tif temp0001.tif temp0002.tif temp0003.tif")
+        system("#{$enblend_path} --no-optimize --compression=100 --fine-mask -o #{%Q{"#{$stitched_images_path}/#{date}_full.jpg"}} temp0000.tif temp0001.tif temp0002.tif temp0003.tif")
         match_count += 1
       rescue
 
       end
     end
     puts "Stitching complete. Stitched #{match_count} out of #{count} possible frames."
+
+    create_tm
+  end
+
+  def create_tm
+    puts "Creating time machine..."
+    system("ruby /home/pdille/tmca/ct/ct.rb #{File.dirname($input_path)} #{$output_path} -j #{$num_jobs}")
   end
 
   def usage
-    puts "Usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE"
-    return
+    puts "Usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE"
+    exit
   end
 
 end

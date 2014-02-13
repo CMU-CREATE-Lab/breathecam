@@ -26,6 +26,7 @@ $config = "res=full&x0=0&y0=0&x1=3648&y1=2752&quality=21&doublescan=0"
 
 loan_camera_lense_order = ["4","2","1","3"]
 camera3_lense_order = ["1","3","4","2"]
+camera4_lense_order = ["1","3","4","2"]
 
 $current_camera = camera3_lense_order
 
