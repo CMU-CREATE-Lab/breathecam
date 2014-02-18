@@ -1,10 +1,11 @@
 class HomeController < ApplicationController
   require "open-uri"
+  require "date"
 
   layout 'application'
 
   def index
-    @img_path = "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam/heinz/050-original-images/"
+    @img_path = "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam/heinz/050-original-images/#{Date.today.to_s}/"
     imageArray = []
     open(@img_path) {|html|
       imageArray = html.read.scan(/\d*_image\d.jpg/)
