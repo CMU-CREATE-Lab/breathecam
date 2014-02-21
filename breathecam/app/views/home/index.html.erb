@@ -47,8 +47,8 @@
   </style>
 
   <script>
-    var count = 0;
     jQuery.support.cors = true;
+    var count = 0;
     var breatheCamJSON = {};
     var initialDataset;
 
@@ -143,6 +143,7 @@
         document.getElementById("loading").style.display = 'none';
         document.getElementById("images").style.visibility = 'visible';
         count = 0;
+        $("#timelapse_feed").css("top", $(".lens-img").height() + 30);
       }
     }
   </script>
@@ -155,17 +156,17 @@
   <div id="images" style="visibility:hidden">
     <table id="img-table" cellspacing="0" cellpadding="0">
       <tr>
-        <td><img class="lens-img" src="<%= @img_path %><%= @img1 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
-        <td><img class="lens-img" src="<%= @img_path %><%= @img2 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
-        <td><img class="lens-img" src="<%= @img_path %><%= @img3 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
-        <td><img class="lens-img" src="<%= @img_path %><%= @img4 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img1 %>.jpg" onload="resizeImg(this, screen.width/4 - 7, null);"></td>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img2 %>.jpg" onload="resizeImg(this, screen.width/4 - 7, null);"></td>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img3 %>.jpg" onload="resizeImg(this, screen.width/4 - 7, null);"></td>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img4 %>.jpg" onload="resizeImg(this, screen.width/4 - 7, null);"></td>
       </tr>
     </table>
     <span id="image_feed_timestamp" style="position: absolute; top: 10px; left: 10px; color: white"><%= @pretty_time %></span>
   </div>
 </div>
 
-<div id="timelapse_feed" style="position: absolute; top: 390px; left: 10px;">
+<div id="timelapse_feed" style="position: absolute; top: 390px; left: 10px; padding-bottom: 650px">
   <div id="player1" style="position: absolute; top: 10px;"></div>
   <div id="datepicker" style="position: absolute; top: 10px; left: 1090px;"></div>
   <p style="position: absolute; top: 200px; left:1090px; width: 225px; font-size: 12px">Click a date to go to that timelapse.</p>
