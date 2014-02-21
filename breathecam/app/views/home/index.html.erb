@@ -1,10 +1,42 @@
 <% content_for :head do %>
 
-  <%= javascript_include_tag "http://code.jquery.com/jquery-1.10.2.min.js",
-                             "http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.timemachine/js/org/gigapan/postmessage.js"
+  <%= stylesheet_link_tag    "/timemachine-explorer/css/timelapse.css",
+                             "/timemachine-explorer/css/snaplapse.css",
+                             "/timemachine-explorer/css/jquery-ui/smoothness/jquery-ui.custom.css",
+                             "/timemachine-explorer/css/player.css",
+                             "/timemachine-explorer/css/visualizer.css",
+                             "/timemachine-explorer/css/annotator.css"
+  %>
+
+  <%= javascript_include_tag "/timemachine-explorer/js/jquery/jquery.min.js",
+                             "/timemachine-explorer/js/jquery/jquery-ui.custom.min.js",
+                             "/timemachine-explorer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
+                             "/timemachine-explorer/js/jquery/plugins/carousel/jcarousellite.min.js",
+                             "/timemachine-explorer/js/kinetic/kinetic.min.js",
+                             "/timemachine-explorer/js/org/gigapan/util.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/videoset.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/timelapse.js",
+                             "/timemachine-explorer/js/Math.uuid.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/snaplapse.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/snaplapseViewer.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/mercator.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/visualizer.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/annotator.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/defaultUI.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/urlEncoder.js",
+                             "/timemachine-explorer/js/org/gigapan/timelapse/crossdomain_api.js",
+                             "/timemachine-explorer/template_includes.js"
   %>
 
   <style type="text/css">
+    #datepicker { font-size: 10px;}
+    #datepicker .ui-state-default { background: white; }
+    #datepicker .date-highlight a { background: rgb(240, 240, 240); }
+    #datepicker .ui-state-active { border: 1px solid #000000; }
+    .ui-datepicker-today a.ui-state-highlight {
+      border-color: #d3d3d3;
+      color: #555555;
+    }
     .lens-img {
       -webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
       -moz-transform: rotate(180deg);        /* FF */
@@ -16,29 +48,25 @@
 
   <script>
     var count = 0;
+    jQuery.support.cors = true;
+    var breatheCamJSON = {};
+    var initialDataset;
 
-    // Run on page ready
-    $(function() {
-      // If the user is already at the page and happens to
-      // do a hash param to change the view, handle this.
-      $(window).bind('hashchange', function () {
-        setShareView();
-      });
-      $("#time_machine_frame").load(function (){
-        setShareView();
-      });
-    });
+    function tm_init() {
 
-    // Grab the hash from the parent URL and send the relevant share portion to the iframe
-    function setShareView() {
-      var hash = window.location.hash.slice(1);
-      var hashVars = unpackVars(hash);
-      if (hashVars && hashVars.v && hashVars.t) {
-        post("timemachine-set-share-view", hashVars);
-      }
+      var viewerOptions = {
+        url: initialDataset,
+        disableTourLooping: true,
+        mediaType: ".mp4",
+        showFullScreenBtn: false,
+        showLogoOnDefaultUI: false
+      };
+
+      timelapse = new org.gigapan.timelapse.Timelapse("player1", viewerOptions);
     }
 
-    // Unpack the URL hash into an obj of keys and values
+    function onTimeMachinePlayerReady(viewerDivId) { }
+
     function unpackVars(str) {
       var keyvals = str.split('&');
       var vars = {};
@@ -52,23 +80,65 @@
       return vars;
     }
 
-    // Handles the sending of requests to the currently embedded time machine
-    function post(type,data) {
-      pm({
-        target: window.frames["time_machine_frame"],
-        type: type,
-        data: data,
-        url: "http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.timemachine/view.html", // needed for hash fallback in older browsers
-        origin: "http://g7.gigapan.org"
-      });
+    function highlightDays(date) {
+      date = $.datepicker.formatDate('yy-mm-dd', date);
+      if (breatheCamJSON.datasets[date])
+        return [true, 'date-highlight'];
+      else
+        return [false, ''];
     }
 
+    function selectDay(dateText, dateElem) {
+      var date = $.datepicker.formatDate('yy-mm-dd', new Date(dateText));
+      var path = breatheCamJSON.datasets[date];
+      if (typeof(timelapse) !== "undefined" && timelapse && path)
+        timelapse.loadTimelapse(path);
+    }
+
+    $(function() {
+      $.ajax({
+        dataType: 'json',
+        url: "http://g7.gigapan.org/timemachines/breathecam/heinz/breathecam.json",
+        success: function(data) {
+          if (data) {
+            breatheCamJSON = data;
+
+            initialDataset = breatheCamJSON.latest.path;
+            var startingDate = breatheCamJSON.latest.date;
+
+            var hash = window.location.hash.slice(1);
+            var hashVars = unpackVars(hash);
+
+            if (hashVars && hashVars.d) {
+              startingDate = hashVars.d;
+              initialDataset = initialDataset.replace(/\d\d\d\d-\d\d-\d\d/, hashVars.d);
+            }
+
+            tm_init();
+
+            var dateArray = startingDate.split("-");
+            $("#datepicker").datepicker({
+              defaultDate : new Date(dateArray[0], dateArray[1] - 1, dateArray[2]),
+              minDate : new Date(2014, 0),
+              onSelect : selectDay,
+              beforeShowDay : highlightDays
+            });
+
+          }
+        },
+        error: function() {
+          console.log("Error fetching breathecam.json");
+          $("#timelapse_feed").hide();
+        }
+      });
+    });
+
     function resizeImg(img, width, height) {
-      maxHeight = 2752;
-      maxWidth = 3648;
+      var maxHeight = 2752;
+      var maxWidth = 3648;
       if (width > maxWidth) width = maxWidth;
       img.width = width;
-      count++
+      count++;
       if (count == 4) {
         document.getElementById("loading").style.display = 'none';
         document.getElementById("images").style.visibility = 'visible';
@@ -78,27 +148,25 @@
   </script>
 <% end %>
 
-<b>Note: WIP - no alignment, equalized brightness/color, etc yet.</b>
-<br/><br/>
-
-<div id="loading">
-  <img src="images/loading.gif">
-</div>
-<div id="images" style="visibility:hidden">
-  <table id="img-table" cellspacing="0" cellpadding="0">
-    <tr>
-      <td><img class="lens-img" src="<%= @img_path %><%= @img1 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
-      <td><img class="lens-img" src="<%= @img_path %><%= @img2 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
-      <td><img class="lens-img" src="<%= @img_path %><%= @img3 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
-      <td><img class="lens-img" src="<%= @img_path %><%= @img4 %>.jpg" onload="resizeImg(this, screen.width/4 - 6, null);"></td>
-    </tr>
-  </table>
-
-  Recent as of: <%= @pretty_time %>
+<div id="image_feed" style="position: absolute; top: 10px; left: 10px;">
+  <div id="loading">
+    <img src="images/loading.gif">
+  </div>
+  <div id="images" style="visibility:hidden">
+    <table id="img-table" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img1 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img2 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img3 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
+        <td><img class="lens-img" src="<%= @img_path %><%= @img4 %>.jpg" onload="resizeImg(this, screen.width/4 - 5, null);"></td>
+      </tr>
+    </table>
+    <span id="image_feed_timestamp" style="position: absolute; top: 10px; left: 10px; color: white"><%= @pretty_time %></span>
+  </div>
 </div>
 
-<br/><br/>
-<iframe name="time_machine_frame" id="time_machine_frame" src="http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.timemachine/view.html" width="835" height="530" frameborder="0"></iframe>
-<br/>
-Recent as of: 01/11/2014
-<br/><br/><br/>
+<div id="timelapse_feed" style="position: absolute; top: 390px; left: 10px;">
+  <div id="player1" style="position: absolute; top: 10px;"></div>
+  <div id="datepicker" style="position: absolute; top: 10px; left: 1090px;"></div>
+  <p style="position: absolute; top: 200px; left:1090px; width: 225px; font-size: 12px">Click a date to go to that timelapse.</p>
+</div>
