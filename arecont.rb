@@ -1,9 +1,14 @@
 #!/usr/bin/env ruby2.0
 
 require "open-uri"
+require "date"
+require "fileutils"
 
-# Make sure only one instance of this script runs
-cmd = (`ps aux | grep arecont | grep -v -E '(grep|sh|nano)'`)
+$host = ARGV[0] || "http://192.168.4.13"
+$output_dir = ARGV[1] || "./"
+
+# Make sure only one instance of this script with a specific host is run
+cmd = (`ps aux | grep "arecont.*#{$host} " | grep -v -E '(grep|sh|nano)'`)
 num_instances = []
 
 # Backwards compatibility with Ruby 1.8
@@ -16,9 +21,6 @@ end
 if num_instances.length > 1
   exit()
 end
-
-$host = ARGV[0] || "http://97.107.172.118"
-$output_dir = ARGV[1] || "/usr0/web/timemachines/breathecam/heinz/050-original-images"
 
 $username = "admin"
 $password = "illah123"

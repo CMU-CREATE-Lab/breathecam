@@ -28,7 +28,6 @@ $thread_pool = nil
 $rsync_input = false
 $rsync_output = false
 $tmp_output_path = nil
-$working_dir = File.join(File.dirname(__FILE__), 'breathecam.tmc')
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -38,6 +37,11 @@ class Compiler
   def initialize(args)
     if args.length < 4
       usage
+    end
+
+    if File.exists?(File.join("#{$camera_location}","WIP"))
+      puts "A file called 'WIP' was detected, which indicates that this working directory is already in the middle of processing."
+      exit
     end
 
     $input_path = ARGV[0]
@@ -64,6 +68,8 @@ class Compiler
       puts "Camera location (e.g. heinz) not provided"
       usage
     end
+
+    $working_dir = File.join(File.dirname(__FILE__), "#{$camera_location}.tmc")
 
     while !ARGV.empty?
       arg = ARGV.shift
@@ -97,6 +103,8 @@ class Compiler
     $thread_pool = Pool.new($num_jobs)
     at_exit { $thread_pool.shutdown }
 
+    FileUtils.mkdir_p($working_dir)
+    FileUtils.touch(File.join($working_dir,"WIP"))
     clear_working_dir
     $rsync_input ? rsync_source_images : organize_images
   end
@@ -242,8 +250,11 @@ class Compiler
     system("ct.rb #{$working_dir} #{tmp_output_path}/#{$current_day}.timemachine -j #{$num_jobs}")
     puts "Time Machine created."
     add_entry_to_json
-    rsync_output_files if $rsync_output
-    puts "Process Finished."
+    if $rsync_output
+      rsync_output_files
+    else
+      completed_process
+    end
   end
 
   def add_entry_to_json
@@ -267,6 +278,12 @@ class Compiler
     puts "Rsyncing #{$current_day}.timemachine and breathecam.json to #{$output_path}"
     system("rsync -a #{$working_dir}/#{$current_day}.timemachine #{$output_path}")
     system("rsync -a #{$working_dir}/breathecam.json #{$output_path}")
+    completed_process
+  end
+
+  def completed_process
+    puts "Process Finished."
+    FileUtils.rm(File.join($working_dir,"WIP"))
   end
 
   def usage
