@@ -259,7 +259,7 @@ class Compiler
 
   def add_entry_to_json
     json = {}
-    path_to_json = "#{$working_dir}/breathecam.json"
+    path_to_json = "#{$working_dir}/#{$camera_location}.json"
     if File.exists?(path_to_json)
       json = open(path_to_json) {|fh| JSON.load(fh)}
     else
@@ -271,13 +271,13 @@ class Compiler
     json["latest"]["path"] = "http://g7.gigapan.org/timemachines/breathecam/#{$camera_location}/#{$current_day}.timemachine";
     json["datasets"]["#{$current_day}"] = "http://g7.gigapan.org/timemachines/breathecam/#{$camera_location}/#{$current_day}.timemachine"
     open(path_to_json, "wb") {|fh| fh.puts(JSON.generate(json))}
-    puts "Successfully wrote breathecam.json"
+    puts "Successfully wrote #{$camera_location}.json"
   end
 
   def rsync_output_files
-    puts "Rsyncing #{$current_day}.timemachine and breathecam.json to #{$output_path}"
+    puts "Rsyncing #{$current_day}.timemachine and #{$camera_location}.json to #{$output_path}"
     system("rsync -a #{$working_dir}/#{$current_day}.timemachine #{$output_path}")
-    system("rsync -a #{$working_dir}/breathecam.json #{$output_path}")
+    system("rsync -a #{$working_dir}/#{$camera_location}.json #{$output_path}")
     completed_process
   end
 
