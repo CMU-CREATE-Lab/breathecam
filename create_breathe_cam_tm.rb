@@ -282,8 +282,8 @@ class Compiler
   end
 
   def completed_process
-    puts "Process Finished."
     FileUtils.rm(File.join($working_dir,"WIP"))
+    puts "Process Finished."
   end
 
   def usage
