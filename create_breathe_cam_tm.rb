@@ -136,8 +136,37 @@ class Compiler
 
     FileUtils.mkdir_p($working_dir)
     FileUtils.touch(File.join($working_dir,"WIP"))
+    calculate_rsync_input_range if $do_incremental_update
     clear_working_dir
     $rsync_input ? rsync_source_images : organize_images
+  end
+
+  def calculate_rsync_input_range
+    $start_time = {}
+    $start_time["hour"] = $end_time["hour"]
+    $start_time["minute"] = $end_time["minute"] - $incremental_update_interval
+    if $start_time["minute"] < 0
+      hour_diff = ($start_time["minute"].abs / 60.0).ceil
+      $start_time["hour"] = $end_time["hour"] - hour_diff
+      $start_time["minute"] = (60 * hour_diff) - $start_time["minute"].abs
+      if $start_time["hour"] < 0
+        video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
+        day_diff = ($start_time["hour"] / 24.0).abs.ceil
+        tmp_current_day = $current_day
+        tmp_current_day -= day_diff
+        # If we need to backtrack the day.
+        if video_sets.first.include?(tmp_current_day)
+          $current_day = tmp_current_day
+          $start_time["hour"] = 24 - hour_diff
+        else
+          # We just started incremental updating (with no other set from the current date)
+          # and the update interval lands us on the current time. So, start and end times match
+          # and in the end we will not be pulling images until the next interval.
+          $start_time["hour"] = $end_time["hour"]
+          $start_time["minute"] = $end_time["minute"]
+        end
+      end
+    end
   end
 
   def clear_working_dir
@@ -188,24 +217,7 @@ class Compiler
       args = $input_path.split(":")
       host = args[0]
       src_path = args[1]
-
-      start_time = {}
-      start_time["hour"] = $end_time["hour"]
-      start_time["minute"] = $end_time["minute"] - $incremental_update_interval
-      if start_time["minute"] < 0
-        hour_diff = (start_time["minute"].abs / 60.0).ceil
-        start_time["hour"] = $end_time["hour"] - hour_diff
-        start_time["minute"] = (60 * hour_diff) - start_time["minute"].abs
-        # TODO:
-        # We cap to the current day, even if $incremental_update_interval
-        # exceeds the current day.
-        if start_time["hour"] < 0
-          start_time["hour"] = 0
-          start_time["minute"] = 0
-        end
-      end
-
-      system("ssh #{host} \"find #{src_path} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % start_time['hour']}:#{'%02d' % start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:00' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
+      system("ssh #{host} \"find #{src_path} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:00' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
       system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{$input_path}/#{$current_day}/ #{new_input_path}")
     else
       # Else grab the entire day of images

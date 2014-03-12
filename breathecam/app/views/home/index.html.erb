@@ -1,31 +1,31 @@
 <% content_for :head do %>
 
-  <%= stylesheet_link_tag    "/timemachine-explorer/css/timelapse.css",
-                             "/timemachine-explorer/css/snaplapse.css",
-                             "/timemachine-explorer/css/jquery-ui/smoothness/jquery-ui.custom.css",
-                             "/timemachine-explorer/css/player.css",
-                             "/timemachine-explorer/css/visualizer.css",
-                             "/timemachine-explorer/css/annotator.css"
+  <%= stylesheet_link_tag    "/time-machine-explorer/css/timelapse.css",
+                             "/time-machine-explorer/css/snaplapse.css",
+                             "/time-machine-explorer/css/jquery-ui/smoothness/jquery-ui.custom.css",
+                             "/time-machine-explorer/css/player.css",
+                             "/time-machine-explorer/css/visualizer.css",
+                             "/time-machine-explorer/css/annotator.css"
   %>
 
-  <%= javascript_include_tag "/timemachine-explorer/js/jquery/jquery.min.js",
-                             "/timemachine-explorer/js/jquery/jquery-ui.custom.min.js",
-                             "/timemachine-explorer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
-                             "/timemachine-explorer/js/jquery/plugins/carousel/jcarousellite.min.js",
-                             "/timemachine-explorer/js/kinetic/kinetic.min.js",
-                             "/timemachine-explorer/js/org/gigapan/util.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/videoset.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/timelapse.js",
-                             "/timemachine-explorer/js/Math.uuid.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/snaplapse.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/snaplapseViewer.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/mercator.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/visualizer.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/annotator.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/defaultUI.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/urlEncoder.js",
-                             "/timemachine-explorer/js/org/gigapan/timelapse/crossdomain_api.js",
-                             "/timemachine-explorer/template_includes.js"
+  <%= javascript_include_tag "/time-machine-explorer/js/jquery/jquery.min.js",
+                             "/time-machine-explorer/js/jquery/jquery-ui.custom.min.js",
+                             "/time-machine-explorer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
+                             "/time-machine-explorer/js/jquery/plugins/carousel/jcarousellite.min.js",
+                             "/time-machine-explorer/js/kinetic/kinetic.min.js",
+                             "/time-machine-explorer/js/org/gigapan/util.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/videoset.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/timelapse.js",
+                             "/time-machine-explorer/js/Math.uuid.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/snaplapse.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/snaplapseViewer.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/mercator.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/visualizer.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/annotator.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/defaultUI.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/urlEncoder.js",
+                             "/time-machine-explorer/js/org/gigapan/timelapse/crossdomain_api.js",
+                             "/time-machine-explorer/template_includes.js"
   %>
 
   <style type="text/css">
@@ -98,7 +98,7 @@
     $(function() {
       $.ajax({
         dataType: 'json',
-        url: "http://g7.gigapan.org/timemachines/breathecam/heinz/breathecam.json",
+        url: "http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.json",
         success: function(data) {
           if (data) {
             breatheCamJSON = data;
@@ -123,11 +123,11 @@
               onSelect : selectDay,
               beforeShowDay : highlightDays
             });
-
+            $("#datepicker").append("<p style='font-size: 12px'>Click a date to go to that timelapse.</p>");
           }
         },
         error: function() {
-          console.log("Error fetching breathecam.json");
+          console.log("Error fetching heinz.json");
           $("#timelapse_feed").hide();
         }
       });
@@ -169,5 +169,4 @@
 <div id="timelapse_feed" style="position: absolute; top: 390px; left: 10px; padding-bottom: 650px">
   <div id="player1" style="position: absolute; top: 10px;"></div>
   <div id="datepicker" style="position: absolute; top: 10px; left: 1090px;"></div>
-  <p style="position: absolute; top: 200px; left:1090px; width: 225px; font-size: 12px">Click a date to go to that timelapse.</p>
 </div>
