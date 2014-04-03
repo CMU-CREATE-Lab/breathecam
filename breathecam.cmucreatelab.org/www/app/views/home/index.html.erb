@@ -1,0 +1,202 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag    "/timemachine-viewer/css/snaplapse.css",
+                             "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
+                             "/timemachine-viewer/css/player.css",
+                             "zoomify-bundle.css"
+  %>
+
+  <%= javascript_include_tag "/timemachine-viewer/js/jquery/jquery.min.js",
+                             "/timemachine-viewer/js/jquery/jquery-ui.custom.min.js",
+                             "/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
+                             "/timemachine-viewer/js/org/gigapan/util.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/videoset.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/parabolicMotion.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/timelapse.js",
+                             "/timemachine-viewer/js/Math.uuid.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/snaplapse.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/snaplapseViewer.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/defaultUI.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/urlEncoder.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/crossdomain_api.js",
+                             "/timemachine-viewer/template_includes.js",
+                             "http://g7.gigapan.org/timemachines/breathecam/heinz/heinz.js",
+                             "zoomify-bundle.js"  %>
+
+  <style type="text/css">
+    #datepicker { font-size: 10px;}
+    #datepicker .ui-state-default { background: white; }
+    #datepicker .date-highlight a { background: rgb(240, 240, 240); }
+    #datepicker .ui-state-active { border: 1px solid #000000; }
+    .ui-datepicker-today a.ui-state-highlight {
+      border-color: #d3d3d3;
+      color: #555555;
+    }
+  </style>
+
+  <script>
+    jQuery.support.cors = true;
+    var initialDataset;
+    var zoomify;
+
+    function selectTimelapseFeed() {
+      $("#image-zoom-wrapper").css("visibility","hidden");
+      $("#image-zoom").css("visibility","hidden");
+      $("#timelapse_feed").show();
+      $("#feed_title").text("Timelapse");
+      $("#show_timelapse_feed .feed_overlay").hide();
+      $("#show_image_feed .feed_overlay").show();
+    }
+
+    function selectImageFeed() {
+      $("#image-zoom-wrapper").css("visibility","visible");
+      $("#image-zoom").css("visibility","visible");
+      $("#timelapse_feed").hide();
+      $("#feed_title").text("Live");
+      $("#show_image_feed .feed_overlay").hide();
+      $("#show_timelapse_feed .feed_overlay").show();
+    }
+
+    function tm_init() {
+      $("#show_timelapse_feed .feed_overlay").hide();
+      $("#show_image_feed .feed_overlay").show();
+
+      var viewerOptions = {
+        url: initialDataset,
+        disableTourLooping: true,
+        mediaType: ".mp4",
+        showFullScreenBtn: false,
+        showLogoOnDefaultUI: false
+      };
+
+      timelapse = new org.gigapan.timelapse.Timelapse("player1", viewerOptions);
+    }
+
+    function onTimeMachinePlayerReady(viewerDivId) {
+      showContent();
+    }
+
+    function showContent() {
+      $("#loading").hide();
+      $("#content").css("visibility", "visible");
+    }
+
+    function unpackVars(str) {
+      var keyvals = str.split('&');
+      var vars = {};
+
+      if (keyvals.length == 1 && keyvals[0] === "") return null;
+
+      for (var i = 0; i < keyvals.length; i++) {
+        var keyval = keyvals[i].split('=');
+        vars[keyval[0]] = keyval[1];
+      }
+      return vars;
+    }
+
+    function highlightDays(date) {
+      date = $.datepicker.formatDate('yy-mm-dd', date);
+      if (cached_breathecam.datasets[date])
+        return [true, 'date-highlight'];
+      else
+        return [false, ''];
+    }
+
+    function selectDay(dateText, dateElem) {
+      var date = $.datepicker.formatDate('yy-mm-dd', new Date(dateText));
+      var path = cached_breathecam.datasets[date];
+      if (typeof(timelapse) !== "undefined" && timelapse && path)
+        timelapse.loadTimelapse(path);
+    }
+
+    $(function() {
+      zoomify = new org.gigapan.zoomify();
+      var timelapseSupported = org.gigapan.Util.browserSupported();
+      var stitchedImage = "<%= @stitched_image %>";
+      var error_text = "";
+      if ((!timelapseSupported || typeof (cached_breathecam) === "undefined") && stitchedImage === "") {
+        // Nothing is up. Inform the user
+        $("#loading").html("<div class='error_msg2'>Content currently unavailable. Please try again later.</div>");
+        return;
+      } else if (timelapseSupported && stitchedImage === "") {
+        var $image_feed_button = $("#show_image_feed");
+        error_text = "";
+        error_text = "Temporarily unavailable. <br> Please try again later.";
+        $image_feed_button.html($image_feed_button.html() + "<br/><span class='error_msg'>"+ error_text + "</span>");
+        $image_feed_button.off();
+        $("#show_image_feed .feed_overlay").addClass("disabled");
+        selectTimelapseFeed();
+      } else if (!timelapseSupported || typeof (cached_breathecam) === "undefined") {
+        var $timelapse_feed_button = $("#show_timelapse_feed");
+        error_text = "";
+        if (typeof (cached_breathecam) === "undefined")
+          error_text = "Temporarily unavailable. <br> Please try again later.";
+        else
+          error_text = "Your browser or device is not compatible.<br/> Try updating your browser to the latest version.";
+        $timelapse_feed_button.html($timelapse_feed_button.html() + "<br/><span class='error_msg'>"+ error_text + "</span>");
+        $timelapse_feed_button.off();
+        $("#show_timelapse_feed .feed_overlay").addClass("disabled");
+        selectImageFeed();
+        showContent();
+        return;
+      }
+
+      initialDataset = cached_breathecam.latest.path;
+      var startingDate = cached_breathecam.latest.date;
+
+      var hash = window.location.hash.slice(1);
+      var hashVars = unpackVars(hash);
+
+      if (hashVars && hashVars.d) {
+        startingDate = hashVars.d;
+        initialDataset = initialDataset.replace(/\d\d\d\d-\d\d-\d\d/, hashVars.d);
+      }
+
+      tm_init();
+      $('<style type="text/css">.closedHand {cursor: url("./css/cursors/closedhand.cur"), move !important;} .openHand {cursor: url("./css/cursors/openhand.cur"), move !important;} .tiledContentHolder {cursor: url("./css/cursors/openhand.cur"), move;}</style>').appendTo($('head'));
+
+      $("#image-zoom").bind("mouseover mouseup", function() {
+        $(this).removeClass("openHand closedHand").addClass("openHand");
+      }).bind("mousedown", function() {
+        $(this).removeClass("openHand closedHand").addClass("closedHand");
+      });
+
+      var dateArray = startingDate.split("-");
+      $("#datepicker").datepicker({
+        defaultDate : new Date(dateArray[0], dateArray[1] - 1, dateArray[2]),
+        minDate : new Date(2014, 0),
+        onSelect : selectDay,
+        beforeShowDay : highlightDays
+      });
+      $("#datepicker").append("<p class='date_msg'>Click a date to go to that timelapse.</p>");
+
+      $("#show_timelapse_feed").on("click", function() {
+        selectTimelapseFeed();
+      });
+
+      $("#show_image_feed").on("click", function() {
+        selectImageFeed();
+      });
+      $("body").on("selectstart", function(e) { e.preventDefault(); });
+    });
+  </script>
+<% end %>
+
+<div id="loading">
+  <%= image_tag "loading.gif" %>
+</div>
+<div id="content" style="visibility: hidden">
+  <div id="timelapse_feed" style="position: absolute; left: 16px">
+    <div id="player1" style="position: absolute;"></div>
+    <div id="datepicker" style="position: absolute; left: 1090px;"></div>
+  </div>
+  <div id="image_feed">
+    <div id="image-zoom-wrapper" style="visibility: hidden">
+      <div id="zoom-in" title="Zoom in"><span class="ui-button-icon-secondary ui-icon ui-icon-plusthick" style="margin-top:4px; margin-left:4px"></span></div>
+      <div id="zoom-out" title="Zoom out"><span class="ui-button-icon-secondary ui-icon ui-icon-minusthick" style="margin-top:4px; margin-left:4px"></span></div>
+      <img id="image-zoom" src="<%= @stitched_image %>" style="visibility: hidden !important" onload="zoomify.makeImageZoomable()"/>
+      <span id="image_feed_timestamp" style="position: absolute; top: 10px; right: 10px; color: white"><%= @pretty_time %></span>
+    </div>
+  </div>
+  <div id="show_timelapse_feed"><div style="position: absolute; top: 42px; left: 165px;">Timelapse<br><span style="font-size:12px">(Real-time up to the last 10 min)</span></div><div class="feed_overlay"></div></div>
+  <div id="show_image_feed"><div style="position: absolute; top: 42px; left: 165px;">Live<br><span style="font-size:12px">(Real-time up to the last min)</span></div><div class="feed_overlay"></div></div>
+</div>

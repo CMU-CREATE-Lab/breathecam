@@ -6,6 +6,7 @@ require "fileutils"
 
 $host = ARGV[0] || "http://192.168.4.13"
 $output_dir = ARGV[1] || "./"
+$do_stitch = ARGV[2] || false
 
 # Make sure only one instance of this script with a specific host is run
 cmd = (`ps aux | grep "arecont.*#{$host} " | grep -v -E '(grep|sh|nano)'`)
@@ -22,11 +23,23 @@ if num_instances.length > 1
   exit()
 end
 
+$RUNNING_WINDOWS = /(win|w)32$/.match(RUBY_PLATFORM)
+$RUNNING_MAC = RUBY_PLATFORM.downcase.include?("darwin")
+$RUNNING_LINUX = RUBY_PLATFORM.downcase.include?("linux")
+
+# For lossless image rotations
+$jpegtran_path = $RUNNING_WINDOWS ? "jpegtran.exe" : "/usr/local/bin/jpegtran"
+
+# Hugin tools
+$nona_path = $RUNNING_WINDOWS ? "nona.exe" : "/usr/local/bin/nona"
+$enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "/usr/local/bin/enblend"
+
 $username = "admin"
 $password = "illah123"
 $config = "res=full&x0=0&y0=0&x1=3648&y1=2752&quality=21&doublescan=0"
 
 loan_camera_lense_order = ["4","2","1","3"]
+camera2_lense_order = ["1","4","2","3"]
 camera3_lense_order = ["1","3","4","2"]
 camera4_lense_order = ["1","3","4","2"]
 
@@ -39,6 +52,29 @@ def get_images
   FileUtils.mkdir_p(current_output_dir)
   [1,2,3,4].each_with_index do |camera, i|
     File.open("#{current_output_dir}/#{current_time}_image#{$current_camera[i]}.jpg",'wb'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
+  end
+
+  if $do_stitch
+    latest_stitch_dir = "#{current_output_dir}/latest_stitch"
+    FileUtils.mkdir_p(latest_stitch_dir)
+    files = Dir.glob("#{current_output_dir}/#{current_time}_image*.jpg")
+    exit if files.length != 4
+    extra_param = $RUNNING_WINDOWS ? "" : ">"
+    files.each do |img|
+      return_value = system("#{$jpegtran_path} -copy all -rotate 180 -optimize #{%Q{"#{img}"}} #{extra_param} #{%Q{"#{latest_stitch_dir}/#{File.basename(img)}"}}")
+      # Really we want to exit on any error, but the images from the arecont cameras have a malformed header, so jpegtran complains but continues. This triggers a return of false though.
+      exit if return_value == nil
+    end
+    hugin_pto_file = "#{%Q{"#{File.expand_path(File.join(File.dirname(__FILE__), 'heinz2.pto'))}"}}"
+    Dir.chdir(latest_stitch_dir) do
+      return_value = system("#{$nona_path} -o #{current_time}_ #{hugin_pto_file} #{current_time}_image1.jpg #{current_time}_image2.jpg #{current_time}_image3.jpg #{current_time}_image4.jpg")
+      exit if !return_value
+      return_value = system("#{$enblend_path} --no-optimize --compression=93 --fine-mask -o #{current_time}_full.jpg #{current_time}_0000.tif #{current_time}_0001.tif #{current_time}_0002.tif #{current_time}_0003.tif")
+      exit if !return_value
+      Dir["#{latest_stitch_dir}/*.*"].reject{ |f| f["#{current_time}_full.jpg"] }.each do |f|
+        File.delete(f)
+      end
+    end
   end
 end
 

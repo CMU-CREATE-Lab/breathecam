@@ -1,0 +1,92 @@
+#zoom-in {
+  border-radius: 50%;
+  background: white;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  z-index: 100;
+  opacity: 1;
+  box-shadow: rgba(0,0,0,1) 0px 0px 5px;
+  cursor: pointer;
+}
+
+#zoom-in:hover {
+  background: #E6E6E6;
+}
+
+#zoom-out {
+  border-radius: 50%;
+  background: white;
+  opacity: 50%;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  left: 16px;
+  top: 52px;
+  z-index: 100;
+  opacity: 1;
+  box-shadow: rgba(0,0,0,1) 0px 0px 5px;
+  cursor: pointer;
+}
+
+#zoom-out:hover {
+  background: #E6E6E6;
+}
+
+#image-zoom-wrapper {
+  background: black;
+  position: relative;
+  text-align: left;
+  overflow: auto;
+  height: 600px;
+  left: 16px;
+  margin-right: 31px;
+  border: 1px solid #000;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#image-zoom-wrapper.js-active {
+  background-image: none;
+}
+
+.js-enabled #image-zoom-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.js-enabled #image-zoom-wrapper #image-zoom {
+  visibility: hidden;
+  position: relative;
+}
+
+#image-zoom-wrapper div.zoom-control {
+  width: 26px;
+  height: 26px;
+}
+
+#image-zoom-wrapper div.zoom-in,
+#image-zoom-wrapper div.zoom-out {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+#image-zoom-wrapper div.zoom-out {
+  background-image: url("./zoom-out.png");
+  top: 46px;
+}
+
+#image-zoom-wrapper div.zoom-off {
+  background-position: 0 100%;
+}
+
+#image_feed_timestamp {
+  text-shadow: -1px 0 #656565, 0 1px #656565, 1px 0 #656565, 0 -1px #656565, 2px 2px 3px rgba(0,0,0,0.3);
+}
