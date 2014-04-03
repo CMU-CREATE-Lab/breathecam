@@ -54,6 +54,7 @@ class Compiler
     $end_time = {}
     $end_time["hour"] = current_time.strftime("%H").to_i
     $end_time["minute"] = current_time.strftime("%M").to_i
+    $end_time["sec"] = 0
 
     $input_path = ARGV[0]
     $output_path = ARGV[1]
@@ -152,12 +153,16 @@ class Compiler
       if $start_time["hour"] < 0
         video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
         day_diff = ($start_time["hour"] / 24.0).abs.ceil
-        tmp_current_day = $current_day
+        tmp_current_day = Date.parse($current_day)
         tmp_current_day -= day_diff
+        tmp_current_day = tmp_current_day.strftime("%Y-%m-%d")
         # If we need to backtrack the day.
         if video_sets.first.include?(tmp_current_day)
           $current_day = tmp_current_day
           $start_time["hour"] = 24 - hour_diff
+          $end_time["hour"] = 23
+          $end_time["minute"] = 59
+          $end_time["sec"] = 59
         else
           # We just started incremental updating (with no other set from the current date)
           # and the update interval lands us on the current time. So, start and end times match
@@ -217,7 +222,7 @@ class Compiler
       args = $input_path.split(":")
       host = args[0]
       src_path = args[1]
-      system("ssh #{host} \"find #{src_path} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:00' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
+      system("ssh #{host} \"find #{src_path} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
       system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{$input_path}/#{$current_day}/ #{new_input_path}")
     else
       # Else grab the entire day of images
@@ -364,6 +369,7 @@ class Compiler
   def add_entry_to_json
     json = {}
     path_to_json = "#{$working_dir}/#{$camera_location}.json"
+    path_to_js = "#{$working_dir}/#{$camera_location}.js"
     if File.exists?(path_to_json)
       json = open(path_to_json) {|fh| JSON.load(fh)}
     else
@@ -389,6 +395,7 @@ class Compiler
     json["latest"]["path"] = "http://g7.gigapan.org/timemachines/breathecam/#{$camera_location}/#{new_latest}.timemachine";
     json["datasets"]["#{$current_day}"] = "http://g7.gigapan.org/timemachines/breathecam/#{$camera_location}/#{$current_day}.timemachine"
     open(path_to_json, "w") {|fh| fh.puts(JSON.generate(json))}
+    open(path_to_js, "w") {|fh| fh.puts("cached_breathecam=" + JSON.generate(json) + ";")}
     puts "Successfully wrote #{$camera_location}.json"
   end
 
@@ -420,7 +427,7 @@ class Compiler
     system("rsync -a #{$timemachine_output_path}/#{$timemachine_output_dir} #{$output_path}")
     unless $create_videoset_segment_directory
       puts "Rsyncing #{$camera_location}.json to #{$output_path}"
-      system("rsync -a #{$working_dir}/#{$camera_location}.json #{$output_path}")
+      system("rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{$output_path}")
     end
   end
 
