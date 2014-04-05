@@ -1,0 +1,6 @@
+# Heinz every minute
+* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "heinz" /usr0/web/timemachines/breathecam/heinz/050-original-images --do-location-lookup --do-latest-stitch >> /home/pdille/breathecam/heinz.log 2>&1
+
+# Trimont (Albrights) every 5 minutes
+#*/5 * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "trimont1" /usr0/web/timemachines/breathecam/trimont1/050-original-images --do-location-lookup --do-latest-stitch >> /home/pdille/breathecam/trimont1.log 2>&1
+

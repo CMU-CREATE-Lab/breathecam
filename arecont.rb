@@ -3,13 +3,49 @@
 require "open-uri"
 require "date"
 require "fileutils"
+require 'json'
 
-$host = ARGV[0] || "http://192.168.4.13"
-$output_dir = ARGV[1] || "./"
-$do_stitch = ARGV[2] || false
+$host = ARGV[0]
+$output_path = ARGV[1] || "./"
+$do_location_lookup = false
+$location_id = $host
+$location_lookup_path = "http://breathecam.cmucreatelab.org/locations.json"
+$do_latest_stitch = false
+
+def usage
+  puts "Usage: ruby arecont.rb HOST OUTPUT_PATH"
+  exit
+end
+
+required_arg_count = 0
+while !ARGV.empty?
+  arg = ARGV.shift
+  required_arg_count += 1
+  if arg == "--do-latest-stitch"
+    $do_latest_stitch = true
+    required_arg_count -= 1
+  elsif arg == "--do-location-lookup"
+    $do_location_lookup = true
+    required_arg_count -= 1
+  end
+end
+
+if required_arg_count < 2
+  usage
+end
+
+if $do_location_lookup && $location_id
+  location_list  = open($location_lookup_path) {|f| f.read}
+  if location_list && location_list[$location_id]
+    location_list = JSON.parse(location_list)
+    $host = location_list[$location_id]["ip"] + ":" + location_list[$location_id]["port"]
+  end
+end
+
+instance_check = $location_id ? $location_id : $host
 
 # Make sure only one instance of this script with a specific host is run
-cmd = (`ps aux | grep "arecont.*#{$host} " | grep -v -E '(grep|sh|nano)'`)
+cmd = (`ps aux | grep "arecont.*#{instance_check}.*" | grep -v -E '(grep|sh|nano)'`)
 num_instances = []
 
 # Backwards compatibility with Ruby 1.8
@@ -21,6 +57,11 @@ end
 
 if num_instances.length > 1
   exit()
+end
+
+# Make sure we add http:// in the event it is not included, since open() will fail without it
+unless $host.include?("http://") || $host.include?("https://")
+  $host = "http://" + $host
 end
 
 $RUNNING_WINDOWS = /(win|w)32$/.match(RUBY_PLATFORM)
@@ -48,33 +89,14 @@ $current_camera = camera3_lense_order
 def get_images
   current_time = Time.now.to_i
   current_day = Date.today.to_s
-  current_output_dir = File.join($output_dir,current_day)
+  current_output_dir = File.join($output_path,current_day)
   FileUtils.mkdir_p(current_output_dir)
   [1,2,3,4].each_with_index do |camera, i|
     File.open("#{current_output_dir}/#{current_time}_image#{$current_camera[i]}.jpg",'wb'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
   end
 
-  if $do_stitch
-    latest_stitch_dir = "#{current_output_dir}/latest_stitch"
-    FileUtils.mkdir_p(latest_stitch_dir)
-    files = Dir.glob("#{current_output_dir}/#{current_time}_image*.jpg")
-    exit if files.length != 4
-    extra_param = $RUNNING_WINDOWS ? "" : ">"
-    files.each do |img|
-      return_value = system("#{$jpegtran_path} -copy all -rotate 180 -optimize #{%Q{"#{img}"}} #{extra_param} #{%Q{"#{latest_stitch_dir}/#{File.basename(img)}"}}")
-      # Really we want to exit on any error, but the images from the arecont cameras have a malformed header, so jpegtran complains but continues. This triggers a return of false though.
-      exit if return_value == nil
-    end
-    hugin_pto_file = "#{%Q{"#{File.expand_path(File.join(File.dirname(__FILE__), 'heinz2.pto'))}"}}"
-    Dir.chdir(latest_stitch_dir) do
-      return_value = system("#{$nona_path} -o #{current_time}_ #{hugin_pto_file} #{current_time}_image1.jpg #{current_time}_image2.jpg #{current_time}_image3.jpg #{current_time}_image4.jpg")
-      exit if !return_value
-      return_value = system("#{$enblend_path} --no-optimize --compression=93 --fine-mask -o #{current_time}_full.jpg #{current_time}_0000.tif #{current_time}_0001.tif #{current_time}_0002.tif #{current_time}_0003.tif")
-      exit if !return_value
-      Dir["#{latest_stitch_dir}/*.*"].reject{ |f| f["#{current_time}_full.jpg"] }.each do |f|
-        File.delete(f)
-      end
-    end
+  if $do_latest_stitch
+    stitch_latest(current_time, current_output_dir)
   end
 end
 
@@ -127,6 +149,29 @@ def defaults(camera)
   arecont_set(camera,"lowlight", "balance");
   arecont_set(camera,"shortexposures", 5);
   arecont_set(camera,"daynight", "auto");
+end
+
+def stitch_latest(current_time, current_output_dir)
+  latest_stitch_dir = "#{current_output_dir}/latest_stitch"
+  FileUtils.mkdir_p(latest_stitch_dir)
+  files = Dir.glob("#{current_output_dir}/#{current_time}_image*.jpg")
+  exit if files.length != 4
+  extra_param = $RUNNING_WINDOWS ? "" : ">"
+  files.each do |img|
+    return_value = system("#{$jpegtran_path} -copy all -rotate 180 -optimize #{%Q{"#{img}"}} #{extra_param} #{%Q{"#{latest_stitch_dir}/#{File.basename(img)}"}}")
+    # Really we want to exit on any error, but the images from the arecont cameras have a malformed header, so jpegtran complains but continues. This triggers a return of false though.
+    exit if return_value == nil
+  end
+  hugin_pto_file = "#{%Q{"#{File.expand_path(File.join(File.dirname(__FILE__), 'heinz2.pto'))}"}}"
+  Dir.chdir(latest_stitch_dir) do
+    return_value = system("#{$nona_path} -o #{current_time}_ #{hugin_pto_file} #{current_time}_image1.jpg #{current_time}_image2.jpg #{current_time}_image3.jpg #{current_time}_image4.jpg")
+    exit if !return_value
+    return_value = system("#{$enblend_path} --no-optimize --compression=93 --fine-mask -o #{current_time}_full.jpg #{current_time}_0000.tif #{current_time}_0001.tif #{current_time}_0002.tif #{current_time}_0003.tif")
+    exit if !return_value
+    Dir["#{latest_stitch_dir}/*.*"].reject{ |f| f["#{current_time}_full.jpg"] }.each do |f|
+      File.delete(f)
+    end
+  end
 end
 
 def reload

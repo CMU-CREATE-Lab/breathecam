@@ -11,7 +11,7 @@ class LocationsHandlerController < ApplicationController
     # Location lookup table. We check this when pulling images to get the correct IP.
     locations = File.file?(locationsOutputFile) ? open(locationsOutputFile) {|fh| JSON.load(fh)} : {}
     # What params we want in the location lookup table.
-    logExcludeList = ["id", "uuid", "ip"]
+    logExcludeList = ["id", "uuid", "ip", "port"]
     logKeys = []
 
     bodyContent = request.body.read
@@ -27,7 +27,7 @@ class LocationsHandlerController < ApplicationController
         # Assumes the id (i.e. the location name) is the first param.
         if (i == 0)
           locationName = tmpParamArray[1]
-          locations[locationName] = {}
+          locations[locationName] = locations[locationName] || {}
           logOutputFile = Rails.root.join('public', "#{locationName}.log")
         else
           key = tmpParamArray[0]
