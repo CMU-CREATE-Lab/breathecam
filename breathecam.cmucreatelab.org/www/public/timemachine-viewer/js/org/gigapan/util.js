@@ -82,6 +82,7 @@ if (!org.gigapan) {
   var isChromeOS = navigator.userAgent.match(/CrOS/) != null;
   var mediaType = ".mp4";
   var viewerType = (isSafariUserAgent || isChromeOS) ? "video" : "canvas";
+  var rootAppURL = computeRootAppURL();
 
   //0 == none
   //1 == errors only
@@ -384,10 +385,14 @@ if (!org.gigapan) {
       $element.find(".keyframe_table").css("background-color", colorStr);
   };
 
+  function computeRootAppURL() {
+    var jsFiles = $("script");
+    var pathOfCurrentScript = $(jsFiles[jsFiles.length - 1]).attr("src");
+    return pathOfCurrentScript.substr(0, pathOfCurrentScript.substring(1).indexOf('/') + 1) + "/";
+  }
+
   org.gigapan.Util.getRootAppURL = function() {
-    var jsFiles = document.getElementsByTagName("script");
-    var pathOfCurrentScript = jsFiles[jsFiles.length-1].src;
-    return pathOfCurrentScript.substr(0, pathOfCurrentScript.indexOf("js/"));
-  };
+    return rootAppURL;
+  }
 
 })();
