@@ -8,8 +8,31 @@
   <%= yield :head %>
 </head>
 <body>
-
-<%= yield %>
-
+  <div id="container">
+    <div id="header">
+      <div id="header-titles">
+        <div class="cmu-font">
+          <a href="http://www.cmu.edu/">
+            <div id="cmu-logo-detail-page"></div>
+          </a>
+        </div>
+        <div class="create-lab-font">
+          <a href="/">
+            <div class="title-text">CREATE Lab</div>
+            <div class="subtitle-text">Breathecam</div>
+          </a>
+        </div>
+      </div>
+      <p id="site-description">
+      </p>
+    </div>
+    <%= yield %>
+    <div id="footer">
+      <a href="http://www.ri.cmu.edu/">The Robotics Institute</a>&nbsp;|
+      <a href="http://www.cmu.edu">Carnegie Mellon University</a>&nbsp;|
+      <a href="mailto:info@cmucreatelab.org">info@cmucreatelab.org</a>&nbsp;|
+      <a href="tel:+14122686723">412-268-6723</a>
+    </div>
+  </div>
 </body>
 </html>

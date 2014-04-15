@@ -180,22 +180,24 @@
   </script>
 <% end %>
 
-<div id="loading">
-  <%= image_tag "loading.gif" %>
-</div>
-<div id="content" style="visibility: hidden">
-  <div id="timelapse_feed" style="position: absolute; left: 16px">
-    <div id="player1" style="position: absolute;"></div>
-    <div id="datepicker" style="position: absolute; left: 1090px;"></div>
+<div id="body-index2">
+  <div id="loading" style="position:absolute; top:30px; left:300px;">
+    <%= image_tag("loading.gif") %>
   </div>
-  <div id="image_feed">
-    <div id="image-zoom-wrapper" style="visibility: hidden">
-      <div id="zoom-in" title="Zoom in"><span class="ui-button-icon-secondary ui-icon ui-icon-plusthick" style="margin-top:4px; margin-left:4px"></span></div>
-      <div id="zoom-out" title="Zoom out"><span class="ui-button-icon-secondary ui-icon ui-icon-minusthick" style="margin-top:4px; margin-left:4px"></span></div>
-      <img id="image-zoom" src="<%= @stitched_image %>" style="visibility: hidden !important" onload="zoomify.makeImageZoomable()"/>
-      <span id="image_feed_timestamp" style="position: absolute; top: 10px; right: 10px; color: white"><%= @pretty_time %></span>
+  <div id="content" style="visibility: hidden">
+    <div id="timelapse_feed">
+      <div id="player1" style="position: absolute;"></div>
+      <div id="datepicker"></div>
     </div>
+    <div id="image_feed">
+      <div id="image-zoom-wrapper" style="visibility: hidden">
+        <div id="zoom-in" title="Zoom in"><p>+</p></div>
+        <div id="zoom-out" title="Zoom out"><p>_</p></div>
+        <img id="image-zoom" src="<%= @stitched_image %>" style="visibility: hidden !important" onload="zoomify.makeImageZoomable()"/>
+        <span id="image_feed_timestamp" style="position: absolute; top: 10px; right: 10px; color: white"><%= @pretty_time %></span>
+      </div>
+    </div>
+    <div id="show_timelapse_feed" style="background-image: url(<%= asset_path("#{@location_id}_timelapse.png") %>);"><div style="position: absolute; top: 42px; left: 175px;"><div>Timelapse</div><p style="font-size:12px;margin-top:5px">(Real-time up to the last 10 min)</p></div><div class="feed_overlay"></div></div>
+    <div id="show_image_feed" style="background-image: url(<%= asset_path("#{@location_id}_live.png") %>);"><div style="position: absolute; top: 42px; left: 175px;"><div>Live</div><p style="font-size:12px;margin-top:5px">(Real-time up to the last min)</p></div><div class="feed_overlay"></div></div>
   </div>
-  <div id="show_timelapse_feed"><div style="position: absolute; top: 42px; left: 165px;">Timelapse<br><span style="font-size:12px">(Real-time up to the last 10 min)</span></div><div class="feed_overlay"></div></div>
-  <div id="show_image_feed"><div style="position: absolute; top: 42px; left: 165px;">Live<br><span style="font-size:12px">(Real-time up to the last min)</span></div><div class="feed_overlay"></div></div>
 </div>

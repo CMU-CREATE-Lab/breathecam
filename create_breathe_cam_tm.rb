@@ -31,6 +31,7 @@ $thread_pool = nil
 $rsync_input = false
 $rsync_output = false
 $tmp_output_path = nil
+$skip_rotate = false
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -99,6 +100,8 @@ class Compiler
         # and thus do not need to worry about it when appending if we
         # keep it this way.
         $incremental_update_interval = (ARGV.shift.to_f / 10.0).ceil * 10
+      elsif arg == "--skip-rotate"
+        $skip_rotate = true
       end
     end
 
@@ -137,9 +140,21 @@ class Compiler
 
     FileUtils.mkdir_p($working_dir)
     FileUtils.touch(File.join($working_dir,"WIP"))
+    create_definition_file
     calculate_rsync_input_range if $do_incremental_update
     clear_working_dir
     $rsync_input ? rsync_source_images : organize_images
+  end
+
+  def create_definition_file
+    path_to_definition_file = "#{$working_dir}/definition.tmc"
+    unless File.exists?(path_to_definition_file)
+      FileUtils.cp("#{File.dirname(__FILE__)}/default_definition.tmc", path_to_definition_file)
+      json = open(path_to_definition_file) {|fh| JSON.load(fh)}
+      json['id'] = $camera_location
+      json['label'] = $camera_location
+      open(path_to_definition_file, "w") {|fh| fh.puts(JSON.pretty_generate(json))}
+    end
   end
 
   def calculate_rsync_input_range
@@ -278,7 +293,12 @@ class Compiler
       match_count += 1
     end
     puts "Organizing complete. Matched #{match_count} out of #{count} possible frames."
-    rotate_images
+    if $skip_rotate
+      puts "Skipping image rotations."
+      stitch_images
+    else
+      rotate_images
+    end
   end
 
   def rotate_images

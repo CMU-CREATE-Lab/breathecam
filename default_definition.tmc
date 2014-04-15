@@ -1,0 +1,22 @@
+{
+    "id":      "",
+    "label":   "",
+    "source":  {
+      "type": "images",
+      "tilesize": 512,
+      "capture_time_parser": "~/breathecam/extract_breathecam_capturetimes.rb"
+    },
+    "videosets": [
+      {
+          "type": "h.264",
+          "label": "600p",
+          "size": [
+            1068,
+            600
+          ],
+          "quality": 26,
+          "fps": 12
+      }
+    ]
+}
+

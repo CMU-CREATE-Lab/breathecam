@@ -9,8 +9,18 @@ $host = ARGV[0]
 $output_path = ARGV[1] || "./"
 $do_location_lookup = false
 $location_id = $host
-$location_lookup_path = "http://breathecam.cmucreatelab.org/locations.json"
+$location_lookup_path = "/usr4/web/breathecam.cmucreatelab.org/www/public/locations.json"
 $do_latest_stitch = false
+$skip_rotate_for_latest_stitch = false
+
+$username = "admin"
+$password = "illah123"
+$config = "res=full&x0=0&y0=0&x1=3648&y1=2752&quality=21&doublescan=0"
+
+# Broken Lense, Walnut Towers, Heinz, Trimont, Loaner
+# The array index is the lense number going from left to right.
+# The value at the array index is the output image number.
+@@camera_list = [[], ["4","2","1","3"], ["1","3","4","2"], ["4","2","1","3"], ["4","2","1","3"]]
 
 def usage
   puts "Usage: ruby arecont.rb HOST OUTPUT_PATH"
@@ -27,6 +37,10 @@ while !ARGV.empty?
   elsif arg == "--do-location-lookup"
     $do_location_lookup = true
     required_arg_count -= 1
+  elsif arg == "-camera-num"
+    @@current_camera = @@camera_list[ARGV.shift.to_i - 1]
+  elsif arg == "--skip-rotate-for-latest-stitch"
+    $skip_rotate_for_latest_stitch = true
   end
 end
 
@@ -56,6 +70,7 @@ else
 end
 
 if num_instances.length > 1
+  puts "Already running: arecont.*#{instance_check}.*"
   exit()
 end
 
@@ -75,24 +90,13 @@ $jpegtran_path = $RUNNING_WINDOWS ? "jpegtran.exe" : "/usr/local/bin/jpegtran"
 $nona_path = $RUNNING_WINDOWS ? "nona.exe" : "/usr/local/bin/nona"
 $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "/usr/local/bin/enblend"
 
-$username = "admin"
-$password = "illah123"
-$config = "res=full&x0=0&y0=0&x1=3648&y1=2752&quality=21&doublescan=0"
-
-loan_camera_lense_order = ["4","2","1","3"]
-camera2_lense_order = ["1","4","2","3"]
-camera3_lense_order = ["1","3","4","2"]
-camera4_lense_order = ["1","3","4","2"]
-
-$current_camera = camera3_lense_order
-
 def get_images
   current_time = Time.now.to_i
   current_day = Date.today.to_s
   current_output_dir = File.join($output_path,current_day)
   FileUtils.mkdir_p(current_output_dir)
   [1,2,3,4].each_with_index do |camera, i|
-    File.open("#{current_output_dir}/#{current_time}_image#{$current_camera[i]}.jpg",'wb'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
+    File.open("#{current_output_dir}/#{current_time}_image#{@@current_camera[i]}.jpg",'wb'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
   end
 
   if $do_latest_stitch
@@ -156,13 +160,19 @@ def stitch_latest(current_time, current_output_dir)
   FileUtils.mkdir_p(latest_stitch_dir)
   files = Dir.glob("#{current_output_dir}/#{current_time}_image*.jpg")
   exit if files.length != 4
-  extra_param = $RUNNING_WINDOWS ? "" : ">"
-  files.each do |img|
-    return_value = system("#{$jpegtran_path} -copy all -rotate 180 -optimize #{%Q{"#{img}"}} #{extra_param} #{%Q{"#{latest_stitch_dir}/#{File.basename(img)}"}}")
-    # Really we want to exit on any error, but the images from the arecont cameras have a malformed header, so jpegtran complains but continues. This triggers a return of false though.
-    exit if return_value == nil
+  if !$skip_rotate_for_latest_stitch
+    extra_param = $RUNNING_WINDOWS ? "" : ">"
+    files.each do |img|
+      return_value = system("#{$jpegtran_path} -copy all -rotate 180 -optimize #{%Q{"#{img}"}} #{extra_param} #{%Q{"#{latest_stitch_dir}/#{File.basename(img)}"}}")
+      # Really we want to exit on any error, but the images from the arecont cameras have a malformed header, so jpegtran complains but continues. This triggers a return of false though.
+      exit if return_value == nil
+    end
+  else
+    files.each do |img|
+      FileUtils.cp(img, latest_stitch_dir)
+    end
   end
-  hugin_pto_file = "#{%Q{"#{File.expand_path(File.join(File.dirname(__FILE__), 'heinz2.pto'))}"}}"
+  hugin_pto_file = "#{%Q{"#{File.expand_path(File.join(File.dirname(__FILE__), $location_id + '.pto'))}"}}"
   Dir.chdir(latest_stitch_dir) do
     return_value = system("#{$nona_path} -o #{current_time}_ #{hugin_pto_file} #{current_time}_image1.jpg #{current_time}_image2.jpg #{current_time}_image3.jpg #{current_time}_image4.jpg")
     exit if !return_value

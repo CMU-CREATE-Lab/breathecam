@@ -1,38 +1,58 @@
 #zoom-in {
   border-radius: 50%;
   background: white;
-  width: 25px;
-  height: 25px;
+  width: 40px;
+  height: 40px;
   position: absolute;
   left: 16px;
   top: 16px;
   z-index: 100;
   opacity: 1;
-  box-shadow: rgba(0,0,0,1) 0px 0px 5px;
+  box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
   cursor: pointer;
+  border: 1px solid #656565;
 }
 
 #zoom-in:hover {
   background: #E6E6E6;
 }
 
+#zoom-in p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  margin-left: 13px;
+  margin-top: 7px;
+  color: #656565;
+}
+
 #zoom-out {
   border-radius: 50%;
   background: white;
   opacity: 50%;
-  width: 25px;
-  height: 25px;
+  width: 40px;
+  height: 40px;
   position: absolute;
   left: 16px;
-  top: 52px;
+  top: 72px;
   z-index: 100;
   opacity: 1;
-  box-shadow: rgba(0,0,0,1) 0px 0px 5px;
+  box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
   cursor: pointer;
+  border: 1px solid #656565;
 }
 
 #zoom-out:hover {
   background: #E6E6E6;
+}
+
+#zoom-out p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  margin-left: 15px;
+  margin-top: 0px;
+  color: #656565;
 }
 
 #image-zoom-wrapper {
@@ -41,7 +61,6 @@
   text-align: left;
   overflow: auto;
   height: 600px;
-  left: 16px;
   margin-right: 31px;
   border: 1px solid #000;
   -moz-user-select: none;
