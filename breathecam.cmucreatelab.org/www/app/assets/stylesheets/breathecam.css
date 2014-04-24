@@ -292,16 +292,47 @@ a {
   margin: 0 auto;
 }
 
+#loading {
+  position:absolute;
+  top: 30px;
+  left: 300px;
+}
+
+#image_feed {
+  visibility: hidden;
+}
+
+#timelapse_feed {
+  display: none;
+}
+
+#image_feed_timestamp {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white;
+  text-shadow: -1px 0 #656565, 0 1px #656565, 1px 0 #656565, 0 -1px #656565, 2px 2px 3px rgba(0,0,0,0.3);
+}
+
+.feed_msg {
+  position: absolute;
+  top: 42px;
+  left: 175px;
+}
+
+.feed_msg_txt {
+  font-size: 12px;
+  margin-top: 5px;
+}
+
 #show_timelapse_feed {
   position: relative;
   width: 523px;
   height: 148px;
-  background: white;
   border: 1px solid black;
-  text-align: center;
   font-size: 40px;
   margin-top: 16px;
-  vertical-align: middle;
+  float: left;
   cursor: pointer;
   color: white;
   text-shadow: -1px 0 #656565, 0 1px #656565, 1px 0 #656565, 0 -1px #656565, 2px 2px 3px rgba(0,0,0,0.3);
@@ -311,14 +342,12 @@ a {
   position: relative;
   width: 523px;
   height: 148px;
-  background: white;
   border: 1px solid black;
-  text-align: center;
   font-size: 40px;
   margin-top: -150px;
-  vertical-align: middle;
   margin-left: 545px;
   cursor: pointer;
+  float: left;
   color: white;
   text-shadow: -1px 0 #656565, 0 1px #656565, 1px 0 #656565, 0 -1px #656565, 2px 2px 3px rgba(0,0,0,0.3);
 }
@@ -356,6 +385,7 @@ a {
 
 #content {
   position: relative;
+  visibility: hidden;
   overflow: visible;
   width: 100%;
   height: 816px;
@@ -364,13 +394,11 @@ a {
 
 .error_msg {
   cursor: default;
-  font-size: 17px;
+  font-size: 19px;
   color: #EB7474;
   font-weight: bold;
   position: relative;
-  top: -40px;
-  text-align:
-  center; vertical-align: middle;
+  top: -154px;
 }
 
 .error_msg2 {
@@ -380,8 +408,7 @@ a {
   font-weight: bold;
   position: relative;
   top: 20px;
-  text-align:
-  center; vertical-align: middle;
+  left: -141px
 }
 
 .disabled {

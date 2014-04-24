@@ -1,3 +1,12 @@
+<% content_for :head do %>
+  <script>
+    /* Handle old share links when the index page was poiting to the Heinz breathecam */
+    var locationArray = window.location.href.split("#");
+    if (locationArray.length > 1)
+      window.location.href = locationArray[0] + "locations/heinz#" + locationArray[1];
+  </script>
+<% end %>
+
 <div id="body-index">
   <table>
     <tr>

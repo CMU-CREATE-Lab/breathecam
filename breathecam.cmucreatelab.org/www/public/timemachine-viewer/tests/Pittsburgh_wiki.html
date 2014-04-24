@@ -31,50 +31,25 @@
     <script type="text/javascript">
       jQuery.support.cors = true;
 
-      // Pittsburgh
       var url = "http://g7.gigapan.org/timemachines/pittsburgh-v12";
-      // Blue Marble
-      //var url = "http://g7.gigapan.org/timemachines/blue-marble-v2/";
-      // Ocean Chlorophyll
-      //var url = "http://g7.gigapan.org/timemachines/chlorophyll-r32d-crf28-g10-bf0-l/";
-      // Plant Growth
-      //var url = "http://g7.gigapan.org/timemachines/brassica-15m-g10-bf0-l/";
-      // Bees
-      //var url = "http://g7.gigapan.org/timemachines/bees-chalkbrood-45m-2011-07-ap-v9/";
-      // Early Universe
-      //var url = "http://g7.gigapan.org/timemachines/e5-crf28-g10-bf0-l/";
-      // Paddle At The Point
-      //var url = "http://g7.gigapan.org/timemachines/patp-sub4-crf28-g10-bf0-l/";
-      // CMU Carnival 2010
-      //var url = "http://g7.gigapan.org/timemachines/carnival-10m-halfsize-g10-bf0-l30/";
-      // Burning Man 2011
-      //var url = "http://g7.gigapan.org/timemachines/BurningMan2011-v1/";
-      // Arizona Grasslands
-      //var url = "http://g7.gigapan.org/timemachines/usda-crf24-g10-bf0-l/";
-      // Visible Human Female
-      //var url = "http://g7.gigapan.org/timemachines/vhf-crf28-g10-bf0-l/";
-      // Weather Radar
-      //var url = "http://g7.gigapan.org/timemachines/radarmosaic-crf28-g10-bf0-6fps/";
-      // Kraus Winter Garden
-      //var url = "http://g7.gigapan.org/timemachines/ghc1-24h-halfsize-crf32-g10-bf0-l30/";
-      // Solar Dynamics Observatory
-      //var url = "http://g7.gigapan.org/timemachines/sdo-color-crf24-g10-bf0-l/";
 
       function init() {
         var viewerSettings = {
           url: url,
           showFullScreenBtn: false,
-          //annotatorDiv: "annotator1",
           presentationSliderDiv: "presentationSlider1",
           composerDiv: "composer1",
           viewportGeometry: {
             width: 1068,
-            height: 600
+            height: 600,
+            max: true
           },
           onTimeMachinePlayerReady: function(viewerDivId) {
             console.log("Time Machine player is ready.");
           },
           disableTourLooping: true,
+          showEditorModeButton: false,
+          showEditorOnLoad: true,
           isGoogleAnalyticEventTrackingEnabled: true
         };
         timelapse = new org.gigapan.timelapse.Timelapse("player1", viewerSettings);
@@ -95,7 +70,7 @@
         m.parentNode.insertBefore(a, m)
       })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-      ga('create', 'UA-49791101-1', 'cmucreatelab.org');
+      ga('create', 'UA-4157572-7', 'gigapan.org');
       ga('send', 'pageview');
     </script>
   </head>
@@ -103,6 +78,5 @@
     <div id="player1" style="position: absolute; top:10px; left:10px;"></div>
     <div id="composer1"></div>
     <div id="presentationSlider1"></div>
-    <div id="annotator1"></div>
   </body>
 </html>

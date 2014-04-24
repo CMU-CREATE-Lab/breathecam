@@ -1,8 +1,8 @@
 #zoom-in {
   border-radius: 50%;
   background: white;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   position: absolute;
   left: 16px;
   top: 16px;
@@ -21,20 +21,19 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
   font-weight: 500;
-  margin-left: 13px;
-  margin-top: 7px;
+  margin-top: 5px;
   color: #656565;
 }
 
 #zoom-out {
   border-radius: 50%;
   background: white;
-  opacity: 50%;
-  width: 40px;
-  height: 40px;
+  opacity: 0.5;
+  width: 36px;
+  height: 36px;
   position: absolute;
   left: 16px;
-  top: 72px;
+  top: 65px;
   z-index: 100;
   opacity: 1;
   box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
@@ -50,62 +49,27 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: 19px;
   font-weight: 500;
-  margin-left: 15px;
-  margin-top: 0px;
+  margin-top: -3px;
   color: #656565;
 }
 
-#image-zoom-wrapper {
+.image-zoom-wrapper {
   background: black;
   position: relative;
-  text-align: left;
-  overflow: auto;
+  overflow: hidden;
   height: 600px;
   margin-right: 31px;
-  border: 1px solid #000;
+  border: 1px solid #656565;
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -ms-user-select: none;
   user-select: none;
+  visibility: visible;
 }
 
-#image-zoom-wrapper.js-active {
-  background-image: none;
-}
-
-.js-enabled #image-zoom-wrapper {
-  overflow: hidden;
+.image-zoom {
   position: relative;
-}
-
-.js-enabled #image-zoom-wrapper #image-zoom {
   visibility: hidden;
-  position: relative;
-}
-
-#image-zoom-wrapper div.zoom-control {
-  width: 26px;
-  height: 26px;
-}
-
-#image-zoom-wrapper div.zoom-in,
-#image-zoom-wrapper div.zoom-out {
-  position: absolute;
-  left: 10px;
-  top: 10px;
-}
-
-#image-zoom-wrapper div.zoom-out {
-  background-image: url("./zoom-out.png");
-  top: 46px;
-}
-
-#image-zoom-wrapper div.zoom-off {
-  background-position: 0 100%;
-}
-
-#image_feed_timestamp {
-  text-shadow: -1px 0 #656565, 0 1px #656565, 1px 0 #656565, 0 -1px #656565, 2px 2px 3px rgba(0,0,0,0.3);
 }

@@ -9,7 +9,17 @@
 
   "use strict";
 
-  org.gigapan.zoomify = function() {
+  var jsFiles = $("script");
+  var pathOfCurrentScript = $(jsFiles[jsFiles.length - 1]).attr("src");
+  var rootURL = pathOfCurrentScript.substr(0, pathOfCurrentScript.substring(1).indexOf('/') + 1);
+  if (rootURL === "" || (rootURL.substr(0,1) !== "/" && rootURL.substr(0,1) !== "." && rootURL.substr(0,2) !== ".."))
+    rootURL = "";
+  else
+    rootURL += "/";
+
+  org.gigapan.zoomify = function(settings) {
+    console.log('hai');
+    $('<style type="text/css">.closedHand {cursor: url("' + rootURL + 'stylesheets/cursors/closedhand.cur"), move !important;} .openHand {cursor: url("' + rootURL + 'stylesheets/cursors/openhand.cur"), move !important;} .tiledContentHolder {cursor: url("' + rootURL + 'stylesheets/cursors/openhand.cur"), move;}</style>').appendTo($('head'));
 
     //--------------------------------------------------
     // Variables
@@ -31,7 +41,8 @@
       zoom_level_count = [],
       click_last = 0,
       origin = null,
-      html_ref = null;
+      html_ref = null,
+      parentOffset = null;
 
     //--------------------------------------------------
     // IE9 Bug ... if loading an iframe which is then
@@ -56,6 +67,7 @@
         mouseX = currentPos[0];
         mouseY = currentPos[1];
       }
+
       //--------------------------------------------------
       // Variables
 
@@ -148,12 +160,23 @@
 
     function event_coords(e) {
       var coords = [];
+      var posX, posY;
+      if (!parentOffset)
+        parentOffset = $(div_ref).parent().offset();
+
       if (e.touches && e.touches.length) {
-        coords[0] = e.touches[0].clientX;
-        coords[1] = e.touches[0].clientY;
+        coords[0] = e.touches[0].clientX - parentOffset.left;
+        coords[1] = e.touches[0].clientY - parentOffset.top;
       } else {
-        coords[0] = e.clientX;
-        coords[1] = e.clientY;
+        if (e.pageX || e.pageY) {
+          posX = e.pageX;
+          posY = e.pageY;
+        } else if (e.clientX || e.clientY) {
+          posX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+          posY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+        }
+        coords[0] = posX - parentOffset.left;
+        coords[1] = posY - parentOffset.top;
       }
       return coords;
     }
@@ -235,6 +258,7 @@
           click_last = now;
         }
       }
+
       //--------------------------------------------------
       // Add events
 
@@ -276,9 +300,9 @@
 
     //--------------------------------------------------
     // Run on load
-    this.makeImageZoomable = function() {
-      div_ref = document.getElementById('image-zoom-wrapper');
-      img_ref = document.getElementById('image-zoom');
+    this.makeImageZoomable = function(imageId) {
+      img_ref = $("#" + imageId).get(0);
+      div_ref = $("#" + imageId).parent().get(0);
 
       if (div_ref && img_ref) {
 
@@ -314,10 +338,7 @@
         img_orig_height = img_ref.height;
 
         //--------------------------------------------------
-        // Zoom levels
-
-        //--------------------------------------------------
-        // Defaults
+        // Set zoom level defaults
 
         div_width = (div_half_width);
         div_height = (div_half_height);
@@ -351,10 +372,13 @@
 
         //--------------------------------------------------
         // Make visible
-
-        if ($("#image_feed").css("visibility") !== "hidden") {
+        if ($(div_ref).css("visibility") !== "hidden") {
           img_ref.style.visibility = 'visible';
         }
+
+        if (typeof(settings.onImageReady) === "function")
+          settings.onImageReady(imageId);
+
         div_ref.className = div_ref.className + ' js-active';
 
         //--------------------------------------------------
