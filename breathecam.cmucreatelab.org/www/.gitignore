@@ -15,4 +15,6 @@ Gemfile.lock
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
-/tmp
+/tmp/*
+!/tmp/deploy.sh
+!/tmp/restart.txt
