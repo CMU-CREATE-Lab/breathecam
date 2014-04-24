@@ -177,7 +177,7 @@
         $image_feed_button.off();
         $("#show_image_feed .feed_overlay").addClass("disabled");
         tm_init();
-      } else if (true) {
+      } else if (!timelapseSupported || typeof (cached_breathecam) === "undefined") {
         var $timelapse_feed_button = $("#show_timelapse_feed");
         if (typeof (cached_breathecam) === "undefined")
           error_text = "Temporarily unavailable. Please try again later.";
