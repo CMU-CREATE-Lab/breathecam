@@ -18,7 +18,8 @@
     rootURL += "/";
 
   org.gigapan.zoomify = function(settings) {
-    console.log('hai');
+
+    // Set a custom cursor
     $('<style type="text/css">.closedHand {cursor: url("' + rootURL + 'stylesheets/cursors/closedhand.cur"), move !important;} .openHand {cursor: url("' + rootURL + 'stylesheets/cursors/openhand.cur"), move !important;} .tiledContentHolder {cursor: url("' + rootURL + 'stylesheets/cursors/openhand.cur"), move;}</style>').appendTo($('head'));
 
     //--------------------------------------------------
