@@ -17,9 +17,12 @@ class LocationsController < ApplicationController
       # Some error encountered. Most likely an invalid link.
     end
 
-    # We might be checking at midnight and thus need to backtrack
-    if imageArray.blank?
-      img_path = img_path.gsub(date_today.to_s,(date_today - 1).to_s)
+    # We might be checking at midnight and thus need to backtrack.
+    # Or things might have really broken, so backtrack up to 3 weeks.
+    # If we have not noticed a camera down in that timeframe, then shame on us.
+    i = 1
+    while i < 21 && imageArray.blank?
+      img_path = img_path.gsub((date_today - (i - 1)).to_s,(date_today - i).to_s)
       begin
         open(img_path) {|html|
           imageArray = html.read.scan(/\d*_full.jpg/).uniq.sort
@@ -27,6 +30,7 @@ class LocationsController < ApplicationController
       rescue => e
         # Some error encountered. Most likely an invalid link.
       end
+      i += 1
     end
 
     # We did not find any stitched images for today or yesterday. There is most likely a problem with the image collection...
