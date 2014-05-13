@@ -105,25 +105,41 @@ if (!Math.uuid) {
 
 (function() {
   var UTIL = org.gigapan.Util;
-  org.gigapan.timelapse.Snaplapse = function(composerDivId, timelapse, settings, usePresentationSlider) {
+  org.gigapan.timelapse.Snaplapse = function(composerDivId, timelapse, settings, mode) {
 
+    // Objects
+    var thisObj = this;
     var snaplapseViewer;
     var eventListeners = {};
     var keyframes = [];
     var keyframesById = {};
     var keyframeIntervals = [];
     var currentKeyframeInterval = null;
-    var isCurrentlyPlaying = false;
-    var warpStartingTime = null;
     var timeCounterIntervalHandle = null;
-    var thisObj = this;
-    var $composerDivObj = $("#" + composerDivId);
-    var viewerDivId = timelapse.getViewerDivId();
-    var captureTimes = timelapse.getCaptureTimes();
-    var useCustomUI = timelapse.useCustomUI();
 
+    // Settings
+    var useCustomUI = timelapse.useCustomUI();
+    var usePresentationSlider = (mode == "presentation") ? true : false;
+    var disableKeyframeTitle = ( typeof (settings["disableKeyframeTitle"]) == "undefined") ? false : settings["disableKeyframeTitle"];
+
+    // Flags
+    var isCurrentlyPlaying = false;
+
+    // DOM elements
+    var viewerDivId = timelapse.getViewerDivId();
+
+    // Parameters
+    var warpStartingTime = null;
+    var captureTimes = timelapse.getCaptureTimes();
     var loadJSON;
     var loadKeyframesLength;
+    var rootAppURL = org.gigapan.Util.getRootAppURL();
+
+    // Because the viewer on Google Earth Engine is not updated yet,
+    // we need to use disableKeyframeTitle flag for backward compatibility.
+    var TOUR_SHARING_VERSION = disableKeyframeTitle ? 3 : 4;
+
+    // Loop Dwell
     var doLoopDwellTimeout;
     var waitForSeekTimeout;
     var doStartDwell = false;
@@ -136,29 +152,10 @@ if (!Math.uuid) {
     var doExtraStartDwell = false;
     var extraStartDwell = 0;
     var startingPlaybackRate = 1;
-    var rootAppURL = org.gigapan.Util.getRootAppURL();
-
-    var TOUR_SHARING_VERSION = 4;
 
     var _clearSnaplapse = function() {
-
       if (thisObj.isPlaying) {
         thisObj.stop();
-      }
-
-      if (keyframes.length > 0 && !usePresentationSlider) {
-        $("#" + viewerDivId + " .tourLoadOverlay").hide();
-        if ($("#" + viewerDivId + " .snaplapseTourPlayBack").children().length > 1) {
-          $("#" + viewerDivId + " .snaplapseTourPlayBack").empty();
-        }
-        $("#" + viewerDivId + " .snaplapseTourPlayBack").hide();
-
-        if ($("#" + viewerDivId + "_customTimeline").is(':hidden'))
-          snaplapseViewer.showViewerUI();
-
-        $("#" + viewerDivId + " .tourLoadOverlay").remove();
-        $("#" + viewerDivId).append('<div class="tourLoadOverlay"><div class="tourLoadOverlayTitleContainer"><div class="tourLoadOverlayTitle"></div></div><img class="tourLoadOverlayPlay" title="Click to start the tour" src="' + rootAppURL + 'images/tour_play_outline.png"></div>');
-        snaplapseViewer.initializeTourOverlyUI();
       }
 
       keyframes.length = 0;
@@ -183,25 +180,6 @@ if (!Math.uuid) {
       doStartDwell = false;
       doEndDwell = true;
     };
-
-    // Hide the transition area for the last key frame on the UI
-    var hideLastKeyframeTransition = function(showIdx) {
-      var $keyframeItems = $("#" + composerDivId + " .snaplapse_keyframe_list").children();
-      var numItems = $keyframeItems.length;
-      // Unhide the transition options
-      if ( typeof (showIdx) == "undefined" || showIdx == numItems - 1)
-        showIdx = numItems - 2;
-      var $keyframeItems_show = $keyframeItems.eq(showIdx);
-      if ($keyframeItems_show) {
-        $keyframeItems_show.find(".transition_table_mask").children().show();
-        $keyframeItems_show.find(".snaplapse_keyframe_list_item_play_button").button("option", "disabled", false);
-      }
-      // Hide the transition options and reset the keyframe
-      var $keyframeItems_hide = $keyframeItems.eq(numItems - 1);
-      $keyframeItems_hide.find(".snaplapse_keyframe_list_item_play_button").button("option", "disabled", true);
-      $keyframeItems_hide.find(".transition_table_mask").children().hide();
-    };
-    this.hideLastKeyframeTransition = hideLastKeyframeTransition;
 
     // Every time user updates a parameter, try to build the interval
     // TODO: change the function of buildPreviousFlag to buildCurrentAndPreviousFlag
@@ -397,7 +375,7 @@ if (!Math.uuid) {
             previousKeyframe['duration'] = null;
           tryBuildKeyframeInterval_refreshKeyframeParas(previousKeyframe['id']);
         }
-        hideLastKeyframeTransition();
+        snaplapseViewer.hideLastKeyframeTransition();
         if (timelapse.getVisualizer())
           timelapse.getVisualizer().deleteTimeTag(keyframeId, keyframes[indexToDelete - 1]);
         return true;
@@ -471,8 +449,10 @@ if (!Math.uuid) {
           encoder.write_udecimal(zoom, 2);
           // Keyframe description
           encoder.write_string(desiredKeyframes[i]['unsafe_string_description']);
-          // Keyframe title
-          encoder.write_string(desiredKeyframes[i]['unsafe_string_frameTitle']);
+          if (!disableKeyframeTitle) {
+            // Keyframe title
+            encoder.write_string(desiredKeyframes[i]['unsafe_string_frameTitle']);
+          }
         }
         // Tour title
         var title = $("#" + composerDivId + " .saveTimewarpWindow_tourTitleInput").val();
@@ -627,16 +607,6 @@ if (!Math.uuid) {
       return JSON.stringify(snaplapseJSON, null, 3);
     };
 
-    this.loadPresentation = function(url) {
-      var match = url.match(/(presentation)=([^#?&]*)/);
-      if (match) {
-        var presentation = match[2];
-        snaplapseViewer.loadNewSnaplapse(urlStringToJSON(presentation));
-      } else {
-        alert("Error: Invalid presentation");
-      }
-    };
-
     // The function loads a keyframe everytime it get called
     // e.g. loadFromJSON(json, 0), loadFromJSON(undefined, 1), loadFromJSON(undefined, 2)...
     this.loadFromJSON = function(json, loadIndex) {
@@ -646,13 +616,6 @@ if (!Math.uuid) {
           $(document.body).css("cursor", "wait");
           loadJSON = JSON.parse(json);
           _clearSnaplapse();
-          var tourTitle = loadJSON['snaplapse']['unsafe_string_title'] ? loadJSON['snaplapse']['unsafe_string_title'] : "Untitled";
-          // Add the tour title to the save dialogue
-          $("#" + composerDivId + " .saveTimewarpWindow_tourTitleInput").val(tourTitle);
-          if (!usePresentationSlider) {
-            // Add the tour title to be used during tour playback
-            $("#" + viewerDivId + " .tourLoadOverlayTitle").text("Tour: " + tourTitle);
-          }
         }
         if ( typeof (loadJSON['snaplapse']) != 'undefined' && typeof (loadJSON['snaplapse']['keyframes']) != 'undefined') {
           UTIL.log("Found [" + loadJSON['snaplapse']['keyframes'].length + "] keyframes in the json:\n\n" + json);
@@ -738,11 +701,6 @@ if (!Math.uuid) {
         if (!isKeyframeFromLoad)
           resetKeyframe(keyframes[insertionIndex - 1]);
         tryBuildKeyframeInterval_refreshKeyframeParas(keyframeId, true);
-      }
-
-      if (!isKeyframeFromLoad) {
-        if (timelapse.getVisualizer())
-          timelapse.getVisualizer().addTimeTag(keyframes, insertionIndex);
       }
 
       // Events should be fired at the end of this function
@@ -894,7 +852,6 @@ if (!Math.uuid) {
         // TODO: Always keep playing after a tour finishes OR return to the previous player state?
         timelapse.handlePlayPause();
         timelapse.pause();
-
         isCurrentlyPlaying = false;
 
         // Clear the time counter interval
@@ -964,10 +921,6 @@ if (!Math.uuid) {
       return snaplapseViewer;
     };
 
-    this.getPresentationSliderViewer = function() {
-      return snaplapseViewer;
-    };
-
     var cloneFrame = function(frame) {
       return $.extend({}, frame);
     };
@@ -979,7 +932,7 @@ if (!Math.uuid) {
 
       if (currentKeyframeInterval != null) {
         var rate = currentKeyframeInterval.getPlaybackRate();
-        timelapse.setPlaybackRate(rate);
+        timelapse.setPlaybackRate(rate, null, true);
 
         // When we set the current keyframe interval,
         // ask if we need to do an extra pausing at the beginning of playing the tour
@@ -992,6 +945,7 @@ if (!Math.uuid) {
         }
         currentLoopDwell = currentKeyframeInterval.getLoopDwell();
         var currentFrame = currentKeyframeInterval.getStartingFrame();
+
         if (currentFrame)
           UTIL.selectSortableElements($("#" + composerDivId + " .snaplapse_keyframe_list"), $("#" + composerDivId + "_snaplapse_keyframe_" + currentFrame.id), true);
 
@@ -1143,8 +1097,8 @@ if (!Math.uuid) {
     //
 
     org.gigapan.Util.ajax("html", rootAppURL, "time_warp_composer.html", function(html) {
-      $composerDivObj.html(html);
-      snaplapseViewer = new org.gigapan.timelapse.snaplapse.SnaplapseViewer(thisObj, timelapse, settings, usePresentationSlider);
+      $("#" + composerDivId).html(html);
+      snaplapseViewer = new org.gigapan.timelapse.snaplapse.SnaplapseViewer(thisObj, timelapse, settings, mode);
     });
 
   };
