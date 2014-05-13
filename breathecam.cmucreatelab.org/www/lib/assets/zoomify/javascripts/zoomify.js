@@ -88,8 +88,8 @@
         }
       }
 
-      if (new_zoom <= 3) {
-        if (new_zoom < 3) {
+      if (new_zoom <= 4) {
+        if (new_zoom < 4) {
           return;
         }
       }
@@ -302,7 +302,9 @@
     //--------------------------------------------------
     // Run on load
     this.makeImageZoomable = function(imageId) {
+      // stitched_image
       img_ref = $("#" + imageId).get(0);
+      // stitched_image_wrapper
       div_ref = $("#" + imageId).parent().get(0);
 
       if (div_ref && img_ref) {
@@ -369,7 +371,7 @@
         // Set default
 
         zoom_level_count = (zoom_levels.length - 1);
-        image_zoom(3);
+        image_zoom(4);
 
         //--------------------------------------------------
         // Make visible

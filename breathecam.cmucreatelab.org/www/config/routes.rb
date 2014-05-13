@@ -57,6 +57,8 @@ Breathecam::Application.routes.draw do
   # match ':controller(/:action(/:id))(.:format)'
 
   match 'locations/:location' => 'locations#index'
+  match 'embeds/' => 'embeds#index', :defaults => { :location => "heinz" }
+  match 'embeds/:location' => 'embeds#index', :defaults => { :location => "heinz" }
 
   post '/location_pinger' => 'locations_handler#receive_data'
 
