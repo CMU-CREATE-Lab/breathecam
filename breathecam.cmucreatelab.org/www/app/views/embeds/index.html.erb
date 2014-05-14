@@ -23,13 +23,61 @@
                              "zoomify-bundle.js"  %>
 
   <style type="text/css">
-    #datepicker { font-size: 10px;}
-    #datepicker .ui-state-default { background: white; }
-    #datepicker .date-highlight a { background: rgb(240, 240, 240); }
-    #datepicker .ui-state-active { border: 1px solid #000000; }
-    .ui-datepicker-today a.ui-state-highlight {
-      border-color: #d3d3d3;
+    #datepicker {
+      right: 0px !important;
+    }
+    #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
+      cursor: pointer;
+    }
+    #datepicker .ui-datepicker-header {
+      color: white;
+      background: rgb(150, 150, 150);
+      border: 0px solid rgb(204, 204, 204);
+      border-radius: 3px !important;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-datepicker {
+      font-size: 12px;
+      height: 190px;
+      border-radius: 0;
       color: #555555;
+      background: rgb(248, 248, 248);
+      border: 1px solid rgb(150, 150, 150);
+    }
+    #datepicker .ui-state-default {
+      background: rgb(150, 150, 150);
+      border-radius: 3px !important;
+      color: white;
+      box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-state-hover {
+      background: rgb(100, 100, 100) !important;
+    }
+    #datepicker .date-highlight a {
+      color: white;
+      background: rgb(150, 150, 150);
+      border: 1px solid rgb(204, 204, 204);
+    }
+    #datepicker .ui-state-active {
+      border: 1px solid rgb(204, 204, 204) !important;
+      background: #2794DD !important;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-datepicker-header .ui-icon {
+      background-image: url(<%= asset_path('ui-icons_custom_256x240.png') %>);
+    }
+    .ui-datepicker-today a.ui-state-highlight {
+    }
+    #locationTitle {
+      position: absolute;
+      right: 240px;
+      top: 18px;
+      font-size: 20px;
+      text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000, 2px 2px 3px rgba(0,0,0,0.3);
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      font-weight: normal;
+      z-index: 50;
     }
   </style>
 
@@ -44,6 +92,7 @@
       $("#stitched_image_wrapper").css("visibility", "hidden");
       $("#stitched_image").css("visibility", "hidden");
       $("#timelapse_feed").show();
+      setLocationTitle();
     }
 
     function selectImageFeed() {
@@ -51,6 +100,12 @@
       $("#image_feed").css("visibility", "visible");
       $("#stitched_image_wrapper").css("visibility", "visible");
       $("#stitched_image").css("visibilriity", "visible");
+      setLocationTitle();
+    }
+
+    function setLocationTitle($parent) {
+      var locationTitle = $("#location_toggle .location_thumbnail_selected").siblings(".location_title").text();
+      $("#locationTitle").text(locationTitle);
     }
 
     function tm_init() {
@@ -185,7 +240,6 @@
         tm_init();
         //img_init();
       }
-
       $("body").on("selectstart", function(e) { e.preventDefault(); });
     });
   </script>
@@ -193,8 +247,9 @@
 
 <div>
   <div id="loading">
-    <img src="<%= asset_path('loading.gif') %>">
+    <img id="loadingImg" src="<%= asset_path('loading.gif') %>">
   </div>
+  <div id="locationTitle"></div>
   <div>
     <div id="timelapse_feed" class="timelapse_feed_embed">
       <div id="player1"></div>

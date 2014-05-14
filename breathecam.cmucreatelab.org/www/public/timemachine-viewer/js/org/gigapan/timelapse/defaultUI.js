@@ -635,7 +635,8 @@ if (!org.gigapan.timelapse.Timelapse) {
 
     var fitToWindow = function() {
       var newViewportWidth, newViewportHeight;
-      newViewportWidth = window.innerWidth - 238;
+      // Hack for Breathecam embed (was window.innerWidth - 2)
+      newViewportWidth = window.innerWidth - 219;
       // Extra 2px for the borders
       newViewportHeight = window.innerHeight - 2;
       // Extra 2px for the borders
