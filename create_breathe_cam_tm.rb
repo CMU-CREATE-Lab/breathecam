@@ -32,6 +32,7 @@ $rsync_input = false
 $rsync_output = false
 $tmp_output_path = nil
 $skip_rotate = false
+$run_append_externally = false
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -102,12 +103,14 @@ class Compiler
         $incremental_update_interval = (ARGV.shift.to_f / 10.0).ceil * 10
       elsif arg == "--skip-rotate"
         $skip_rotate = true
+      elsif arg == "--run-append-externally"
+        $run_append_externally = true
       end
     end
 
     $do_incremental_update = true if defined?($incremental_update_interval)
 
-    if $current_day and $do_incremental_update
+    if $current_day && $do_incremental_update
       puts "Specifying a day AND doing incremental appending is not supported. You can only do incremental appending from the actual day of running the script. \n So, either just specify a day OR specify incremental updating."
       exit
     end
@@ -377,12 +380,14 @@ class Compiler
   def create_tm
     puts "Creating Time Machine..."
     $timemachine_output_dir = $create_videoset_segment_directory ? "#{$current_day}-#{$incremental_update_interval}m.timemachine" : "#{$current_day}.timemachine"
+    $timemachine_master_output_dir = "#{$current_day}.timemachine"
     # TODO: Assumes Ruby is installed and ct.rb is in the PATH
     system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs}")
     puts "Time Machine created."
     add_entry_to_json
-    rsync_output_files if $rsync_output
+    rsync_output_files if $rsync_output && $run_append_externally
     append_new_segments if $create_videoset_segment_directory
+    rsync_output_files($timemachine_master_output_dir) if $rsync_output && !$run_append_externally
     completed_process
   end
 
@@ -397,7 +402,7 @@ class Compiler
       json["datasets"] = {}
     end
     new_latest = $current_day
-    if json["latest"] and json["latest"]["date"]
+    if json["latest"] && json["latest"]["date"]
       last_latest = json["latest"]["date"]
       last_latest_array = last_latest.split("-")
       date_array = $current_day.split("-")
@@ -407,13 +412,13 @@ class Compiler
       date_year = date_array[0].to_i
       date_month = date_array[1].to_i
       date_day = date_array[2].to_i
-      new_latest = last_latest if ((last_latest_year > date_year) or (last_latest_year >= date_year and last_latest_month > date_month) or (last_latest_year >= date_year and last_latest_month >= date_month and last_latest_day > date_day))
+      new_latest = last_latest if ((last_latest_year > date_year) || (last_latest_year >= date_year && last_latest_month > date_month) || (last_latest_year >= date_year && last_latest_month >= date_month && last_latest_day > date_day))
     else
       json["latest"] = {}
     end
     json["latest"]["date"] = new_latest
-    json["latest"]["path"] = "http://g7.gigapan.org/timemachines/breathecam/#{$camera_location}/#{new_latest}.timemachine";
-    json["datasets"]["#{$current_day}"] = "http://g7.gigapan.org/timemachines/breathecam/#{$camera_location}/#{$current_day}.timemachine"
+    json["latest"]["path"] = "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam/timemachines/#{$camera_location}/#{new_latest}.timemachine";
+    json["datasets"]["#{$current_day}"] = "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam/timemachines/#{$camera_location}/#{$current_day}.timemachine"
     open(path_to_json, "w") {|fh| fh.puts(JSON.generate(json))}
     open(path_to_js, "w") {|fh| fh.puts("cached_breathecam=" + JSON.generate(json) + ";")}
     puts "Successfully wrote #{$camera_location}.json"
@@ -421,12 +426,12 @@ class Compiler
 
   def append_new_segments
     # The code for appending is in a separate script, since it may potentially need to be run on another machine if the output files are there.
-    # While we could rsync files in the above case, it would take too long once we get torwards the end of a day of images and we would be unable
-    # to complete it in the 10 minutes (or less) window that we want. So, we just do all processing there.
+    # Rsync does allow us to send partial data and thus only the new segments would be sent, which we will take advantage of if we can, but if
+    # we do not have rsync, at least the append script is separate and we have the choice to handle things outside this master script.
     output_path = $output_path
     ssh_to_host_param = ""
     extra_ssh_command = ""
-    if $rsync_output
+    if $rsync_output && $run_append_externally
       args = $output_path.split(":")
       host = args[0]
       output_path = args[1]
@@ -437,14 +442,15 @@ class Compiler
     else
       # TODO
       # Appending script assumed to be in the same directory from which we called the script currently running. Also assumes ruby is installed and in the PATH.
-      cmd = "ruby append_breathecam_videos.rb #{output_path}/#{$current_day}.timemachine #{$output_path}/#{$timemachine_output_dir} #{$num_jobs}"
+      cmd = "ruby #{File.join(File.dirname(__FILE__), 'append_breathecam_videos.rb')} #{output_path}/#{$timemachine_master_output_dir} #{$output_path}/#{$timemachine_output_dir} #{$num_jobs}"
     end
     system(cmd)
   end
 
-  def rsync_output_files
-    puts "Rsyncing #{$timemachine_output_path}/#{$timemachine_output_dir} to #{$output_path}"
-    system("rsync -a #{$timemachine_output_path}/#{$timemachine_output_dir} #{$output_path}")
+  def rsync_output_files(dir_to_rsync)
+    dir_to_rsync ||= "#{$timemachine_output_dir}"
+    puts "Rsyncing #{$timemachine_output_path}/#{dir_to_rsync} to #{$output_path}"
+    system("rsync -a #{$timemachine_output_path}/#{dir_to_rsync} #{$output_path}")
     unless $create_videoset_segment_directory
       puts "Rsyncing #{$camera_location}.json to #{$output_path}"
       system("rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{$output_path}")
