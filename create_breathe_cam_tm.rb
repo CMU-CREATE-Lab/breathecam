@@ -45,11 +45,6 @@ class Compiler
       usage
     end
 
-    if File.exists?(File.join("#{$camera_location}","WIP"))
-      puts "A file called 'WIP' was detected, which indicates that this working directory is already in the middle of processing. Aborting."
-      exit
-    end
-
     current_time = Time.now
     puts "Start Time: #{current_time}"
 
@@ -84,6 +79,11 @@ class Compiler
     end
 
     $working_dir = File.join(File.dirname(__FILE__), "#{$camera_location}.tmc")
+
+    if File.exists?(File.join($working_dir, "WIP"))
+      puts "A file called 'WIP' was detected, which indicates that this working directory is already in the middle of processing. Aborting."
+      exit
+    end
 
     while !ARGV.empty?
       arg = ARGV.shift
