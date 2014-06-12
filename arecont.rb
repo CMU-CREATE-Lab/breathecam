@@ -20,7 +20,7 @@ $config = "res=full&x0=0&y0=0&x1=3648&y1=2752&quality=21&doublescan=0"
 # Broken Lense, Walnut Towers, Heinz, Trimont, Loaner
 # The array index is the lense number going from left to right.
 # The value at the array index is the output image number.
-@@camera_list = [[], ["4","2","1","3"], ["1","3","4","2"], ["4","2","1","3"], ["4","2","1","3"]]
+@@camera_list = [["4","2","1","3"], ["4","2","1","3"], ["1","3","4","2"], ["4","2","1","3"], ["4","2","1","3"]]
 
 def usage
   puts "Usage: ruby arecont.rb HOST OUTPUT_PATH"
@@ -59,7 +59,7 @@ end
 instance_check = $location_id ? $location_id : $host
 
 # Make sure only one instance of this script with a specific host is run
-cmd = (`ps aux | grep "arecont.*#{instance_check}.*" | grep -v -E '(grep|sh|nano)'`)
+cmd = (`ps aux | grep 'arecont.*#{instance_check}.*"' | grep -v -E '(grep|sh|nano)'`)
 num_instances = []
 
 # Backwards compatibility with Ruby 1.8
