@@ -2,7 +2,7 @@ from numpy import *
 heinz_camera_lla = {'lat': 40.442588, 'lon': -80.001047, 'alt': 335}
 
 # From https://code.google.com/p/pysatel/source/browse/trunk/coord.py?r=22
-import math, IPython
+import math, IPython, scipy.optimize
 
 # Constants defined by the World Geodetic System 1984 (WGS84), in km
 '''
@@ -127,7 +127,7 @@ pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 listOfKnownPoints =  []
 listOfKnownPoints.append(({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
 
-#We will be passing the dictionary of paramters to the cost function
+#paramters to the cost function that need to be optimized. pixels per radian, and quarternion
 parameters = [2273,1,0,0,0]
 
 def totalErrorInPixels(para):
@@ -154,6 +154,9 @@ print "The cost of the points observed is  ", testCostFunction
 #TODO, write up the optimization problem with the variable is the heinz_imodel using scipy.optimize
 
 
+
+IPython.embed()
+res = scipy.optimize.leastsq(totalErrorInPixels, parameters)
 
 
 
