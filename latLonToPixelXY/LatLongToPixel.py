@@ -2,21 +2,33 @@ from numpy import *
 heinz_camera_lla = {'lat': 40.442588, 'lon': -80.001047, 'alt': 335}
 
 # From https://code.google.com/p/pysatel/source/browse/trunk/coord.py?r=22
-import math
+import math, IPython
 
 # Constants defined by the World Geodetic System 1984 (WGS84), in km
+'''
 a = 6378.137
 b = 6356.7523142
 esq = 6.69437999014 * 0.001
 e1sq = 6.73949674228 * 0.001
 f = 1 / 298.257223563
-
+'''
 def lla2ecef(lla):
+
+    # Constants defined by the World Geodetic System 1984 (WGS84), in km
+    a = 6378.137
+    b = 6356.7523142
+    esq = 6.69437999014 * 0.001
+    e1sq = 6.73949674228 * 0.001
+    f = 1 / 298.257223563
+
+
+
     lat = lla['lat']
     lon = lla['lon']
     alt = lla['alt'] / 1000.0
     """Convert geodetic coordinates to ECEF."""
     lat, lon = math.radians(lat), math.radians(lon)
+    IPython.embed()
     xi = math.sqrt(1 - esq * math.sin(lat))
     x = (a / xi + alt) * math.cos(lat) * math.cos(lon)
     y = (a / xi + alt) * math.cos(lat) * math.sin(lon)
@@ -25,9 +37,11 @@ def lla2ecef(lla):
 
 print lla2ecef(heinz_camera_lla)
 
-def pixel_from_ccxyz(cc, imodel):
 
-    yaw = math.atan2(cc[0], cc[2])
+
+def pixel_from_ccxyz(cc, imodel):  #pixel from camera centered xyz coordinates
+
+    yaw = math.atan2(cc[0], cc[2])  
     print '  yaw is %g' % yaw
     pixel_x = yaw * imodel['pixels_per_radian'] + imodel['width'] * 0.5
     print '  pixel_x is %g' % pixel_x
@@ -40,14 +54,14 @@ def pixel_from_ccxyz(cc, imodel):
     return (pixel_x, pixel_y)
     
 heinz_imodel = {
-    'height': 1688,
-    'width': 7141,
-    'pixels_per_radian': 2273,
+    'height': 1688,              #size of the panoramic image ? 
+    'width': 7141,               
+    'pixels_per_radian': 2273,   #width/angle covered. Here 7141/pi
     'ecef': lla2ecef(heinz_camera_lla),
     'rotation': (1, 0, 0, 0)
 }
 
-straight_ahead_cc = array((0, 0, 1000))
+straight_ahead_cc = array((0, 0, 1000))      
 right_face_cc = array((500, 0, 0))
 left_face_cc = array((-500, 0, 0))
 upwards_45_cc = array((0, -25, 25))
@@ -104,11 +118,34 @@ def pixel_from_ecef(ecef, model):
 # TO DO:  locate ~10 reference points
 
 home_plate_lla = {'lat':40.447057, 'lon':-80.006170, 'alt':222}
-
+print "Enter something to enter the place of next funtion"
+a = raw_input()
 pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 
 
-# TODO: use something like scipy.optimize.leastsq to find external and pixels per radian
+
+#The cost function will be a function of the rotation parameters and the pixels per radian parameter
+#It will calculste the total error between the actual pixel values and the estimated pixel values from the code
+
+#Store the points as list of tuples of dictionaried (tuple so that we do not chagne them, and dictionary to make semantic sense)
+listOfValues =  []
+listOfValues.append(({'lat':40.447057,'lon': -80.006170 ,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
+
+
+def totalErrorInPixels(listOfKnownPoints):
+    error = 0
+    for point in range(len(listOfKnownPoints)):
+        llaKnown   = listOfKnownPoints[point][0]
+	pixelKnown = (listOfKnownPoints[point][1]['xPixel'],listOfKnownPoints[point][1]['yPixel'])
+	pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),heinz_imodel)
+  	error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
+    return error
+
+
+testCostFunction =  totalErrorInPixels(listOfValues)
+print "The cost of the points observed is  ", testCostFunction
+
+#TODO, write up the optimization problem with the variable is the heinz_imodel using scipy.optimize
 
 
 
