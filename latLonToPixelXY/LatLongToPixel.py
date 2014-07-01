@@ -28,7 +28,6 @@ def lla2ecef(lla):
     alt = lla['alt'] / 1000.0
     """Convert geodetic coordinates to ECEF."""
     lat, lon = math.radians(lat), math.radians(lon)
-    IPython.embed()
     xi = math.sqrt(1 - esq * math.sin(lat))
     x = (a / xi + alt) * math.cos(lat) * math.cos(lon)
     y = (a / xi + alt) * math.cos(lat) * math.sin(lon)
@@ -118,31 +117,38 @@ def pixel_from_ecef(ecef, model):
 # TO DO:  locate ~10 reference points
 
 home_plate_lla = {'lat':40.447057, 'lon':-80.006170, 'alt':222}
-print "Enter something to enter the place of next funtion"
-a = raw_input()
 pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
-
 
 
 #The cost function will be a function of the rotation parameters and the pixels per radian parameter
 #It will calculste the total error between the actual pixel values and the estimated pixel values from the code
 
 #Store the points as list of tuples of dictionaried (tuple so that we do not chagne them, and dictionary to make semantic sense)
-listOfValues =  []
-listOfValues.append(({'lat':40.447057,'lon': -80.006170 ,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
+listOfKnownPoints =  []
+listOfKnownPoints.append(({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
 
+#We will be passing the dictionary of paramters to the cost function
+parameters = [2273,1,0,0,0]
 
-def totalErrorInPixels(listOfKnownPoints):
+def totalErrorInPixels(para):
     error = 0
+    cam_model = {
+        'height': 1688,            
+        'width' : 7141 ,
+        'pixels_per_radian': para[0], 
+        'ecef': lla2ecef(heinz_camera_lla),
+        'rotation': (para[1], para[2], para[3], para[4])
+    }
+
     for point in range(len(listOfKnownPoints)):
         llaKnown   = listOfKnownPoints[point][0]
 	pixelKnown = (listOfKnownPoints[point][1]['xPixel'],listOfKnownPoints[point][1]['yPixel'])
-	pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),heinz_imodel)
+	pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),cam_model)
   	error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
     return error
 
 
-testCostFunction =  totalErrorInPixels(listOfValues)
+testCostFunction =  totalErrorInPixels(parameters)
 print "The cost of the points observed is  ", testCostFunction
 
 #TODO, write up the optimization problem with the variable is the heinz_imodel using scipy.optimize
