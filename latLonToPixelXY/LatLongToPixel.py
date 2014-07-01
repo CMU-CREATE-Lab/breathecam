@@ -126,15 +126,27 @@ pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 #Store the points as list of tuples of dictionaried (tuple so that we do not chagne them, and dictionary to make semantic sense)
 listOfKnownPoints =  []
 listOfKnownPoints.append(({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
+'''
+listOfKnownPoints = [({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }),
+({'lat':98.447057,'lon': -12.006170,'alt': 652  },{'xPixel': 164  , 'yPixel': 22.26 }),
+({'lat':67.447057,'lon': -56.006170,'alt': 243  },{'xPixel': 244.64  , 'yPixel': 502.26 }),
+({'lat':76.447057,'lon': -23.006170,'alt': 222  },{'xPixel': 44.64  , 'yPixel': 602.26 }),
+({'lat':40.447057,'lon': -65.006170,'alt': 122  },{'xPixel': 1244.64  , 'yPixel': 2.26 }),
+({'lat':0.447057,'lon': -13.006170,'alt': 352  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }),
+({'lat':40.447057,'lon': -5.0070,'alt': 122  },{'xPixel': 14.64  , 'yPixel': 2122.26 })]
+
+LatLongAlt = 
+'''
+
 
 #paramters to the cost function that need to be optimized. pixels per radian, and quarternion
-parameters = [2273,1,0,0,0]
+parameters = [2855 , 1 , 0 , 0 , 0]
 
 def totalErrorInPixels(para):
     error = 0
     cam_model = {
-        'height': 1688,            
-        'width' : 7141 ,
+        'height': 1733,            
+        'width' : 8970 ,
         'pixels_per_radian': para[0], 
         'ecef': lla2ecef(heinz_camera_lla),
         'rotation': (para[1], para[2], para[3], para[4])
@@ -148,6 +160,26 @@ def totalErrorInPixels(para):
     return error
 
 
+def errorOnePoint(para,latLong,pixelVal):
+
+#latLong is a dictionary of lat,long and alt. example = {'lat':40.447057, 'lon':-80.006170, 'alt':222}
+#pixelVal is a tuple  (xpixel,ypixel)
+
+    cam_model = {
+        'height': 1733,            
+        'width' : 8970 ,
+        'pixels_per_radian': para[0], 
+        'ecef': lla2ecef(heinz_camera_lla),
+        'rotation': (para[1], para[2], para[3], para[4])
+    }
+    pixelCalc     = pixel_from_ecef(lla2ecef(latLong),cam_model)
+    errorOnePoint = (pixelVal[0] - pixelCalc[0])**2 + (pixelVal[1] - pixelCalc[1])**2
+    return errorOnePoint
+
+
+IPython.embed()
+
+
 testCostFunction =  totalErrorInPixels(parameters)
 print "The cost of the points observed is  ", testCostFunction
 
@@ -156,9 +188,5 @@ print "The cost of the points observed is  ", testCostFunction
 
 
 IPython.embed()
-res = scipy.optimize.leastsq(totalErrorInPixels, parameters)
-
-
-
-
+res = scipy.optimize.anneal(totalErrorInPixels, parameters,lower = [0,0,0,0,0],upper=[10000,1,1,1,1])
 
