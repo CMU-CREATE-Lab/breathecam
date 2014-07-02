@@ -125,15 +125,9 @@ pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 
 
 
-#The cost function will be a function of the rotation parameters and the pixels per radian parameter
-#It will calculste the total error between the actual pixel values and the estimated pixel values from the code
-
-#Store the points as list of tuples of dictionaried (tuple so that we do not chagne them, and dictionary to make semantic sense)
 #listOfKnownPoints =  []
 #listOfKnownPoints.append(({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
 #TODO if necessary:write parsing script to read from json file into datastructures
-
-
 listOfKnownPoints = [
 ({'lat':40.441366,'lon': -79.994775, 'alt': 222  },{'xPixel': 4144.083  , 'yPixel': 760.187  }),
 ({'lat':40.441823,'lon': -80.012776, 'alt': 206  },{'xPixel': 2752.402  , 'yPixel': 1642.679 }),
@@ -153,7 +147,7 @@ parameters = [2855 , 1 , 0 , 0 , 0]
 #Functions takes in the paramerters and spits out the total cost(error). All the points that we handselected are put in the global varibale "listOfKnownPoints" which is used in the function.
 def totalErrorInPixels(para):
     error = 0
-    global errorList
+    global errorList        #I use it to print out the error list and the end of optimization.
     errorList = []
     cam_model = {
         'height': 1733,            
@@ -169,7 +163,7 @@ def totalErrorInPixels(para):
 	pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),cam_model)
         errorList.append((pixelKnown[0] - pixelCalc[0]  ,  pixelKnown[1] - pixelCalc[1]))
   	error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
-    # print "The errors obtained with these parameters are ", errorList , " /n   "
+#    print "The errors obtained with these parameters are ", errorList , " \n   "
     return error
 
 
@@ -204,17 +198,17 @@ def errorOnePoint(para,latLong,pixelVal):
 #res = scipy.optimize.leastsq(errorOnePoint, parameters,args = (LatLongAlt,Pixulus)) 
 res = scipy.optimize.fmin(totalErrorInPixels, parameters, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.00001, xtol = 0.00001)
 # check http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html downhill simplex algorithm
+
 global errorList
 print "The optimum parameters found are " , res , " and the error observed is  ", errorList
-
 IPython.embed()
 
 #To test the data
 normQuat   =  normalize(res[1:])
 newRes     = [res[0]] +  list(normQuat)
 print "The new Res looks like " , newRes
-print "\n The total error is ", totalErrorInPixels(newRes) , " \n and the list of error values is ", errorList
-print "\n error of one location is " ,errorOnePoint(newRes,latLong,pixelVal)
+print "\n The total error is "  , totalErrorInPixels(newRes) , " \n and the list of error values is ", errorList
+print "\n error of one location is " , errorOnePoint(newRes,latLong,pixelVal)
 
 
 
