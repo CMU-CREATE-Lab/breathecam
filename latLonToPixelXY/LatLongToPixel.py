@@ -41,14 +41,14 @@ print lla2ecef(heinz_camera_lla)
 def pixel_from_ccxyz(cc, imodel):  #pixel from camera centered xyz coordinates
 
     yaw = math.atan2(cc[0], cc[2])  
-    print '  yaw is %g' % yaw
+    #print '  yaw is %g' % yaw
     pixel_x = yaw * imodel['pixels_per_radian'] + imodel['width'] * 0.5
-    print '  pixel_x is %g' % pixel_x
+    #print '  pixel_x is %g' % pixel_x
 
     tilt = math.atan2(cc[1], math.sqrt(cc[0] * cc[0] + cc[2] * cc[2]))
-    print '  tilt is %g' % tilt
+    #print '  tilt is %g' % tilt
     pixel_y = tilt * imodel['pixels_per_radian'] + imodel['height'] * 0.5
-    print '  pixel_y is %g' % pixel_y
+    #print '  pixel_y is %g' % pixel_y
     
     return (pixel_x, pixel_y)
     
@@ -129,47 +129,32 @@ pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 #It will calculste the total error between the actual pixel values and the estimated pixel values from the code
 
 #Store the points as list of tuples of dictionaried (tuple so that we do not chagne them, and dictionary to make semantic sense)
-listOfKnownPoints =  []
-listOfKnownPoints.append(({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
+#listOfKnownPoints =  []
+#listOfKnownPoints.append(({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
+#TODO if necessary:write parsing script to read from json file into datastructures
 
 
-#following are a some dummy data to check there was no error in the functions
-'''
-listOfKnownPoints = [({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }),
-({'lat':98.447057,'lon': -12.006170,'alt': 652  },{'xPixel': 164  , 'yPixel': 22.26 }),
-({'lat':67.447057,'lon': -56.006170,'alt': 243  },{'xPixel': 244.64  , 'yPixel': 502.26 }),
-({'lat':76.447057,'lon': -23.006170,'alt': 222  },{'xPixel': 44.64  , 'yPixel': 602.26 }),
-({'lat':40.447057,'lon': -65.006170,'alt': 122  },{'xPixel': 1244.64  , 'yPixel': 2.26 }),
-({'lat':0.447057,'lon': -13.006170,'alt': 352  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }),
-({'lat':40.447057,'lon': -5.0070,'alt': 122  },{'xPixel': 14.64  , 'yPixel': 2122.26 })]
-'''
-'''
-LatLongAlt = [{'lat':40.447057,'lon': -80.006170,'alt':222   },
-              {'lat':98.447057,'lon': -12.006170,'alt': 652  },
-              {'lat':67.447057,'lon': -56.006170,'alt': 243  },
-              {'lat':76.447057,'lon': -23.006170,'alt': 222  },
-              {'lat':40.447057,'lon': -65.006170,'alt': 122  },
-              {'lat':0.447057, 'lon': -13.006170,'alt': 352  },
-              {'lat':40.447057,'lon': -5.0070,   'alt': 122  }]
-
-Pixulus = [( 1244.64 ,2002.26 ),
-           ( 164     ,22.26   ),
-           ( 244.64  ,502.26  ),
-           ( 44.64   ,602.26  ),
-           ( 1244.64 ,2.26    ),
-           ( 1244.64 ,2002.26 ),
-           ( 14.64   ,2122.26 )]
-'''
+listOfKnownPoints = [
+({'lat':40.441366,'lon': -79.994775, 'alt': 222  },{'xPixel': 4144.083  , 'yPixel': 760.187  }),
+({'lat':40.441823,'lon': -80.012776, 'alt': 206  },{'xPixel': 2752.402  , 'yPixel': 1642.679 }),
+({'lat':40.444209,'lon': -80.009189, 'alt': 243  },{'xPixel': 2645.539  , 'yPixel': 1307.134 }),
+({'lat':40.438913,'lon': -80.011329, 'alt': 222  },{'xPixel': 4265.726  , 'yPixel': 1557.211 }),
+({'lat':40.445889,'lon': -80.015228, 'alt': 212  },{'xPixel': 1133.514  , 'yPixel': 1447.93  }),
+({'lat':40.436114,'lon': -80.018811, 'alt': 231  },{'xPixel': 8372.991  , 'yPixel': 1288.094 }),
+({'lat':40.437190,'lon': -80.017578, 'alt': 213  },{'xPixel': 6084.036  , 'yPixel': 1382.086 }),
+({'lat':40.437054,'lon': -80.016465, 'alt': 234  },{'xPixel': 5754.627  , 'yPixel': 1463.708 }),
+({'lat':40.432715,'lon': -79.989217, 'alt': 231  },{'xPixel': 5258.228  , 'yPixel': 1074.379 }),
+({'lat':40.441829,'lon': -80.003713, 'alt': 234  },{'xPixel': 3736.978  , 'yPixel': 1274.988 })]
 
 #paramters to the cost function that need to be optimized. pixels per radian, and quarternion
 #We start of with the following guess
-
 parameters = [2855 , 1 , 0 , 0 , 0]
-
 
 #Functions takes in the paramerters and spits out the total cost(error). All the points that we handselected are put in the global varibale "listOfKnownPoints" which is used in the function.
 def totalErrorInPixels(para):
     error = 0
+    global errorList
+    errorList = []
     cam_model = {
         'height': 1733,            
         'width' : 8970 ,
@@ -182,12 +167,17 @@ def totalErrorInPixels(para):
         llaKnown   = listOfKnownPoints[point][0]
 	pixelKnown = (listOfKnownPoints[point][1]['xPixel'],listOfKnownPoints[point][1]['yPixel'])
 	pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),cam_model)
+        errorList.append((pixelKnown[0] - pixelCalc[0]  ,  pixelKnown[1] - pixelCalc[1]))
   	error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
+    # print "The errors obtained with these parameters are ", errorList , " /n   "
     return error
 
 
 
 #Function written to get leastsq in optimize to work. Can be safely ignored
+latLong  = {'lat':40.441366,'lon': -79.994775, 'alt': 222  }
+pixelVal = (4144.083, 760.187 )
+
 def errorOnePoint(para,latLong,pixelVal):
 #latLong is a dictionary of lat,long and alt. example = {'lat':40.447057, 'lon':-80.006170, 'alt':222}
 #pixelVal is a tuple  (xpixel,ypixel)
@@ -202,6 +192,7 @@ def errorOnePoint(para,latLong,pixelVal):
     errorOnePoint = (pixelVal[0] - pixelCalc[0])**2 + (pixelVal[1] - pixelCalc[1])**2
     return errorOnePoint
 
+
 #Test to check if the function runs without error
 #testCostFunction =  totalErrorInPixels(parameters)
 #print "The cost of the points observed is  ", testCostFunction
@@ -211,5 +202,24 @@ def errorOnePoint(para,latLong,pixelVal):
 
 #res = scipy.optimize.anneal(totalErrorInPixels, parameters,lower = [0,-1,-1,-1,-1],upper=[10000.234,1,1,1,1]) 
 #res = scipy.optimize.leastsq(errorOnePoint, parameters,args = (LatLongAlt,Pixulus)) 
-res = scipy.optimize.fmin(totalErrorInPixels, parameters)
+res = scipy.optimize.fmin(totalErrorInPixels, parameters, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.00001, xtol = 0.00001)
+# check http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html downhill simplex algorithm
+global errorList
+print "The optimum parameters found are " , res , " and the error observed is  ", errorList
+
 IPython.embed()
+
+#To test the data
+normQuat   =  normalize(res[1:])
+newRes     = [res[0]] +  list(normQuat)
+print "The new Res looks like " , newRes
+print "\n The total error is ", totalErrorInPixels(newRes) , " \n and the list of error values is ", errorList
+print "\n error of one location is " ,errorOnePoint(newRes,latLong,pixelVal)
+
+
+
+
+
+
+
+
