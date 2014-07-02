@@ -120,12 +120,20 @@ home_plate_lla = {'lat':40.447057, 'lon':-80.006170, 'alt':222}
 pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 
 
+
+
+
+
+
 #The cost function will be a function of the rotation parameters and the pixels per radian parameter
 #It will calculste the total error between the actual pixel values and the estimated pixel values from the code
 
 #Store the points as list of tuples of dictionaried (tuple so that we do not chagne them, and dictionary to make semantic sense)
 listOfKnownPoints =  []
 listOfKnownPoints.append(({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }))
+
+
+#following are a some dummy data to check there was no error in the functions
 '''
 listOfKnownPoints = [({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }),
 ({'lat':98.447057,'lon': -12.006170,'alt': 652  },{'xPixel': 164  , 'yPixel': 22.26 }),
@@ -134,14 +142,32 @@ listOfKnownPoints = [({'lat':40.447057,'lon': -80.006170,'alt': 222  },{'xPixel'
 ({'lat':40.447057,'lon': -65.006170,'alt': 122  },{'xPixel': 1244.64  , 'yPixel': 2.26 }),
 ({'lat':0.447057,'lon': -13.006170,'alt': 352  },{'xPixel': 1244.64  , 'yPixel': 2002.26 }),
 ({'lat':40.447057,'lon': -5.0070,'alt': 122  },{'xPixel': 14.64  , 'yPixel': 2122.26 })]
+'''
+'''
+LatLongAlt = [{'lat':40.447057,'lon': -80.006170,'alt':222   },
+              {'lat':98.447057,'lon': -12.006170,'alt': 652  },
+              {'lat':67.447057,'lon': -56.006170,'alt': 243  },
+              {'lat':76.447057,'lon': -23.006170,'alt': 222  },
+              {'lat':40.447057,'lon': -65.006170,'alt': 122  },
+              {'lat':0.447057, 'lon': -13.006170,'alt': 352  },
+              {'lat':40.447057,'lon': -5.0070,   'alt': 122  }]
 
-LatLongAlt = 
+Pixulus = [( 1244.64 ,2002.26 ),
+           ( 164     ,22.26   ),
+           ( 244.64  ,502.26  ),
+           ( 44.64   ,602.26  ),
+           ( 1244.64 ,2.26    ),
+           ( 1244.64 ,2002.26 ),
+           ( 14.64   ,2122.26 )]
 '''
 
-
 #paramters to the cost function that need to be optimized. pixels per radian, and quarternion
+#We start of with the following guess
+
 parameters = [2855 , 1 , 0 , 0 , 0]
 
+
+#Functions takes in the paramerters and spits out the total cost(error). All the points that we handselected are put in the global varibale "listOfKnownPoints" which is used in the function.
 def totalErrorInPixels(para):
     error = 0
     cam_model = {
@@ -160,11 +186,11 @@ def totalErrorInPixels(para):
     return error
 
 
-def errorOnePoint(para,latLong,pixelVal):
 
+#Function written to get leastsq in optimize to work. Can be safely ignored
+def errorOnePoint(para,latLong,pixelVal):
 #latLong is a dictionary of lat,long and alt. example = {'lat':40.447057, 'lon':-80.006170, 'alt':222}
 #pixelVal is a tuple  (xpixel,ypixel)
-
     cam_model = {
         'height': 1733,            
         'width' : 8970 ,
@@ -176,17 +202,14 @@ def errorOnePoint(para,latLong,pixelVal):
     errorOnePoint = (pixelVal[0] - pixelCalc[0])**2 + (pixelVal[1] - pixelCalc[1])**2
     return errorOnePoint
 
+#Test to check if the function runs without error
+#testCostFunction =  totalErrorInPixels(parameters)
+#print "The cost of the points observed is  ", testCostFunction
 
+
+#Various Optimizers attempted.
+
+#res = scipy.optimize.anneal(totalErrorInPixels, parameters,lower = [0,-1,-1,-1,-1],upper=[10000.234,1,1,1,1]) 
+#res = scipy.optimize.leastsq(errorOnePoint, parameters,args = (LatLongAlt,Pixulus)) 
+res = scipy.optimize.fmin(totalErrorInPixels, parameters)
 IPython.embed()
-
-
-testCostFunction =  totalErrorInPixels(parameters)
-print "The cost of the points observed is  ", testCostFunction
-
-#TODO, write up the optimization problem with the variable is the heinz_imodel using scipy.optimize
-
-
-
-IPython.embed()
-res = scipy.optimize.anneal(totalErrorInPixels, parameters,lower = [0,0,0,0,0],upper=[10000,1,1,1,1])
-
