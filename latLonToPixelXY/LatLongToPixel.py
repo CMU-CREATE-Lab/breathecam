@@ -178,8 +178,8 @@ def errorForOnePoint(para,latLong,pixelVal):
     }
     pixelCalc     = pixel_from_ecef(lla2ecef(latLong),cam_model)
     errorOnePoint = math.fabs(pixelVal[0] - pixelCalc[0]) +math.fabs(pixelVal[1] - pixelCalc[1])
-    print "The pixel value observed is", pixelCalc 
-    return errorOnePoint
+ #   print "The pixel value observed is", pixelCalc 
+    return errorOnePoint , pixelCalc
 
 #Various Optimizers attempted.
 
@@ -194,8 +194,8 @@ res = scipy.optimize.fmin(totalErrorInPixels, parameters, maxiter = 10**6,maxfun
 #To test the data
 normQuat                =  normalize(res[1:])
 parametersOptimized     =  [res[0]] +  list(normQuat)
-print "Error of test location one " , errorOnePoint(parametersOptimized , latLongTest1 , pixelValTest1)
-print "Error of test location two " , errorOnePoint(parametersOptimized , latLongTest2 , pixelValTest2)
+print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(parametersOptimized , latLongTest1 , pixelValTest1)
+print "Absolute sum of Errors of test location two and pixel calculated are" , errorForOnePoint(parametersOptimized , latLongTest2 , pixelValTest2)
 
 
 
