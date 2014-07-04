@@ -1,0 +1,162 @@
+{
+   "annotator": {
+      "annotations": [
+         {
+            "id": "annotation_1_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": " 40.446247, -80.004498",
+            "x-pos": 3920,
+            "y-pos": 1528,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         },
+         {
+            "id": "annotation_2_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": " 40.443270, -80.004716",
+            "x-pos": 1772,
+            "y-pos": 1308,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         },
+         {
+            "id": "annotation_3_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": "  40.447973, -80.002204",
+            "x-pos": 5156,
+            "y-pos": 1185,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         },
+         {
+            "id": "annotation_4_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": " 40.447769,-80.000556",
+            "x-pos": 5865,
+            "y-pos": 1188,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 3.416
+         },
+         {
+            "id": "annotation_5_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": "  40.445897, -79.998206",
+            "x-pos": 7366,
+            "y-pos": 1371,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         },
+         {
+            "id": "annotation_6_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": "  40.446126, -80.007509",
+            "x-pos": 2893,
+            "y-pos": 1228,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.024
+         },
+         {
+            "id": "annotation_7_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": "  40.449067, -79.997707",
+            "x-pos": 6735,
+            "y-pos": 1134,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 3.264
+         },
+         {
+            "id": "annotation_8_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": "  40.444333, -80.000954",
+            "x-pos": 5914,
+            "y-pos": 1502,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.328
+         },
+         {
+            "id": "annotation_9_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": " 40.453250,-80.003403",
+            "x-pos": 5084,
+            "y-pos": 939,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         },
+         {
+            "id": "annotation_10_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": "  40.451433, -79.998886",
+            "x-pos": 6155,
+            "y-pos": 941,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         }
+         {
+            "id": "annotation_11_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": " 40.447309, -80.003277",
+            "x-pos": 4635,
+            "y-pos": 1280,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         },
+         {
+            "id": "annotation_12_item",
+            "marker-src": "../images/map-pointer.png",
+            "type": "",
+            "type-src": " 40.447510, -80.009500",
+            "x-pos": 2951,
+            "y-pos": 1111,
+            "min-zoom": -1,
+            "start-time": 0,
+            "end-time": "18.19",
+            "time": 14.691666666666668,
+            "zoom": 4.48
+         },
+      ]
+   }
+}
