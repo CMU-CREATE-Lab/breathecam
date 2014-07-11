@@ -6,7 +6,7 @@ require 'fileutils'
 require 'logger'
 require 'date'
 require 'json'
-require 'shellwords'
+#require 'shellwords'
 require File.join(File.dirname(__FILE__), 'thread-pool')
 
 # Logging
@@ -78,13 +78,6 @@ class Compiler
       usage
     end
 
-    $working_dir = File.join(File.dirname(__FILE__), "#{$camera_location}.tmc")
-
-    if File.exists?(File.join($working_dir, "WIP"))
-      puts "A file called 'WIP' was detected, which indicates that this working directory is already in the middle of processing. Aborting."
-      exit
-    end
-
     while !ARGV.empty?
       arg = ARGV.shift
       if arg == "-j"
@@ -105,7 +98,18 @@ class Compiler
         $skip_rotate = true
       elsif arg == "--run-append-externally"
         $run_append_externally = true
+      elsif arg == "-ssd-mount"
+        $ssd_mount = ARGV.shift
+      elsif arg == "-working-dir"
+        $working_dir = ARGV.shift
       end
+    end
+
+    $working_dir ||= File.join(File.dirname(__FILE__), "#{$camera_location}.tmc")
+
+    if File.exists?(File.join($working_dir, "WIP"))
+      puts "A file called 'WIP' was detected, which indicates that this working directory is already in the middle of processing. Aborting."
+      exit
     end
 
     $do_incremental_update = true if defined?($incremental_update_interval)
@@ -382,12 +386,15 @@ class Compiler
     $timemachine_output_dir = $create_videoset_segment_directory ? "#{$current_day}-#{$incremental_update_interval}m.timemachine" : "#{$current_day}.timemachine"
     $timemachine_master_output_dir = "#{$current_day}.timemachine"
     # TODO: Assumes Ruby is installed and ct.rb is in the PATH
-    system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs}")
+    Dir.chdir($working_dir) do
+      system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs}")
+    end
     puts "Time Machine created."
     add_entry_to_json
     rsync_output_files if $rsync_output && $run_append_externally
     append_new_segments if $create_videoset_segment_directory
     rsync_output_files($timemachine_master_output_dir) if $rsync_output && !$run_append_externally
+    trim_ssd if $ssd_mount
     completed_process
   end
 
@@ -442,7 +449,8 @@ class Compiler
     else
       # TODO
       # Appending script assumed to be in the same directory from which we called the script currently running. Also assumes ruby is installed and in the PATH.
-      cmd = "ruby #{File.join(File.dirname(__FILE__), 'append_breathecam_videos.rb')} #{output_path}/#{$timemachine_master_output_dir} #{$output_path}/#{$timemachine_output_dir} #{$num_jobs}"
+      output_path = $working_dir if $rsync_output && !$run_append_externally
+      cmd = "ruby #{File.join(File.dirname(__FILE__), 'append_breathecam_videos.rb')} #{output_path}/#{$timemachine_master_output_dir} #{output_path}/#{$timemachine_output_dir} #{$num_jobs}"
     end
     system(cmd)
   end
@@ -457,15 +465,20 @@ class Compiler
     end
   end
 
+  def trim_ssd
+    puts "Trimming #{$ssd_mount}"
+    system("sudo fstrim -v #{$ssd_mount}")
+  end
+
   def completed_process
     puts "Process Finished Successfully."
     puts "End Time: #{Time.now}"
   end
 
-  def bash(command)
-    escaped_command = Shellwords.escape(command)
-    system("bash -c #{escaped_command}")
-  end
+  #def bash(command)
+  #  escaped_command = Shellwords.escape(command)
+  #  system("bash -c #{escaped_command}")
+  #end
 
   def usage
     puts "Usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE CAMERA_SETUP_LOCATION"
