@@ -34,8 +34,16 @@ html, body {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 }
 
+@-ms-viewport {
+  width: device-width;
+}
+
 a {
   text-decoration: none;
+}
+
+a img {
+  border: 0;
 }
 
 @font-face {
@@ -112,35 +120,11 @@ a {
   text-decoration: none;
 }
 
-#site-description {
-  font-size: 16px;
-  text-align: left;
-  margin-top: 30px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 720px;
-}
-
-#cmu-logo-detail-page {
-  position: relative;
-  width: 200px;
-  height: 30px;
-  margin-top: 10px;
-  background-image: url('CM_logo_horiz_red.png');
-  background-size: 200px 30px;
-}
-
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   #cmu-logo-detail-page {
     background-image: url('CM_logo_horiz_red@2x.png');
     background-size: 200px 30px;
   }
-}
-
-#body {
-  overflow: hidden;
-  width: 960px;
-  margin: 30px auto 0;
 }
 
 #body-index {
@@ -200,89 +184,6 @@ a {
 
 #footer a {
   color: black;
-}
-
-#embed {
-  float: left;
-  width: 520px;
-  margin-right: 20px;
-  margin-left: 2px;
-}
-
-#embed-description {
-  float: right;
-  width: 400px;
-  text-align: left;
-}
-
-#embed-description ul {
-  list-style: none;
-  padding:0;
-}
-
-#embed-description ul a{
-  font-size: large;
-}
-
-#embed-fixed {
-  z-index: 2;
-  top: 45px;
-  width: 942px;
-  height: 494px;
-  margin-left: 2px;
-  background: white;
-  -moz-box-shadow: 0 5px 10px 0px rgba(0,0,0,0.3);
-  -webkit-box-shadow: 0 5px 10px 0px rgba(0,0,0,0.3);
-  box-shadow: 0 5px 10px 0px rgba(0,0,0,0.3);
-  border-bottom: 1px #ddd;
-}
-
-#embed-description-scroll {
-  z-index: 1;
-  position: absolute;
-  top: 530px;
-  width: 943px;
-  margin-left: 3px;
-  text-align: left;
-}
-
-#embed-description-scroll p {
-  font-size: 12pt;
-  line-height: 19px;
-  margin-top: 20px;
-  margin-bottom: 0px;
-  margin-left: 0px;
-  margin-right: 0px;
-  font-family: Arial, Helvetica, sans-serif;
-  word-spacing: 0px;
-  letter-spacing: 0px;
-}
-
-#embed-description-scroll h2 {
-  margin-top: 20px;
-  line-height: 25px;
-  margin-bottom: 0px;
-  font-size: 16pt;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-#embed-description-scroll .imgLeft {
-  border-radius: 3px;
-  margin-right: 20px;
-  margin-top: 22px;
-  margin-bottom: -2px;
-  width: 308px;
-}
-
-#embed-description-scroll .imgSmall {
-  border-radius: 3px;
-  margin-right: 0px;
-  margin-top: 20px;
-  width: 308px;
-}
-
-#embed-description-scroll table {
-  border-spacing: 0px;
 }
 
 #body-index2 {
@@ -409,15 +310,24 @@ a {
   transition: all 0.2s linear;
 }
 
-#location_toggle {
-  position: absolute;
+#location_toggle_container {
+  position: fixed;
+  bottom: 0px;
   right: 0px;
   top: 202px;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 211px;
+}
+
+#location_toggle {
+  right: 0px;
+  top: 0px;
   bottom: 0px;
   margin: 0;
   padding: 0;
   height: auto;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
@@ -440,6 +350,18 @@ a {
   margin-left: 18px;
 }
 
+#locationTitle {
+  position: absolute;
+  right: 240px;
+  top: 18px;
+  font-size: 20px;
+  text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000, 2px 2px 3px rgba(0,0,0,0.3);
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  font-weight: normal;
+  z-index: 50;
+}
+
 .error_msg {
   cursor: default;
   font-size: 19px;
@@ -456,7 +378,6 @@ a {
   font-weight: bold;
   position: relative;
   top: 20px;
-  left: -141px
 }
 
 .disabled {
@@ -483,6 +404,10 @@ a {
   margin-bottom: 7px;
   margin-right: 0;
   cursor: pointer;
+}
+
+.location_thumbnail_container_end {
+  margin-bottom: 0px !important;
 }
 
 .location_thumbnail {
