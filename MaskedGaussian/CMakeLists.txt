@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( MaskedGaussian )
+find_package( OpenCV REQUIRED )
+add_executable( MaskedGaussian MaskedGaussian.cpp )
+target_link_libraries( MaskedGaussian ${OpenCV_LIBS} )
