@@ -588,6 +588,7 @@ if (!window['$']) {
       if (( typeof (tmJSON['projection-bounds']) !== 'undefined') && bboxViewNE && bboxViewSW && UTIL.isNumber(bboxViewNE.lat) && UTIL.isNumber(bboxViewNE.lng) && UTIL.isNumber(bboxViewSW.lat) && UTIL.isNumber(bboxViewSW.lng)) {
         newView = latLngBoundingBoxToPixelCenter(bboxView);
       } else if (UTIL.isNumber(bboxView.bbox.xmin) && UTIL.isNumber(bboxView.bbox.xmax) && UTIL.isNumber(bboxView.bbox.ymin) && UTIL.isNumber(bboxView.bbox.ymax)) {
+        console.log("snbh 1");
         newView = pixelBoundingBoxToPixelCenter(bboxView);
       } else {
         newView = view;
@@ -736,6 +737,7 @@ if (!window['$']) {
       setTargetView(newView);
       view.x = targetView.x;
       view.y = targetView.y;
+      view.who = "sure";
       view.scale = targetView.scale;
       refresh();
     };
@@ -745,6 +747,7 @@ if (!window['$']) {
       computePanoView();
       if (settings["newHomeView"] != undefined) {
         // Store the home view so we don't need to compute it every time
+        console.log("snbh2");
         homeView = pixelBoundingBoxToPixelCenter(pixelCenterToPixelBoundingBoxView(settings["newHomeView"]).bbox);
       } else {
         homeView = panoView;
@@ -752,6 +755,7 @@ if (!window['$']) {
     };
 
     var computePanoView = function() {
+      console.log("snbh3");
       panoView = pixelBoundingBoxToPixelCenter({
         xmin: 0,
         ymin: 0,
@@ -761,6 +765,7 @@ if (!window['$']) {
     };
 
     this.getBoundingBoxForCurrentView = function() {
+      console.log("getboundingboxforcurrentview");
       var bboxView = pixelCenterToPixelBoundingBoxView(view);
       if (bboxView == null)
         return null;
@@ -769,6 +774,7 @@ if (!window['$']) {
     };
 
     this.warpToBoundingBox = function(bbox) {
+      console.log("snbh4");
       this.warpTo(pixelBoundingBoxToPixelCenter(bbox));
     };
 
@@ -898,6 +904,7 @@ if (!window['$']) {
         return;
 
       newView = _normalizeView(newView);
+      console.log("setNewView", newView);
 
       var defaultEndViewCallback = function() {
         _removeEndViewChangeListener(this);
@@ -937,15 +944,16 @@ if (!window['$']) {
     this.setNewView = _setNewView;
 
     var _normalizeView = function(newView) {
-      if (!newView) return null;
-
+      console.log("i normalize");
       if (newView.center) {// Center view
         var newCenterView = newView.center;
         if (( typeof (tmJSON['projection-bounds']) !== 'undefined') && UTIL.isNumber(newCenterView.lat) && UTIL.isNumber(newCenterView.lng) && UTIL.isNumber(newView.zoom)) {
           newView = latLngCenterViewToPixelCenter(newView);
         } else if (UTIL.isNumber(newCenterView.x) && UTIL.isNumber(newCenterView.y) && UTIL.isNumber(newView.zoom)) {
+          console.log("normalize,eh");
           newView = pixelCenterViewToPixelCenter(newView);
         } else {
+          console.log("you better not");
           newView = view;
         }
       } else if (newView.bbox) {// Bounding box view
@@ -955,6 +963,7 @@ if (!window['$']) {
         if (( typeof (tmJSON['projection-bounds']) !== 'undefined') && newViewBboxNE && newViewBboxSW && UTIL.isNumber(newViewBboxNE.lat) && UTIL.isNumber(newViewBboxNE.lng) && UTIL.isNumber(newViewBboxSW.lat) && UTIL.isNumber(newViewBboxSW.lng)) {
           newView = latLngBoundingBoxToPixelCenter(newView);
         } else if (UTIL.isNumber(newViewBbox.xmin) && UTIL.isNumber(newViewBbox.xmax) && UTIL.isNumber(newViewBbox.ymin) && UTIL.isNumber(newViewBbox.ymax)) {
+          console.log("snbh5");
           newView = pixelBoundingBoxToPixelCenter(newView);
         } else {
           newView = view;
@@ -974,15 +983,20 @@ if (!window['$']) {
     };
     this.getShareView = getShareView;
 
-    // Extract a safe view from either a view object (e.g. {center:{x:val, y:val}, zoom:val}) or
+    // Extract a safe view from either a view object (i.e. {center:{x:val, y:val}, zoom:val}) or
     // from an array of strings (i.e. a share URL, such as #v=44.96185,59.06233,4.5,latLng&t=0.10,
     // that has been unpacked).
     var unsafeViewToView = function(unsafe_viewParam) {
       var view = null;
 
+      console.log('unsafeviewtoview');
+      console.log(typeof(unsafe_viewParam), !unsafe_viewParam);
       if (!unsafe_viewParam)
         return null;
-
+      console.log('we be goin');
+      console.log(unsafe_viewParam);
+      var foo_unsafe_viewParam = unsafe_viewParam.split(",");
+      console.log(foo_unsafe_viewParam)
       // If we have a view object and not an array of strings (i.e. an unpacked share URL) then we need to unpack
       // the view object into an array of strings so that it can be properly sanitized further down.
       if (unsafe_viewParam.center || unsafe_viewParam.bbox) {
@@ -1015,50 +1029,44 @@ if (!window['$']) {
         }
       }
 
-      // If we still have a share URL (e.g. #v=44.96185,59.06233,4.5,latLng&t=0.10)
-      // that has not been unpacked into an array of strings, do so now.
-      if (typeof(unsafe_viewParam) === "string") {
-        unsafe_viewParam = unsafe_viewParam.split(",");
-      }
-
-      if (unsafe_viewParam.indexOf("latLng") != -1) {
-        if (unsafe_viewParam.length == 4)
+      if (foo_unsafe_viewParam.indexOf("latLng") != -1) {
+        if (foo_unsafe_viewParam.length == 4)
           view = {
             center: {
-              "lat": parseFloat(unsafe_viewParam[0]),
-              "lng": parseFloat(unsafe_viewParam[1])
+              "lat": parseFloat(foo_unsafe_viewParam[0]),
+              "lng": parseFloat(foo_unsafe_viewParam[1])
             },
-            "zoom": parseFloat(unsafe_viewParam[2])
+            "zoom": parseFloat(foo_unsafe_viewParam[2])
           };
-        else if (unsafe_viewParam.length == 5)
+        else if (foo_unsafe_viewParam.length == 5)
           view = {
             bbox: {
               "ne": {
-                "lat": parseFloat(unsafe_viewParam[0]),
-                "lng": parseFloat(unsafe_viewParam[1])
+                "lat": parseFloat(foo_unsafe_viewParam[0]),
+                "lng": parseFloat(foo_unsafe_viewParam[1])
               },
               "sw": {
-                "lat": parseFloat(unsafe_viewParam[2]),
-                "lng": parseFloat(unsafe_viewParam[3])
+                "lat": parseFloat(foo_unsafe_viewParam[2]),
+                "lng": parseFloat(foo_unsafe_viewParam[3])
               }
             }
           };
       } else {// Assume points if the user did not specify latLng. Also allow for the omission of 'pts' param for backwards compatibility
-        if ((unsafe_viewParam.indexOf("pts") == -1 && unsafe_viewParam.length == 3) || unsafe_viewParam.length == 4)
+        if ((foo_unsafe_viewParam.indexOf("pts") == -1 && foo_unsafe_viewParam.length == 3) || foo_unsafe_viewParam.length == 4)
           view = {
             center: {
-              "x": parseFloat(unsafe_viewParam[0]),
-              "y": parseFloat(unsafe_viewParam[1])
+              "x": parseFloat(foo_unsafe_viewParam[0]),
+              "y": parseFloat(foo_unsafe_viewParam[1])
             },
-            "zoom": parseFloat(unsafe_viewParam[2])
+            "zoom": parseFloat(foo_unsafe_viewParam[2])
           };
-        else if ((unsafe_viewParam.indexOf("pts") == -1 && unsafe_viewParam.length == 4) || unsafe_viewParam.length == 5)
+        else if ((foo_unsafe_viewParam.indexOf("pts") == -1 && foo_unsafe_viewParam.length == 4) || foo_unsafe_viewParam.length == 5)
           view = {
             bbox: {
-              "xmin": parseFloat(unsafe_viewParam[0]),
-              "xmax": parseFloat(unsafe_viewParam[1]),
-              "ymin": parseFloat(unsafe_viewParam[2]),
-              "ymax": parseFloat(unsafe_viewParam[3])
+              "xmin": parseFloat(foo_unsafe_viewParam[0]),
+              "xmax": parseFloat(foo_unsafe_viewParam[1]),
+              "ymin": parseFloat(foo_unsafe_viewParam[2]),
+              "ymax": parseFloat(foo_unsafe_viewParam[3])
             }
           };
       }
@@ -1411,6 +1419,7 @@ if (!window['$']) {
     };
 
     var setInitialView = function() {
+      console.log("setting initial view", initialView);
       if (initialView) {
         view = initialView;
       } else if (loadSharedViewFromUnsafeURL(UTIL.getUnsafeHashString())) {
@@ -1494,6 +1503,7 @@ if (!window['$']) {
 
     // Handle any hash variables related to time machines
     var handleHashChange = function() {
+      console.log('handle');
       var unsafeHashString = UTIL.getUnsafeHashString();
 
       // Share views
@@ -1519,6 +1529,7 @@ if (!window['$']) {
           if (didFirstTimeOnLoad) {
             _setNewView(newView, true);
           } else {
+            console.log("shareViewFromURL", view);
             view = _normalizeView(newView);
           }
         }
@@ -1636,6 +1647,7 @@ if (!window['$']) {
         targetView.y += 1 * (1 - 1 / actualZoom) * (y - $(videoDiv).offset().top - viewportHeight * 0.5) / targetView.scale;
       }
       targetView.scale = newScale;
+      targetView.sure = "ok";
       setTargetView(targetView);
     };
     this.zoomAbout = zoomAbout;
@@ -1836,6 +1848,7 @@ if (!window['$']) {
         for (var i = 0; i < viewEndChangeListeners.length; i++)
           viewEndChangeListeners[i](view);
       } else {
+        console.log("snbh6");
         view = pixelBoundingBoxToPixelCenter(_computeMotion(pixelCenterToPixelBoundingBoxView(view).bbox, pixelCenterToPixelBoundingBoxView(targetView).bbox, t));
       }
       refresh();
@@ -1856,11 +1869,12 @@ if (!window['$']) {
         bbox = bbox.bbox;
 
       var scale = Math.min(viewportWidth / (bbox.xmax - bbox.xmin), viewportHeight / (bbox.ymax - bbox.ymin));
-
+      console.log('-----------------------------------------A------------------------------------')
       return {
         x: 0.5 * (bbox.xmin + bbox.xmax),
         y: 0.5 * (bbox.ymin + bbox.ymax),
-        scale: scale
+        scale: scale,
+        "fook": "fooku"
       };
     };
     this.pixelBoundingBoxToPixelCenter = pixelBoundingBoxToPixelCenter;
@@ -1893,11 +1907,12 @@ if (!window['$']) {
       var ymin = Math.min(a.y, b.y);
 
       var scale = Math.min(viewportWidth / (xmax - xmin), viewportHeight / (ymax - ymin));
-
+      console.log('-----------------------------------------B------------------------------------')
       return {
         x: 0.5 * (xmin + xmax),
         y: 0.5 * (ymin + ymax),
-        scale: scale
+        scale: scale,
+        "omg": "why"
       };
     };
     this.latLngBoundingBoxToPixelCenter = latLngBoundingBoxToPixelCenter;
@@ -1906,11 +1921,12 @@ if (!window['$']) {
     var pixelCenterViewToPixelCenter = function(theView) {
       if (!theView)
         return null;
-
+      console.log('-----------------------------------------C------------------------------------')
       return {
         x: theView.center.x,
         y: theView.center.y,
-        scale: Math.pow(2, theView.zoom) * panoView.scale
+        scale: Math.pow(2, theView.zoom) * panoView.scale,
+        "haha" : "uded"
       };
     };
     this.pixelCenterViewToPixelCenter = pixelCenterViewToPixelCenter;
@@ -1924,7 +1940,9 @@ if (!window['$']) {
         lat: theView.center.lat,
         lng: theView.center.lng
       });
+      console.log('-----------------------------------------D------------------------------------')
       return {
+        "nooo": "wa",
         x: point.x,
         y: point.y,
         scale: Math.pow(2, theView.zoom) * panoView.scale
@@ -1940,13 +1958,14 @@ if (!window['$']) {
         return null;
       if (!theView.scale)
         theView = _normalizeView(theView);
-
+      console.log("latlngcenterview");
       var projection = _getProjection();
       var latLng = projection.pointToLatlng({
         x: theView.x,
         y: theView.y
       });
       return {
+        "ahaha":"booo",
         center: {
           lat: latLng.lat,
           lng: latLng.lng
@@ -1962,6 +1981,7 @@ if (!window['$']) {
         return null;
 
       // bbox will be normalized if it is in the form {bbox:{...}}
+      console.log("snbh7");
       var centerView = pixelBoundingBoxToPixelCenter(bbox);
       var projection = _getProjection();
       var latLng = projection.pointToLatlng({
@@ -1969,6 +1989,7 @@ if (!window['$']) {
         y: centerView.y
       });
       return {
+        "tears":"nojoy",
         center: {
           lat: latLng.lat,
           lng: latLng.lng
@@ -1984,9 +2005,11 @@ if (!window['$']) {
         return null;
       if (bbox.bbox)
         bbox = _normalizeView(bbox);
-
+      console.log("pixelboundingboxtopixel");
+      console.log("snbh8");
       var pixelFit = pixelBoundingBoxToPixelCenter(bbox);
       return {
+        "splosion":"stuff",
         center: {
           x: pixelFit.x,
           y: pixelFit.y
@@ -2002,7 +2025,7 @@ if (!window['$']) {
         return null;
       if (!theView.scale)
         theView = _normalizeView(theView);
-
+      console.log("pixcenttobounding");
       var halfWidth = 0.5 * viewportWidth / theView.scale;
       var halfHeight = 0.5 * viewportHeight / theView.scale;
       return {
@@ -2046,6 +2069,7 @@ if (!window['$']) {
     var pixelBoundingBoxToLatLngBoundingBoxView = function(bbox) {
       if (!bbox)
         return null;
+        console.log("snbh9");
       return pixelCenterToLatLngBoundingBoxView(pixelBoundingBoxToPixelCenter(bbox));
     };
     this.pixelBoundingBoxToLatLngBoundingBoxView = pixelBoundingBoxToLatLngBoundingBoxView;
@@ -2523,7 +2547,9 @@ if (!window['$']) {
 
       _makeVideoVisibleListener(function(videoId) {
         // This is the first video of the dataset being displayed
+        console.log('makeVideoVisible');
         if (videoId == firstVideoId) {
+          console.log('first');
           // If the user requested the same point spatial and temporal point in the previous dataset, calculate and seek there.
           if (loadTimelapseWithPreviousViewAndTime) {
             var closestFrame = findExactOrClosestCaptureTime(previousCaptureTime);
@@ -2550,6 +2576,7 @@ if (!window['$']) {
           }
 
           if (didFirstTimeOnLoad) {
+            console.log('yo dog');
             timelapseCurrentCaptureTimeIndex = Math.min(frames - 1, Math.floor(timelapseCurrentTimeInSeconds * _getFps()));
             // Recreate timeline slider.
             // There seems to be an issue with the jQuery UI slider widget, since just changing the max value and refreshing
@@ -2644,7 +2671,7 @@ if (!window['$']) {
 
       // If the user specifies a starting view, use it.
       if (desiredView && typeof (desiredView) === "object") {
-        initialView = desiredView;
+        initialView = $.extend({}, desiredView);
       } else {
         initialView = null;
       }

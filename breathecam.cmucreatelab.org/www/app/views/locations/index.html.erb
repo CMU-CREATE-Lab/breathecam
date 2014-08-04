@@ -1,7 +1,6 @@
 <% content_for :head do %>
-  <%= stylesheet_link_tag    "/timemachine-viewer/css/snaplapse.css",
-                             "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
-                             "/timemachine-viewer/css/player.css",
+  <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
+                             "/timemachine-viewer/css/defaultUI.css",
                              "zoomify-bundle.css"
   %>
 
@@ -16,10 +15,10 @@
                              "/timemachine-viewer/js/org/gigapan/timelapse/snaplapse.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/snaplapseViewer.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/defaultUI.js",
-                             "/timemachine-viewer/js/org/gigapan/timelapse/urlEncoder.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/crossdomain_api.js",
                              "/timemachine-viewer/template_includes.js",
                              "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam/timemachines/#{@location_id}/#{@location_id}.js",
+                             "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam/timemachines/#{@location_id}/#{@viewable_date}.timemachine/ajax_includes.js",
                              "zoomify-bundle.js"  %>
 
   <style type="text/css">
@@ -70,7 +69,7 @@
         initialDataset = initialDataset.replace(/\d\d\d\d-\d\d-\d\d/, hashVars.d);
       }
 
-      var viewerOptions = {
+      var settings = {
         url: initialDataset,
         disableTourLooping: true,
         mediaType: ".mp4",
@@ -88,7 +87,7 @@
         }
       };
 
-      timelapse = new org.gigapan.timelapse.Timelapse("player1", viewerOptions);
+      timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
 
       var dateArray = startingDate.split("-");
       $("#datepicker").datepicker({
@@ -202,7 +201,7 @@
   </div>
   <div id="content">
     <div id="timelapse_feed">
-      <div id="player1" style="position: absolute;"></div>
+      <div id="timeMachine"></div>
       <div id="datepicker"></div>
     </div>
     <div id="image_feed">
