@@ -24,6 +24,6 @@ int main(int argc, char** argv )
         image.copyTo(output,mask);
         imwrite( "masked_blurred.jpg", output );
         waitKey(0);
+        return 0;
     }
-    return 0;
 }
