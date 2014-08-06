@@ -244,7 +244,7 @@ class Compiler
       args = $input_path.split(":")
       host = args[0]
       src_path = args[1]
-      system("ssh #{host} \"find #{src_path} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
+      system("ssh #{host} \"find #{src_path}/#{$current_day} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
       system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{$input_path}/#{$current_day}/ #{new_input_path}")
     else
       # Else grab the entire day of images
