@@ -1,5 +1,6 @@
 from numpy import *
-heinz_camera_lla = {'lat': 40.442588, 'lon': -80.001047, 'alt': 335}
+#heinz_camera_lla = {'lat': 40.442588, 'lon': -80.001047, 'alt': 335}
+heinz_camera_lla = {'lat':40.442503, 'lon':-80.001199, 'alt':328}
 
 # From https://code.google.com/p/pysatel/source/browse/trunk/coord.py?r=22
 import math, IPython, scipy.optimize
@@ -13,15 +14,12 @@ e1sq = 6.73949674228 * 0.001
 f = 1 / 298.257223563
 '''
 def lla2ecef(lla):
-
     # Constants defined by the World Geodetic System 1984 (WGS84), in km
     a = 6378.137
     b = 6356.7523142
     esq = 6.69437999014 * 0.001
     e1sq = 6.73949674228 * 0.001
     f = 1 / 298.257223563
-
-
 
     lat = lla['lat']
     lon = lla['lon']
@@ -36,20 +34,15 @@ def lla2ecef(lla):
 
 print lla2ecef(heinz_camera_lla)
 
-
-
 def pixel_from_ccxyz(cc, imodel):  #pixel from camera centered xyz coordinates
-
     yaw = math.atan2(cc[0], cc[2])  
     #print '  yaw is %g' % yaw
     pixel_x = yaw * imodel['pixels_per_radian'] + imodel['width'] * 0.5
     #print '  pixel_x is %g' % pixel_x
-
     tilt = math.atan2(cc[1], math.sqrt(cc[0] * cc[0] + cc[2] * cc[2]))
     #print '  tilt is %g' % tilt
     pixel_y = tilt * imodel['pixels_per_radian'] + imodel['height'] * 0.5
     #print '  pixel_y is %g' % pixel_y
-    
     return (pixel_x, pixel_y)
     
 heinz_imodel = {
@@ -130,24 +123,24 @@ listOfKnownPoints = [
 ({'lat':40.445897,'lon': -79.998206, 'alt': 248  },{'xPixel': 7366  , 'yPixel': 1371 }),
 ({'lat':40.446126,'lon': -80.007509, 'alt': 256  },{'xPixel': 2893  , 'yPixel': 1228 }),
 ({'lat':40.449067,'lon': -79.997707, 'alt': 239  },{'xPixel': 6735  , 'yPixel': 1134 }),
-({'lat':40.444333,'lon': -80.000954, 'alt': 290  },{'xPixel': 5914  , 'yPixel': 1502 }),
-({'lat':40.453250,'lon': -80.003403, 'alt': 266  },{'xPixel': 5084  , 'yPixel': 939  }),
+({'lat':40.447510,'lon': -80.009500, 'alt': 259  },{'xPixel': 2951  , 'yPixel': 1111 }),
+({'lat':40.447309,'lon': -80.003277, 'alt': 245  },{'xPixel': 4635  , 'yPixel': 1280 }),
 ({'lat':40.451433,'lon': -79.998886, 'alt': 276  },{'xPixel': 6155  , 'yPixel': 941  })]
 
 #paramters to the cost function that need to be optimized. pixels per radian, and quarternion
 #We start of with the following guess
-parameters = [2855 , 0.1414 , 0.1414 , 0.1414 , 0.1414]
 
+
+parameters = [2855 , 0.1414 , 0.1414 , 0.1414 , 0.1414]#would have preferred dictionary, but optimizer takes lists TODO: see if you can find a way out
 
 def totalErrorInPixels(para):
     error = 0
-#    global errorList        #I use it to print out the error list and the end of optimization.
     errorList = []
     cam_model = {
         'height': 1733,            
         'width' : 8970 ,
-        'pixels_per_radian': para[0], 
-        'ecef': lla2ecef(heinz_camera_lla),
+        'pixels_per_radian': para[0],
+        'ecef':     lla2ecef(heinz_camera_lla), 
         'rotation': (para[1], para[2], para[3], para[4])
     }
 
@@ -157,29 +150,14 @@ def totalErrorInPixels(para):
 	pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),cam_model)
         errorList.append((pixelKnown[0] - pixelCalc[0]  ,  pixelKnown[1] - pixelCalc[1]))
   	error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
-  #  print "The errors obtained with these parameters are ", errorList , " \n   "
+    print "The errors obtained with these parameters are ", errorList , " \n   "
     return error
 
 
-
-latLongTest1  = {'lat':40.447309,'lon': -80.003277, 'alt': 245  }
-pixelValTest1 = (4635, 1280 )
-latLongTest2  = {'lat':40.447510,'lon': -80.009500, 'alt': 259  }
-pixelValTest2 = (2951, 1111 )
-
-#For testing
-def errorForOnePoint(para,latLong,pixelVal):
-    cam_model = {
-        'height': 1733,   #duplicating the data from previous function. Will try to avoid it once code is good for all other purposes         
-        'width' : 8970 ,
-        'pixels_per_radian': para[0], 
-        'ecef': lla2ecef(heinz_camera_lla),
-        'rotation': (para[1], para[2], para[3], para[4])
-    }
-    pixelCalc     = pixel_from_ecef(lla2ecef(latLong),cam_model)
-    errorOnePoint = math.fabs(pixelVal[0] - pixelCalc[0]) +math.fabs(pixelVal[1] - pixelCalc[1])
- #   print "The pixel value observed is", pixelCalc 
-    return errorOnePoint , pixelCalc
+latLongTest1  = {'lat':40.453250,'lon': -80.003403, 'alt': 266  }
+pixelValTest1 = (5084  ,939)  
+latLongTest2  = {'lat':40.444333,'lon': -80.000954, 'alt': 290  }
+pixelValTest2 = (5914, 1502 )
 
 #Various Optimizers attempted.
 
@@ -188,18 +166,70 @@ def errorForOnePoint(para,latLong,pixelVal):
 res = scipy.optimize.fmin(totalErrorInPixels, parameters, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.00001, xtol = 0.00001)
 # check http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html downhill simplex algorithm
 
-#global errorList
-#print "The optimum parameters found are " , res , " and the error observed is  ", errorList
+print res
+print len(res)
 
-#To test the data
-normQuat                =  normalize(res[1:])
-parametersOptimized     =  [res[0]] +  list(normQuat)
-print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(parametersOptimized , latLongTest1 , pixelValTest1)
-print "Absolute sum of Errors of test location two and pixel calculated are" , errorForOnePoint(parametersOptimized , latLongTest2 , pixelValTest2)
+parametersAll = list(res) + list(lla2ecef(heinz_camera_lla))
+def totalErrorInPixelsAllParams(parameters):
+    error = 0
+    errorList = []
+    cam_model = {
+        'height'  : 1733,
+        'width'   : 8970 ,
+        'pixels_per_radian': parameters[0],
+        'ecef'    : array(parameters[-3:]), #lla2ecef(heinz_camera_lla), 
+        'rotation': (parameters[1], parameters[2], parameters[3], parameters[4])
+    }
+
+    for point in range(len(listOfKnownPoints)):
+        llaKnown   = listOfKnownPoints[point][0]
+        pixelKnown = (listOfKnownPoints[point][1]['xPixel'],listOfKnownPoints[point][1]['yPixel'])
+        pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),cam_model)
+        errorList.append((pixelKnown[0] - pixelCalc[0]  ,  pixelKnown[1] - pixelCalc[1]))
+        error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
+    print "The errors obtained with these parameters are ", errorList , " \n   "
+    return error
 
 
 
+resAllParam = scipy.optimize.fmin(totalErrorInPixelsAllParams, parametersAll, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.00001, xtol = 0.00001)
+print resAllParam
+
+IPython.embed()
+parametersOptimized     =  list(resAllParam)
+
+
+#For testing
+def errorForOnePoint(para,latLong,pixelVal):
+    cam_model = {
+        'height': 1733,   #duplicating the data from previous function. Will try to avoid it once code is good for all other purposes         
+        'width' : 8970 ,
+        'pixels_per_radian': para[0],#['ppr'], 
+        'ecef': lla2ecef(heinz_camera_lla),
+        'rotation': (para[1], para[2], para[3], para[4]) #para['quaternion']
+    }
+    pixelCalc     = pixel_from_ecef(lla2ecef(latLong),cam_model)
+    errorOnePoint = tuple([pixelVal[0] - pixelCalc[0] ,pixelVal[1] - pixelCalc[1]])
+    return errorOnePoint , pixelCalc
 
 
 
+def errorForOnePointAllParam(para,latLong,pixelVal):
+    cam_model = {
+        'height': 1733,   #duplicating the data from previous function. Will try to avoid it once code is good for all other purposes         
+        'width' : 8970 ,
+        'pixels_per_radian': para[0],
+        'ecef': array(para[-3:]), # lla2ecef(heinz_camera_lla),
+        'rotation': (para[1], para[2], para[3], para[4])
+    }
+    pixelCalc     = pixel_from_ecef(lla2ecef(latLong),cam_model)
+   # pixelCalc     = pixel_from_ecef(array(para[-3:]),cam_model)
+    errorOnePoint = tuple([pixelVal[0] - pixelCalc[0] ,pixelVal[1] - pixelCalc[1]])
+ #   print "The pixel value observed is", pixelCalc 
+    return errorOnePoint , pixelCalc
 
+
+print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePointAllParam(parametersOptimized , latLongTest1 , pixelValTest1)
+print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
+print "Absolute sum of Errors of test location two and pixel calculated are" , errorForOnePointAllParam(parametersOptimized , latLongTest2 , pixelValTest2)
+print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
