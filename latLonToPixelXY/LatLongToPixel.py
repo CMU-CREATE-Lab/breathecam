@@ -118,6 +118,10 @@ pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 
 
 #TODO if necessary:write parsing script to read from json file into datastructures
+
+tempRead = open('listOfKnownPoints.txt','r').open()
+listOfKnownPoints = tempRead.eval(tempRead)
+'''
 listOfKnownPoints = [
 ({'lat':40.446247,'lon': -80.004498, 'alt': 221  },{'xPixel': 3920  , 'yPixel': 1528 }),
 ({'lat':40.443270,'lon': -80.004716, 'alt': 299  },{'xPixel': 1772  , 'yPixel': 1308 }),
@@ -129,7 +133,7 @@ listOfKnownPoints = [
 ({'lat':40.447510,'lon': -80.009500, 'alt': 259  },{'xPixel': 2951  , 'yPixel': 1111 }),
 ({'lat':40.447309,'lon': -80.003277, 'alt': 245  },{'xPixel': 4635  , 'yPixel': 1280 }),
 ({'lat':40.451433,'lon': -79.998886, 'alt': 276  },{'xPixel': 6155  , 'yPixel': 941  })]
-
+'''
 #paramters to the cost function that need to be optimized. pixels per radian, and quarternion
 #We start of with the following guess
 
@@ -168,7 +172,9 @@ pixelValTest2 = {'xPixel':5914, 'yPixel':1502}
 #res = scipy.optimize.leastsq(errorOnePoint, parameters,args = (LatLongAlt,Pixulus)) 
 res = scipy.optimize.fmin(totalErrorInPixels, parameters, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.00001, xtol = 0.00001)
 # check http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html downhill simplex algorithm
+
 print res
+print len(res)
 
 parametersAll = list(res) + list(lla2ecef(heinz_camera_lla))
 def totalErrorInPixelsAllParams(parameters):
@@ -198,6 +204,7 @@ print resAllParam
 
 parametersOptimized     =  list(resAllParam)
 
+
 #For testing
 def errorForOnePoint(para,latLong,pixelVal):
     cam_model = {
@@ -211,6 +218,8 @@ def errorForOnePoint(para,latLong,pixelVal):
     errorOnePoint = tuple([pixelVal['xPixel'] - pixelCalc[0] ,pixelVal['yPixel'] - pixelCalc[1]])
     return errorOnePoint , pixelCalc
 
+
+
 def errorForOnePointAllParam(para,latLong,pixelVal):
     cam_model = {
         'height': heightImage,   #duplicating the data from previous function. Will try to avoid it once code is good for all other purposes         
@@ -222,20 +231,20 @@ def errorForOnePointAllParam(para,latLong,pixelVal):
     pixelCalc     = pixel_from_ecef(lla2ecef(latLong),cam_model)
    # pixelCalc     = pixel_from_ecef(array(para[-3:]),cam_model)
     errorOnePoint = tuple([pixelVal['xPixel'] - pixelCalc[0] ,pixelVal['yPixel'] - pixelCalc[1]])
+#    print "The pixel value observed is", pixelCalc,pixelVal 
     print pixelCalc, tuple([pixelVal['xPixel'],pixelVal['yPixel']])
     #return errorOnePoint , pixelCalc
     return None
 
-'''
-for i in range(len(listOfKnownPoints)):
+IPython.embed()
+
+
+for i in range(length(listOfKnownPoints)):
     errorForOnePointAllParam(parametersOptimized,listOfKnownPoints[i][0],listOfKnownPoints[i][1])
+
+
+
 print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePointAllParam(parametersOptimized , latLongTest1 , pixelValTest1)
 print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
 print "Absolute sum of Errors of test location two and pixel calculated are" , errorForOnePointAllParam(parametersOptimized , latLongTest2 , pixelValTest2)
 print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
-'''
-
-
-
-
-
