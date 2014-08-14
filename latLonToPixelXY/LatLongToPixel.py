@@ -119,8 +119,8 @@ pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 
 #TODO if necessary:write parsing script to read from json file into datastructures
 
-tempRead = open('listOfKnownPoints.txt','r').open()
-listOfKnownPoints = tempRead.eval(tempRead)
+tempRead = open('listOfKnownPoints.txt','r').read()
+listOfKnownPoints = eval(tempRead)
 '''
 listOfKnownPoints = [
 ({'lat':40.446247,'lon': -80.004498, 'alt': 221  },{'xPixel': 3920  , 'yPixel': 1528 }),
@@ -204,8 +204,9 @@ print resAllParam
 
 parametersOptimized     =  list(resAllParam)
 
-
+##########
 #For testing
+##########
 def errorForOnePoint(para,latLong,pixelVal):
     cam_model = {
         'height': heightImage,  
@@ -236,10 +237,9 @@ def errorForOnePointAllParam(para,latLong,pixelVal):
     #return errorOnePoint , pixelCalc
     return None
 
-IPython.embed()
 
-
-for i in range(length(listOfKnownPoints)):
+'''
+for i in range(len(listOfKnownPoints)):
     errorForOnePointAllParam(parametersOptimized,listOfKnownPoints[i][0],listOfKnownPoints[i][1])
 
 
@@ -248,3 +248,4 @@ print "Absolute sum of Errors of test location one and pixel caluclated are" , e
 print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
 print "Absolute sum of Errors of test location two and pixel calculated are" , errorForOnePointAllParam(parametersOptimized , latLongTest2 , pixelValTest2)
 print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
+'''
