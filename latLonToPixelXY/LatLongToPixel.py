@@ -119,10 +119,10 @@ pixel_from_ecef(lla2ecef(home_plate_lla), heinz_imodel)
 
 #TODO if necessary:write parsing script to read from json file into datastructures
 
-tempRead = open('listOfKnownPoints.txt','r').read()
-listOfKnownPoints = eval(tempRead)
+tempRead = open('listOfTrainPoints.txt','r').read()
+listOfTrainPoints = eval(tempRead)
 '''
-listOfKnownPoints = [
+listOfTrainPoints = [
 ({'lat':40.446247,'lon': -80.004498, 'alt': 221  },{'xPixel': 3920  , 'yPixel': 1528 }),
 ({'lat':40.443270,'lon': -80.004716, 'alt': 299  },{'xPixel': 1772  , 'yPixel': 1308 }),
 ({'lat':40.447973,'lon': -80.002204, 'alt': 255  },{'xPixel': 5156  , 'yPixel': 1185 }),
@@ -151,9 +151,9 @@ def totalErrorInPixels(para):
         'rotation': (para[1], para[2], para[3], para[4])
     }
 
-    for point in range(len(listOfKnownPoints)):
-        llaKnown   = listOfKnownPoints[point][0]
-	pixelKnown = (listOfKnownPoints[point][1]['xPixel'],listOfKnownPoints[point][1]['yPixel'])
+    for point in range(len(listOfTrainPoints)):
+        llaKnown   = listOfTrainPoints[point][0]
+	pixelKnown = (listOfTrainPoints[point][1]['xPixel'],listOfTrainPoints[point][1]['yPixel'])
 	pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),cam_model)
         errorList.append((pixelKnown[0] - pixelCalc[0]  ,  pixelKnown[1] - pixelCalc[1]))
   	error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
@@ -170,7 +170,7 @@ pixelValTest2 = {'xPixel':5914, 'yPixel':1502}
 
 #res = scipy.optimize.anneal(totalErrorInPixels, parameters,lower = [0,-1,-1,-1,-1],upper=[10000.234,1,1,1,1]) 
 #res = scipy.optimize.leastsq(errorOnePoint, parameters,args = (LatLongAlt,Pixulus)) 
-res = scipy.optimize.fmin(totalErrorInPixels, parameters, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.00001, xtol = 0.00001)
+res = scipy.optimize.fmin(totalErrorInPixels, parameters, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.000001, xtol = 0.000001)
 # check http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html downhill simplex algorithm
 
 print res
@@ -188,9 +188,9 @@ def totalErrorInPixelsAllParams(parameters):
         'rotation': (parameters[1], parameters[2], parameters[3], parameters[4])
     }
 
-    for point in range(len(listOfKnownPoints)):
-        llaKnown   = listOfKnownPoints[point][0]
-        pixelKnown = (listOfKnownPoints[point][1]['xPixel'],listOfKnownPoints[point][1]['yPixel'])
+    for point in range(len(listOfTrainPoints)):
+        llaKnown   = listOfTrainPoints[point][0]
+        pixelKnown = (listOfTrainPoints[point][1]['xPixel'],listOfTrainPoints[point][1]['yPixel'])
         pixelCalc  = pixel_from_ecef(lla2ecef(llaKnown),cam_model)
         errorList.append((pixelKnown[0] - pixelCalc[0]  ,  pixelKnown[1] - pixelCalc[1]))
         error      = error  + (pixelKnown[0] - pixelCalc[0])**2 + (pixelKnown[1] - pixelCalc[1])**2
@@ -199,7 +199,7 @@ def totalErrorInPixelsAllParams(parameters):
 
 
 
-resAllParam = scipy.optimize.fmin(totalErrorInPixelsAllParams, parametersAll, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.00001, xtol = 0.00001)
+resAllParam = scipy.optimize.fmin(totalErrorInPixelsAllParams, parametersAll, maxiter = 10**6,maxfun = 10**6 ,ftol = 0.000001, xtol = 0.000001)
 print resAllParam
 
 parametersOptimized     =  list(resAllParam)
@@ -233,19 +233,22 @@ def errorForOnePointAllParam(para,latLong,pixelVal):
    # pixelCalc     = pixel_from_ecef(array(para[-3:]),cam_model)
     errorOnePoint = tuple([pixelVal['xPixel'] - pixelCalc[0] ,pixelVal['yPixel'] - pixelCalc[1]])
 #    print "The pixel value observed is", pixelCalc,pixelVal 
-    print pixelCalc, tuple([pixelVal['xPixel'],pixelVal['yPixel']])
+    print list(pixelCalc)+list( tuple([pixelVal['xPixel'],pixelVal['yPixel']]))+list(errorOnePoint)
     #return errorOnePoint , pixelCalc
     return None
 
 
-'''
-for i in range(len(listOfKnownPoints)):
-    errorForOnePointAllParam(parametersOptimized,listOfKnownPoints[i][0],listOfKnownPoints[i][1])
+tempRead = open('listOfTestPoints.txt','r').read()
+listOfTestPoints = eval(tempRead)
 
+IPython.embed()
+#paramters to the cost function that need to be optimized. pixels per radian, and quarternion
+#We start of with the following guess
+print "\n The errors we had for the training points with the parameters: "
+for i in range(len(listOfTrainPoints)):
+    errorForOnePointAllParam(parametersOptimized,listOfTrainPoints[i][0],listOfTrainPoints[i][1])
 
+print "\n The errors we have for the select test points:"
+for i in range(len(listOfTestPoints)):
+    errorForOnePointAllParam(parametersOptimized,listOfTestPoints[i][0],listOfTestPoints[i][1])
 
-print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePointAllParam(parametersOptimized , latLongTest1 , pixelValTest1)
-print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
-print "Absolute sum of Errors of test location two and pixel calculated are" , errorForOnePointAllParam(parametersOptimized , latLongTest2 , pixelValTest2)
-print "Absolute sum of Errors of test location one and pixel caluclated are" , errorForOnePoint(res , latLongTest1 , pixelValTest1)
-'''
