@@ -6,19 +6,19 @@
 #include "GCPhase.h"
 #include "Ulti.h"
 
+
 double LensHomo(double *Homography, double *HPhase, double *VPhase, double &hmp, double &vmp, int width, int height, int lcdwidth, int lcdheight)
 {
-	//trying to 
-	int ii, jj, mid_x = width/2, mid_y = height/2;
+	int ii, jj, mid_x = width/2, mid_y = height/2, range =25*width/1280, step = 10*width/1280;
 
 	hmp = HPhase[mid_x+mid_y*width];
 	vmp = VPhase[mid_x+mid_y*width];
 
 	std::vector<Point2f> src;
 	std::vector<Point2f> dst;
-	for(jj=mid_y-25; jj<mid_y+26; jj+=25)
+	for(jj=mid_y-range; jj<mid_y+range+1; jj+=step)
 	{
-		for(ii=mid_x-25; ii<mid_x+26; ii+=25)
+		for(ii=mid_x-range; ii<mid_x+range+1; ii+=step)
 		{
 			//point in LCD + origin in middle
 			Point2f xy; xy.x = HPhase[ii+jj*width] - hmp, xy.y =VPhase[ii+jj*width] - vmp;
@@ -54,6 +54,7 @@ double LensHomo(double *Homography, double *HPhase, double *VPhase, double &hmp,
 
 	return err;
 }
+
 void PhaseRange(CPoint2 *PhaseRangeH, CPoint2 *PhaseRangeV, double *HPhase, double *VPhase, CPoint2 &Hrange, CPoint2 &Vrange, int width, int height, int npartitions = 50)
 {
 	int ii, jj, mm, nn;
