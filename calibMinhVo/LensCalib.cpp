@@ -406,7 +406,7 @@ void NonParametricLensUndistort(char *Image, float *LUTx, float *LUTy, int width
 void NonParametricLensUndistortDriver(int nchannels = 3, double magnified = 2.0, double scale = 1.8)
 {
 	char PATH[] = "/home/vamshi/Desktop/semester2/breathecam/breathecam/calibMinhVo/labNo_NameGoProImages", Fname[200];
-	int ii, jj, kk, width = 4000, height = 3000, length = width*height, lcdwidth = 3600, lcdheight = 2160, npartitions = max(height/10, width/10); //assuming each window is of size 10x10
+	int ii, jj, kk, width = 4000, height = 3000, length = width*height, lcdwidth = 3600, lcdheight = 2160, npartitions = max(height/20, width/20); //assuming each window is of size 10x10
 	int frequency1[] = {1, 2, 6, 18, 90}, frequency2[] = {1, 2, 6, 18, 54}, nfrequency = 5, sstep = 6, LFstep = 10, hFilter = 0, mMask = 5; 
 
 	int Zwidth = (int)(magnified*width), Zheight = (int)(magnified*height), Zlength = Zwidth*Zheight;
