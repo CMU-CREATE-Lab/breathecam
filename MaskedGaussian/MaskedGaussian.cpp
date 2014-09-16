@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <iostream>
 
 using namespace cv;
 int main(int argc, char** argv )
@@ -9,7 +10,22 @@ int main(int argc, char** argv )
     mask  = imread(argv[2],0);
     Mat inpainted;
     inpaint(image, mask, inpainted, 30, CV_INPAINT_TELEA);
-    imwrite("inpaintedImage.jpg",inpainted);
+
+    vector<int> compression_params;
+    compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    compression_params.push_back(100);
+
+    try 
+    {
+        imwrite("inpaintedImage.jpg",inpainted,compression_params);
+    }
+    catch (...) 
+    {
+        std::cout << "Some exception occured. Lookout \n"; 
+        return 1;
+    }
+
+//    imwrite("inpaintedImage.jpg",inpainted,compression_params);
 /*
 
         output = image.clone();
