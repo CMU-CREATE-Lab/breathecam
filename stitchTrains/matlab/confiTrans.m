@@ -32,6 +32,8 @@ matched_points2 = valid_points2(indexPairs(:, 2), :);
 locs1 = round(matched_points1.Location);
 locs2 = round(matched_points2.Location);
 
+sprintf('The size of locs 1 is ');size(locs1)
+
 N           = size(locs1,1);
 % disp(['The number of points matching is ' , num2str(N)]);
 if (N >= confi_points)
