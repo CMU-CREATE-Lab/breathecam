@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 
 require 'json'
-require 'shellwords'
 require 'fileutils'
-require File.join(File.expand_path(File.dirname(__FILE__)), 'thread-pool')
+require 'parallel'
 
 def append_and_cut(path_to_master_videoset, path_to_new_videoset)
-  puts "Cutting garbage frames from the beginning/end and then appending current set to master video files."
+  puts "[#{Time.now}] Cutting garbage frames from the beginning/end and then appending current set to master video files."
   path_to_master_r_json = Dir.glob("#{path_to_master_videoset}/crf*/r.json").first
   path_to_new_r_json = Dir.glob("#{path_to_new_videoset}/crf*/r.json").first
   path_to_master_tm_json = "#{path_to_master_videoset}/tm.json"
@@ -21,13 +20,12 @@ def append_and_cut(path_to_master_videoset, path_to_new_videoset)
     leader_for_master = master_r_json["leader"].to_f
     vid_width = master_r_json["video_width"].to_f
     vid_height = master_r_json["video_height"].to_f
-    start_time = 0
-    end_time_without_extra_end_frames = num_frames / fps
+    end_frame_for_master = num_frames
 
     new_r_json = open(path_to_new_r_json) {|fh| JSON.load(fh)}
     additional_frame_count = new_r_json["frames"].to_i
     leader_for_next_segment = new_r_json["leader"].to_f
-    start_time_for_next_segment = leader_for_next_segment / fps
+    start_time_for_next_segment = leader_for_next_segment.floor / fps
 
     master_videos = Dir.glob("#{path_to_master_videoset}/crf*/*/*/*.mp4").sort
     next_segment_videos = Dir.glob("#{path_to_new_videoset}/crf*/*/*/*.mp4").sort
@@ -52,11 +50,10 @@ def append_and_cut(path_to_master_videoset, path_to_new_videoset)
     bytes_per_frame = vid_width * vid_height * leader_bytes_per_pixel[26]
     leader_threshold = 1200000
     estimated_video_size = bytes_per_frame * num_frames
+    add_leader = false
     if estimated_video_size < leader_threshold
-      add_leader = false
       new_leader = 0
     else
-      add_leader = true
       minimum_leader_length = 2500000
       leader_nframes = minimum_leader_length / bytes_per_frame
       # Round up to nearest multiple of frames per keyframe
@@ -71,56 +68,46 @@ def append_and_cut(path_to_master_videoset, path_to_new_videoset)
       # The first time we add the leader we do not want to modify the start time, since
       # this assumes a leader is already present in the master video.
       if leader_for_master > 0
-        start_time = actual_leader / fps
-        end_time_without_extra_end_frames = (actual_leader + num_frames) / fps
+        end_frame_for_master = actual_leader + num_frames
+      else
+        add_leader = true
       end
     end
     # END TODO
 
-    num_jobs = master_videos.length
-    completed_jobs = 0
+   Parallel.each_with_index(master_videos, :in_threads=> 8) do |video, index|
+      next_segment_video = next_segment_videos[index]
 
-    master_videos.each_with_index do |video, index|
-      $thread_pool.schedule do
-        next_segment_video = next_segment_videos[index]
+      # Create a temp video file from the master that has the leader and black frames at the end removed.
+      # We need double forward slashes for a links inside the .txt file below for things to work on Windows. Odd.
+      tmp_master = "#{File.dirname(video)}/#{File.basename(video,'.*')}-cut.mp4".gsub('/','//')
+      system("ffmpeg -y -i #{video} -vframes #{end_frame_for_master} -vcodec copy -acodec copy #{tmp_master}")
 
-        # Create a temp video file from the master that has the leader and black frames at the end removed.
-        # We need double forward slashes for a links inside the .txt file below for things to work on Windows. Odd.
-        tmp_master = "#{File.dirname(video)}/#{File.basename(video,'.*')}-cut.mp4".gsub('/','//')
-        system("ffmpeg -y -i #{video} -ss #{start_time} -to #{end_time_without_extra_end_frames} -vcodec copy -acodec copy #{tmp_master}")
-        # Create a temp video from the new file without a leader included but does still have black frames at the end.
-        # We need double forward slashes for a links inside the txt file below for things to work on Windows. Odd.
-        tmp_new_video = "#{File.dirname(next_segment_video)}/#{File.basename(next_segment_video,'.*')}-cut.mp4".gsub('/','//')
+      # Create a temp video from the new file without a leader included but does still have black frames at the end.
+      # We need double forward slashes for a links inside the txt file below for things to work on Windows. Odd.
+      tmp_new_video = "#{File.dirname(next_segment_video)}/#{File.basename(next_segment_video,'.*')}-cut.mp4".gsub('/','//')
+
+      if start_time_for_next_segment > 0.0
         system("ffmpeg -y -i #{next_segment_video} -ss #{start_time_for_next_segment} -vcodec copy -acodec copy #{tmp_new_video}")
-
-        # Append the leader (if needed), tmp_master and tmp_new_video together and overwrite the original master.
-        # Bash shell specifics (command substitution) left here for a reminder of how convenient it is...but alas not portable.
-        video_append_list = ""
-        #video_append_list += "<(printf \""
-        video_append_list += "file '#{leader_path}'\r\n" if add_leader
-        video_append_list += "file '#{tmp_master}'\r\n"
-        video_append_list += "file '#{tmp_new_video}'"
-        #video_append_list += "\")"
-
-        video_append_list_output = "#{File.dirname(video)}/#{File.basename(video,'.*')}-append-list.txt"
-        File.open(video_append_list_output, 'w') {|f| f.write(video_append_list) }
-
-        tmp_final_video = "#{File.dirname(video)}/#{File.basename(video,'.*')}-tmp.mp4"
-        # Change to bash() if we want to make use of the Bash shell stuff commented out above.
-        system("ffmpeg -y -f concat -i #{video_append_list_output} -movflags faststart -vcodec copy -acodec copy #{tmp_final_video}")
-        File.delete("#{video}")
-        File.rename(tmp_final_video, "#{video}")
-
-        # Remove the temp files
-        File.delete(tmp_master)
-        File.delete(tmp_new_video)
-        File.delete(video_append_list_output)
-        completed_jobs += 1
+      else
+        tmp_new_video = next_segment_video
       end
-    end
 
-    while completed_jobs != num_jobs
-      # wait
+      tmp_final_video = "#{File.dirname(video)}/#{File.basename(video,'.*')}-tmp.mp4"
+
+      # If needed, we include the leader in the append below. This is only done once.
+      leader_concat_command = add_leader ? "#{leader_path}.ts|" : ""
+
+      # Append the leader (if needed), the master, and the next set of frames. We accomplish this by first doing an intermediate step of transcoding to mpeg transport streams and then concatenating. This makes use ffmpegs concat protocol.
+      # Note: It seems that the demuxer protocol causes the fps of the final concatenated video to be incorrect (off by some %; i.e. 11.99 vs 12.0)
+      system("ffmpeg -i #{tmp_master} -c copy -bsf:v h264_mp4toannexb -f mpegts #{tmp_master}.ts; ffmpeg -i #{tmp_new_video} -c copy -bsf:v h264_mp4toannexb -f mpegts #{tmp_new_video}.ts; ffmpeg -i 'concat:#{leader_concat_command}#{tmp_master}.ts|#{tmp_new_video}.ts' -c copy -bsf:a aac_adtstoasc #{tmp_final_video}")
+
+      # Rename temp video to final video
+      FileUtils.mv(tmp_final_video, video)
+
+      # Remove the temp files
+      File.delete(tmp_master)
+      File.delete(tmp_master + ".ts")
     end
 
     # Update r.json with the new number of frames being added.
@@ -132,15 +119,19 @@ def append_and_cut(path_to_master_videoset, path_to_new_videoset)
     master_tm_json = open(path_to_master_tm_json) {|fh| JSON.load(fh)}
     new_tm_json = open(path_to_new_tm_json) {|fh| JSON.load(fh)}
     master_tm_json["capture-times"] += new_tm_json["capture-times"]
-    open(path_to_master_tm_json, "w") {|fh| fh.puts(JSON.pretty_generate(master_tm_json))}
+    open(path_to_master_tm_json, "w") {|fh| fh.puts(JSON.generate(master_tm_json))}
 
     # Update ajax_includes.js based on the new changes made to the json above.
     system("ruby #{path_to_ajax_includes_updater}")
 
+    # Run qt-faststart. ffmpeg should be able to do this with '-movflags faststart' but apparently it does not actually do it. Perhaps because we are concatenating or copying streams?
+    # TODO: We assume qtfaststart is in the PATH
+    system("find #{path_to_master_videoset} -type f -name '*.mp4' -exec qtfaststart {} \\;")
+
     # Remove the new set since we just finished appending it to the master.
     FileUtils.rm_rf("#{path_to_new_videoset}")
 
-    puts "Finished appending new files."
+    puts "[#{Time.now}] Finished appending new files."
   else
     if !File.exists?(path_to_master_r_json)
       puts "Did not find r.json for the master videoset."
@@ -157,13 +148,6 @@ def append_and_cut(path_to_master_videoset, path_to_new_videoset)
     end
   end
 end
-
-def bash(command)
-  escaped_command = Shellwords.escape(command)
-  system("bash -c #{escaped_command}")
-end
-
-$thread_pool = nil
 
 if ARGV.length < 2
   puts "usage: append_breathecam_videos.rb PATH_TO_MASTER_VIDEOSET PATH_TO_NEW_VIDEOSET"
@@ -183,8 +167,5 @@ elsif !File.exists?(path_to_new_videoset)
   puts "Invalid path to new videoset"
   exit
 end
-
-$thread_pool = Pool.new(num_jobs.to_i)
-at_exit { $thread_pool.shutdown }
 
 append_and_cut(path_to_master_videoset, path_to_new_videoset)

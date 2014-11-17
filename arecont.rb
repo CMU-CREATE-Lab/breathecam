@@ -17,6 +17,8 @@ $username = "admin"
 $password = "illah123"
 $config = "res=full&x0=0&y0=0&x1=3648&y1=2752&quality=21&doublescan=0"
 
+$downtime_email = "pdille@andrew.cmu.edu"
+
 # Broken Lense, Walnut Towers, Heinz, Trimont, Loaner
 # The array index is the lense number going from left to right.
 # The value at the array index is the output image number.
@@ -93,10 +95,47 @@ $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "/usr/local/bin/enblend"
 def get_images
   current_time = Time.now.to_i
   current_day = Date.today.to_s
-  current_output_dir = File.join($output_path,current_day)
+  current_output_dir = File.join($output_path, current_day)
   FileUtils.mkdir_p(current_output_dir)
-  [1,2,3,4].each_with_index do |camera, i|
-    File.open("#{current_output_dir}/#{current_time}_image#{@@current_camera[i]}.jpg",'wb'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
+  downtime_logger = File.join(File.dirname(__FILE__), $location_id + ".downtime")
+  puts "[#{Time.now}] Start pulling images from #{$location_id}"
+  begin
+    [1,2,3,4].each_with_index do |camera, i|
+      puts "[#{Time.now}] Pulling image #{i + 1} from #{$location_id}"
+      File.open("#{current_output_dir}/#{current_time}_image#{@@current_camera[i]}.jpg",'wb'){ |f| f.write(fetch("#{$host}/image#{camera}?#{$config}")) }
+    end
+    if File.exist?(downtime_logger)
+      contents = File.open(downtime_logger, "r"){ |file| file.read }
+      contents_array = contents.split(" ")
+      count = contents_array.last.to_i
+      system("mail -s '#{$location_id} breathecam back online [eom]' #{$downtime_email} < /dev/null") if (count > 1)
+      File.delete(downtime_logger)
+      # Camera settings were lost, so set them back to default breathecam settings
+      set_breathecam_style
+    end
+    puts "[#{Time.now}] Completed pulling images from #{$location_id}"
+  rescue
+    count = 1
+    if File.exist?(downtime_logger)
+      new_down_time = Time.now.to_i
+      contents = File.open(downtime_logger, "r"){ |file| file.read }
+      contents_array = contents.split(" ")
+      initial_down_time = contents_array.first.to_i
+      count = contents_array.last.to_i
+      time_diff = new_down_time - initial_down_time
+      # Check every 10 min
+      if (time_diff >= count * 600)
+        time_down_in_minutes = (time_diff / 60).floor
+        count = count + 1
+        system("mail -s '#{$location_id} breathecam has been down for #{time_down_in_minutes} minutes [eom]' #{$downtime_email} < /dev/null")
+      end
+    else
+      initial_down_time = new_down_time = Time.now.to_i
+    end
+    new_log_msg = initial_down_time.to_s + " " + new_down_time.to_s + " " + count.to_s
+    File.open(downtime_logger, 'w') { |file| file.write(new_log_msg) }
+    # Exit program
+    exit
   end
 
   if $do_latest_stitch
@@ -125,34 +164,41 @@ end
 
 def set_pulsefield_style
   [1].each do |camera|
-    arecont_set(camera,'lowlight','highspeed'); # highspeed means honor shortexposures = exposure time
-    arecont_set(camera,'maxdigitalgain',32);
-    arecont_set(camera,'exposure','on');
-    arecont_set(camera,'autoexp','on');
-    arecont_set(camera,'analoggain', 1);
-    arecont_set(camera,'shortexposures', 1);
+    arecont_set(camera, 'lowlight', 'highspeed'); # highspeed means honor shortexposures = exposure time
+    arecont_set(camera, 'maxdigitalgain', 32);
+    arecont_set(camera, 'exposure', 'on');
+    arecont_set(camera, 'autoexp', 'on');
+    arecont_set(camera, 'analoggain', 1);
+    arecont_set(camera, 'shortexposures', 1);
+  end
+end
+
+def set_moonlight
+  [1, 2, 3, 4].each do |camera|
+    arecont_set(camera,'lowlight','moonlight'); # highspeed means honor shortexposures = exposure time
   end
 end
 
 def set_breathecam_style
   [1, 2, 3, 4].each do |camera|
     defaults(camera)
-    arecont_set(camera,'lowlight','moonlight'); # highspeed means honor shortexposures = exposure time
-    arecont_set(camera,'brightness',5);
+    arecont_set(camera, 'lowlight', 'moonlight'); # highspeed means honor shortexposures = exposure time
+    arecont_set(camera, 'equalcolor', 'on');
+    arecont_set(camera, 'brightness', 5);
   end
 end
 
 def defaults(camera)
-  arecont_set(camera,"analoggain", 25);
-  arecont_set(camera,"maxdigitalgain", 96);
-  arecont_set(camera,"brightness", 5);
-  arecont_set(camera,"autoexp", "on");
-  arecont_set(camera,"exposure", "on");
-  arecont_set(camera,"equalbright", "on");
-  arecont_set(camera,"equalcolor", "off");
-  arecont_set(camera,"lowlight", "balance");
-  arecont_set(camera,"shortexposures", 5);
-  arecont_set(camera,"daynight", "auto");
+  arecont_set(camera, "analoggain", 25);
+  arecont_set(camera, "maxdigitalgain", 96);
+  arecont_set(camera, "brightness", 5);
+  arecont_set(camera, "autoexp", "on");
+  arecont_set(camera, "exposure", "on");
+  arecont_set(camera, "equalbright", "on");
+  arecont_set(camera, "equalcolor", "off");
+  arecont_set(camera, "lowlight", "balance");
+  arecont_set(camera, "shortexposures", 5);
+  arecont_set(camera, "daynight", "auto");
 end
 
 def stitch_latest(current_time, current_output_dir)

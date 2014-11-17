@@ -1,12 +1,11 @@
-# Heinz (30th floor conference room) every minute
-* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "heinz" /usr0/web/timemachines/breathecam/heinz/050-original-images -camera-num 3 --do-location-lookup --do-latest-stitch >> /home/pdille/breathecam/heinz.log 2>&1
+# Heinz (32nd floor balcony) every minute
+* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "heinz" /usr0/web/timemachines/breathecam/images/heinz/050-original-images -camera-num 1 --do-location-lookup --do-latest-stitch --skip-rotate-for-latest-stitch >> /home/pdille/breathecam/heinz.log 2>&1
 
-# Heinz2 (32nd floor) every minute
-* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "heinz2" /usr0/web/timemachines/breathecam/heinz2/050-original-images -camera-num 1 --do-location-lookup --do-latest-stitch --skip-rotate-for-latest-stitch >> /home/pdille/breathecam/heinz2.log 2>&1
+# Walnut Towers (roof) every minute
+* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "walnuttowers1" /usr0/web/timemachines/breathecam/images/walnuttowers1/050-original-images -camera-num 2 --do-location-lookup --do-latest-stitch --skip-rotate-for-latest-stitch >> /home/pdille/breathecam/walnuttowers1.log 2>&1
 
-# Walnut Towers every minute
-* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "walnuttowers1" /usr0/web/timemachines/breathecam/walnuttowers1/050-original-images -camera-num 2 --do-location-lookup --do-latest-stitch --skip-rotate-for-latest-stitch >> /home/pdille/breathecam/walnuttowers1.log 2>&1
+# Trimont (Albrights) every minute
+* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "trimont1" /usr0/web/timemachines/breathecam/images/trimont1/050-original-images -camera-num 4 --do-location-lookup --do-latest-stitch --skip-rotate-for-latest-stitch >> /home/pdille/breathecam/trimont1.log 2>&1
 
-# Trimont (Albrights) every 6 minutes
-*/6 * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "trimont1" /usr0/web/timemachines/breathecam/trimont1/050-original-images -camera-num 4 --do-location-lookup --do-latest-stitch --skip-rotate-for-latest-stitch >> /home/pdille/breathecam/trimont1.log 2>&1
-
+# Pitt (Benedum Hall roof) every minute
+* * * * * pdille ruby -r /home/pdille/breathecam/arecont.rb -e get_images "pitt1" /usr0/web/timemachines/breathecam/images/pitt1/050-original-images -camera-num 0 --do-location-lookup --do-latest-stitch --skip-rotate-for-latest-stitch >> /home/pdille/breathecam/pitt1.log 2>&1

@@ -17,5 +17,5 @@ end
 
 json = open(ARGV[1]) {|fh| JSON.load(fh)}
 json["capture-times"] = capture_times
-open(ARGV[1], "w") {|fh| fh.puts(JSON.pretty_generate(json))}
+open(ARGV[1], "w") {|fh| fh.puts(JSON.generate(json))}
 STDERR.puts "Successfully wrote capture times to #{ARGV[1]}"
