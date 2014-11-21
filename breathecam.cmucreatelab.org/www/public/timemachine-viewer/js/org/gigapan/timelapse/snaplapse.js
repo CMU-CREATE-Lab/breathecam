@@ -105,7 +105,7 @@ if (!Math.uuid) {
 
 (function() {
   var UTIL = org.gigapan.Util;
-  org.gigapan.timelapse.Snaplapse = function(timelapse, settings, mode) {
+  org.gigapan.timelapse.Snaplapse = function(composerDivId, timelapse, settings, mode) {
 
     // Objects
     var thisObj = this;
@@ -121,15 +121,12 @@ if (!Math.uuid) {
     var useCustomUI = timelapse.useCustomUI();
     var usePresentationSlider = (mode == "presentation") ? true : false;
     var disableKeyframeTitle = ( typeof (settings["disableKeyframeTitle"]) == "undefined") ? false : settings["disableKeyframeTitle"];
-    var uiEnabled = (mode == "noUI") ? false : true;
 
     // Flags
     var isCurrentlyPlaying = false;
 
     // DOM elements
-    var timeMachineDivId = timelapse.getTimeMachineDivId();
-    var composerDivClass = usePresentationSlider ? "presentationSlider" : "composer";
-    var composerDivId = timeMachineDivId + " ." + composerDivClass;
+    var viewerDivId = timelapse.getViewerDivId();
 
     // Parameters
     var warpStartingTime = null;
@@ -187,8 +184,6 @@ if (!Math.uuid) {
     // Every time user updates a parameter, try to build the interval
     // TODO: change the function of buildPreviousFlag to buildCurrentAndPreviousFlag
     var tryBuildKeyframeInterval_refreshKeyframeParas = function(keyframeId, buildPreviousFlag) {
-      if (usePresentationSlider)
-        return;
       var idx;
       for (var i = 0; i < keyframes.length; i++) {
         if (keyframeId == keyframes[i]['id']) {
@@ -200,12 +195,12 @@ if (!Math.uuid) {
       if (buildPreviousFlag) {
         keyframeToBuild = keyframes[idx - 1];
         if ( typeof (keyframeToBuild) != "undefined" && keyframeToBuild != null && typeof (keyframes[idx]) != "undefined" && keyframes[idx] != null) {
-          keyframeInterval = new org.gigapan.timelapse.KeyframeInterval(keyframeToBuild, keyframes[idx], null, timelapse.getDuration(), timeMachineDivId, keyframeToBuild['buildConstraint'], defaultLoopTimes, timelapse, settings);
+          keyframeInterval = new org.gigapan.timelapse.KeyframeInterval(keyframeToBuild, keyframes[idx], null, timelapse.getDuration(), composerDivId, keyframeToBuild['buildConstraint'], timelapse, settings);
         }
       } else {
         keyframeToBuild = keyframes[idx];
         if ( typeof (keyframeToBuild) != "undefined" && keyframeToBuild != null && typeof (keyframes[idx + 1]) != "undefined" && keyframes[idx + 1] != null) {
-          keyframeInterval = new org.gigapan.timelapse.KeyframeInterval(keyframeToBuild, keyframes[idx + 1], null, timelapse.getDuration(), timeMachineDivId, keyframeToBuild['buildConstraint'], defaultLoopTimes, timelapse, settings);
+          keyframeInterval = new org.gigapan.timelapse.KeyframeInterval(keyframeToBuild, keyframes[idx + 1], null, timelapse.getDuration(), composerDivId, keyframeToBuild['buildConstraint'], timelapse, settings);
         }
       }
     };
@@ -265,6 +260,10 @@ if (!Math.uuid) {
         }
       }
       return null;
+    };
+
+    this.getDefaultLoopTimes = function() {
+      return defaultLoopTimes;
     };
 
     this.setDurationForKeyframe = function(keyframeId, duration) {
@@ -337,6 +336,8 @@ if (!Math.uuid) {
           timelapse.getVisualizer().deleteTimeTag(keyframeId, keyframes[index - 1]);
           timelapse.getVisualizer().addTimeTag(keyframes, index);
         }
+        var tagColor = timelapse.getTagColor();
+        var color_head = "rgba(" + tagColor[0] + "," + tagColor[1] + "," + tagColor[2] + ",";
 
         // Events should be fired at the end of this function
         var listeners = eventListeners['keyframe-modified'];
@@ -349,6 +350,8 @@ if (!Math.uuid) {
             }
           }
         }
+
+        return color_head;
       }
     };
 
@@ -778,7 +781,7 @@ if (!Math.uuid) {
       var intervals = [];
       for (var k = startingKeyframeIndex + 1; k < keyframes.length; k++) {
         var previousKeyframeInterval = (intervals.length > 0) ? intervals[intervals.length - 1] : null;
-        var keyframeInterval = new org.gigapan.timelapse.KeyframeInterval(keyframes[k - 1], keyframes[k], previousKeyframeInterval, timelapse.getDuration(), timeMachineDivId, undefined, defaultLoopTimes, timelapse, settings);
+        var keyframeInterval = new org.gigapan.timelapse.KeyframeInterval(keyframes[k - 1], keyframes[k], previousKeyframeInterval, timelapse.getDuration(), composerDivId, undefined, timelapse, settings);
         intervals[intervals.length] = keyframeInterval;
         UTIL.log("buildKeyframeIntervals(): created keyframe interval (" + (intervals.length - 1) + "): between time [" + keyframes[k - 1]['time'] + "] and [" + keyframes[k]['time'] + "]: " + keyframeInterval);
       }
@@ -943,8 +946,8 @@ if (!Math.uuid) {
         currentLoopDwell = currentKeyframeInterval.getLoopDwell();
         var currentFrame = currentKeyframeInterval.getStartingFrame();
 
-        if (currentFrame && uiEnabled)
-          UTIL.selectSortableElements($("#" + composerDivId + " .snaplapse_keyframe_list"), $("#" + timeMachineDivId + "_snaplapse_keyframe_" + currentFrame.id), true);
+        if (currentFrame)
+          UTIL.selectSortableElements($("#" + composerDivId + " .snaplapse_keyframe_list"), $("#" + composerDivId + "_snaplapse_keyframe_" + currentFrame.id), true);
 
         var keyframeStartingTime = currentKeyframeInterval.getStartingTime();
 
@@ -1084,8 +1087,7 @@ if (!Math.uuid) {
         }
       } else {
         _stop(true);
-        if (uiEnabled)
-          UTIL.selectSortableElements($("#" + composerDivId + " .snaplapse_keyframe_list"), $("#" + timeMachineDivId + "_snaplapse_keyframe_" + keyframes[keyframes.length - 1].id));
+        UTIL.selectSortableElements($("#" + composerDivId + " .snaplapse_keyframe_list"), $("#" + composerDivId + "_snaplapse_keyframe_" + keyframes[keyframes.length - 1].id));
       }
     };
 
@@ -1093,24 +1095,22 @@ if (!Math.uuid) {
     //
     // Constructor code
     //
-    if (uiEnabled) {
-      org.gigapan.Util.ajax("html", rootAppURL, "templates/time_warp_composer.html", function(html) {
-        $("#" + timeMachineDivId).append($('<div class="' + composerDivClass + '"></div>').append(html));
-        snaplapseViewer = new org.gigapan.timelapse.snaplapse.SnaplapseViewer(thisObj, timelapse, settings, mode);
-      });
-    } else {
+
+    org.gigapan.Util.ajax("html", rootAppURL, "time_warp_composer.html", function(html) {
+      $("#" + composerDivId).html(html);
       snaplapseViewer = new org.gigapan.timelapse.snaplapse.SnaplapseViewer(thisObj, timelapse, settings, mode);
-    }
+    });
+
   };
 
   org.gigapan.timelapse.Snaplapse.normalizeTime = function(t) {
     return parseFloat(t.toFixed(6));
   };
 
-  org.gigapan.timelapse.KeyframeInterval = function(startingFrame, endingFrame, previousKeyframeInterval, videoDuration, timeMachineDivId, constraintParaName, defaultLoopTimes, timelapse, settings) {
+  org.gigapan.timelapse.KeyframeInterval = function(startingFrame, endingFrame, previousKeyframeInterval, videoDuration, composerDivId, constraintParaName, timelapse, settings) {
     var nextKeyframeInterval = null;
     var playbackRate = null;
-    var itemIdHead = timeMachineDivId + "_snaplapse_keyframe_" + startingFrame.id;
+    var itemIdHead = composerDivId + "_snaplapse_keyframe_" + startingFrame.id;
     var desiredSpeed = startingFrame['speed'] == null ? 100 : startingFrame['speed'];
     var timeDirection = (startingFrame['time'] <= endingFrame['time']) ? 1 : -1;
     // TODO: loopDwell needs to be a setting inside snaplapse json
@@ -1126,6 +1126,7 @@ if (!Math.uuid) {
     var actualDuration;
     var desiredDuration;
     var disableTourLooping = ( typeof settings['disableTourLooping'] == "undefined") ? false : settings['disableTourLooping'];
+    var defaultLoopTimes = timelapse.getSnaplapse().getDefaultLoopTimes();
 
     // Determine and validate loop times and loop dwell time
     // Loop dwell time is the time that users want to pause the video at the begining or end while looping

@@ -139,25 +139,18 @@
   width: 156px;
   height: 58px;
   position: absolute;
-  bottom: 68px;
-  right: 19px;
+  bottom: 53px;
+  right: -22px;
   background-image: url("../images/googleLogo.png");
   -ms-transform: scale(0.5); /* IE 9 */
   -webkit-transform: scale(0.5); /* Chrome, Safari, Opera */
   transform: scale(0.5);
-  -ms-transform-origin: 100% 100%;
-  -webkit-transform-origin: 100% 100%;
-  transform-origin: 100% 100%;
 }
 
 .customControl {
   position: absolute;
   background-color: rgba(255,255,255,0);
   height: 60px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  width: auto;
   z-index: 19;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -171,7 +164,6 @@
   position: absolute;
   height: inherit;
   margin-top: 0px;
-  width: auto;
 }
 
 .timeTextLeft {
@@ -359,10 +351,7 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  bottom: 0px;
-  right: 0px;
-  width: auto;
-  height: auto;
+  margin: auto;
   z-index: 999;
   display: none;
 }

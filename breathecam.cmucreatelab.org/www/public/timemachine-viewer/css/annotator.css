@@ -6,64 +6,55 @@
 }
 
 .annotation_container {
-  position: absolute;
-  top: 37px;
-  left: 1px;
-  right: 1px;
-  border-bottom: 1px solid #656565;
-  border-left: 1px solid #656565;
-  border-right: 1px solid #656565;
-  width: auto;
-  height: 174px;
+  width: 1079px;
+  min-height: 168px;
+  display: block;
   padding: 0;
   margin: 0;
+  overflow-x: auto;
+  overflow-y: scroll;
+  border-left: solid 1px #656565;
+  border-right: solid 1px #656565;
+  border-bottom: solid 1px #656565;
   background-color: white;
+  font-size: 12px;
   overflow-x: scroll;
   overflow-y: hidden;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
+  position: absolute;
   -moz-user-select: none;
-  -ms-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
   -o-user-select: none;
-  user-select: none;
-  z-index: 5;
 }
 
 .annotation_list {
-  /* do not remove, this is used for the scrollTop function */
+  /*	min-width: 365px;*/
   position: relative;
   white-space: nowrap;
-  height: 148px;
 }
 
 .annotation_list .ui-selecting {
-  color: black;
+  /*	background: #eeeeff;*/
 }
 
 .annotation_list .ui-selected {
-  color: black;
+  /*
+   background: #ddddff;
+   color: black;*/
+
 }
 
 .annotation_list_item {
   display: table-cell;
-  padding: 8px;
+  padding: 10px;
   cursor: pointer;
-  font-size: 12px;
-  border-right: solid 1px #656565 !important;
-  border-bottom: solid 1px #656565 !important;
-  border-left: solid 0px #656565 !important;
-  border-top: solid 0px #656565 !important;
+  border-right: solid 1px #656565;
+  border-bottom: solid 1px #656565;
+  border-left: solid 0px #656565;
+  border-top: solid 0px #656565;
   background-color: white;
   min-width: 100px;
   height: 100%;
-}
-
-.annotation_list_item input {
-  height: 14px;
-}
-
-.annotation_list_item tr {
-  line-height: 22px;
 }
 
 .loadAnnotatorButton {
@@ -92,8 +83,8 @@
   position: absolute;
   left: 5px;
   top: 50px;
-  width: 383px;
-  height: 302px;
+  right: 5px;
+  bottom: 5px;
   resize: none;
 }
 
@@ -101,8 +92,8 @@
   position: absolute;
   left: 5px;
   top: 50px;
-  width: 383px;
-  height: 302px;
+  right: 5px;
+  bottom: 5px;
   resize: none;
 }
 
@@ -114,34 +105,6 @@
   height: 0px;
 }
 
-.annotator .toolbar {
-  position: absolute;
-  top: 0px;
-  left: 1px;
-  right: 1px;
-  width: auto;
-  height: 36px;
-  background-color: rgb(220,220,220);
-  border: 1px solid #656565;
-  font-size: 12px;
-  margin: 0;
-  padding: 0;
-  z-index: 20;
-}
-
-.annotator .toolbar .ui-button {
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
-
-.annotator .toolbar .ui-button:focus {
-  outline: none;
-}
-
 .annotatorModeToolbar {
   margin-top: 0px;
   margin-left: 0px;
@@ -149,49 +112,18 @@
   margin-bottom: 0px;
   padding: 0;
   float: right;
+  display: none;
   height: 100%;
-}
-
-.annotatorModeToolbar .ui-button {
-  min-width: 35px;
-  margin-right: -1px;
-  margin-left: 0px;
-  border-radius: 0px !important;
-  vertical-align: middle;
-  border-top: 0px solid white;
-  border-bottom: 0px solid white;
-  height: 100%;
-  border-left: 1px solid rgb(220,220,220);
-  border-right: 1px solid rgb(220,220,220);
-}
-
-.annotatorModeToolbar .ui-button.ui-state-hover {
-  border-right: 1px solid #656565;
-  border-left: 1px solid #656565;
-  z-index: 999;
 }
 
 .annotatorModeToolbar .ui-state-default {
   background: white;
 }
 
-.annotatorModeToolbar .ui-state-active {
-  background: #656565 !important;
-  color: white;
-}
-
-.annotatorModeToolbar .ui-state-active .ui-icon {
-  background-image: url(../images/ui-icons_custom_256x240.png);
-}
-
-.clearAnnotation {
-  border-right: 1px solid #656565 !important;
-}
-
 .addAnnotationLabel .ui-button-text {
-  margin-top: 5px;
+  margin-top: 11px;
 }
 
 .moveAnnotationLabel .ui-button-text {
-  margin-top: 5px;
+  margin-top: 11px;
 }
