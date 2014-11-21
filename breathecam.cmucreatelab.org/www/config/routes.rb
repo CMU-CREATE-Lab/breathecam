@@ -46,9 +46,13 @@ Breathecam::Application.routes.draw do
   #     resources :products
   #   end
 
+  # TODO: This can probably be combined into one statement but I am not sure how...
+  root :to => "embeds#index", :constraints => { :subdomain  => "ecam" }
+  match '(*path)/:location' => "embeds#index", :constraints => { :subdomain  => "ecam" }
+
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-   root :to => 'home#index'
+  root :to => 'home#index'
 
   # See how all your routes lay out with "rake routes"
 

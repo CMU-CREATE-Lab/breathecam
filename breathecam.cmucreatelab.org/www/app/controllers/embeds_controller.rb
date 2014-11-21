@@ -5,10 +5,11 @@ class EmbedsController < ApplicationController
   layout 'embed'
 
   def index
+    subdomain = request.subdomains(0).first
     @location_id = params['location']
-    @root_url = "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam"
+    @root_url = "http://tiles.#{subdomain}.cmucreatelab.org"
     date_today = Date.today
-    img_path = "#{@root_url}/#{@location_id}/050-original-images/#{date_today.to_s}/latest_stitch/"
+    img_path = "#{@root_url}/images/#{@location_id}/050-original-images/#{date_today.to_s}/latest_stitch/"
     imageArray = []
     begin
       open(img_path) {|html|
@@ -47,5 +48,7 @@ class EmbedsController < ApplicationController
     useTime = imageArray.first.scan(/^\d*/)[0].to_i
     @stitched_image = img_path + useTime.to_s + "_full" + ".jpg"
     @pretty_time = Time.at(useTime).to_datetime.strftime("%m/%d/%Y %I:%M %p")
+
+    render :template => 'embeds/ecam' if subdomain == "ecam"
   end
 end

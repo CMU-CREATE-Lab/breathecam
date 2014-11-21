@@ -1,4 +1,5 @@
 <% content_for :head do %>
+<% content_for :title, "E-Cam" %>
   <%= stylesheet_link_tag    "/timemachine-viewer/css/snaplapse.css",
                              "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
                              "/timemachine-viewer/css/player.css",
@@ -37,23 +38,20 @@
     jQuery.support.cors = true;
     var initialDataset;
     var zoomify;
+    var locationDivId;
 
     function selectTimelapseFeed() {
       $("#image_feed").css("visibility", "hidden");
       $("#stitched_image_wrapper").css("visibility", "hidden");
       $("#stitched_image").css("visibility", "hidden");
       $("#timelapse_feed").show();
-      $("#show_timelapse_feed .feed_overlay").hide();
-      $("#show_image_feed .feed_overlay").show();
     }
 
     function selectImageFeed() {
       $("#timelapse_feed").hide();
       $("#image_feed").css("visibility", "visible");
       $("#stitched_image_wrapper").css("visibility", "visible");
-      $("#stitched_image").css("visibility", "visible");
-      $("#show_image_feed .feed_overlay").hide();
-      $("#show_timelapse_feed .feed_overlay").show();
+      $("#stitched_image").css("visibilriity", "visible");
     }
 
     function tm_init() {
@@ -77,12 +75,16 @@
         showFullScreenBtn: false,
         showLogoOnDefaultUI: false,
         datasetType: "breathecam",
+        viewportGeometry: {
+          max: true
+        },
         onTimeMachinePlayerReady: function(viewerDivId) {
           if (!hashVars) {
             var numFrames = timelapse.getNumFrames();
             // 12 fps * 5 seconds = 60 frames
             var fiveSecondsFromEnd = numFrames - 60;
             timelapse.seekToFrame(fiveSecondsFromEnd);
+            timelapse.warpTo(timelapse.homeView());
           }
           showContent();
         }
@@ -97,11 +99,16 @@
         onSelect : selectDay,
         beforeShowDay : highlightDays
       });
-      $("#datepicker").append("<p class='date_msg'>Click a date to go to that timelapse.</p>");
 
-      $("#show_timelapse_feed").on("click", function() {
-        selectTimelapseFeed();
-      });
+      /*$(".location_thumbnail_container").on("click", function() {
+        var newLocation = $(this).attr('href');
+        var shareView = timelapse.getShareView();
+        var shareViewComponents = shareView.split("&");
+        var time = shareViewComponents[1];
+        var day = shareViewComponents[2];
+        $(this).attr('href', newLocation + "#" + time + "&" + day);
+      });*/
+
     }
 
     function img_init() {
@@ -122,10 +129,6 @@
         $(this).removeClass("openHand closedHand").addClass("openHand");
       }).bind("mousedown", function() {
         $(this).removeClass("openHand closedHand").addClass("closedHand");
-      });
-
-      $("#show_image_feed").on("click", function() {
-        selectImageFeed();
       });
     }
 
@@ -166,66 +169,42 @@
       var timelapseSupported = org.gigapan.Util.browserSupported();
       var stitchedImage = "<%= @stitched_image %>";
       var error_text = "";
+      locationDivId = "<%= @location_id %>" + "_overlay";
+
       if ((!timelapseSupported || typeof (cached_breathecam) === "undefined") && stitchedImage === "") {
         // Nothing is up. Inform the user
         $("#stitched_image_wrapper").css("visibility", "hidden");
         $("#loading").html("<div class='error_msg2'>Content currently unavailable. Please try again later.</div>");
-      }  else if (timelapseSupported && stitchedImage === "") {
-        var $image_feed_button = $("#show_image_feed");
-        error_text = "Temporarily unavailable. Please try again later.";
-        $image_feed_button.html($image_feed_button.html() + "<p class='error_msg'>"+ error_text + "</p>");
-        $image_feed_button.off();
-        $("#show_image_feed .feed_overlay").addClass("disabled");
+      } else if (timelapseSupported && stitchedImage === "") {
         tm_init();
       } else if (!timelapseSupported || typeof (cached_breathecam) === "undefined") {
-        var $timelapse_feed_button = $("#show_timelapse_feed");
-        if (typeof (cached_breathecam) === "undefined")
-          error_text = "Temporarily unavailable. Please try again later.";
-        else
-          error_text = "Your browser or device is not compatible.";
-        $timelapse_feed_button.html($timelapse_feed_button.html() + "<p class='error_msg'>"+ error_text + "</p>");
-        $timelapse_feed_button.off();
-        $("#show_timelapse_feed .feed_overlay").addClass("disabled");
         img_init();
       } else {
         tm_init();
-        img_init();
+        //img_init();
       }
+
       $("body").on("selectstart", function(e) { e.preventDefault(); });
     });
   </script>
 <% end %>
 
-<div id="body-index2">
+<div>
   <div id="loading">
     <img src="<%= asset_path('loading.gif') %>">
   </div>
-  <div id="content">
-    <div id="timelapse_feed">
-      <div id="player1" style="position: absolute;"></div>
-      <div id="datepicker"></div>
+  <div>
+    <div id="timelapse_feed" class="timelapse_feed_embed">
+      <div id="player1"></div>
+      <div id="datepicker" class="datepicker_embed"></div>
     </div>
-    <div id="image_feed">
-      <div id="stitched_image_wrapper" class="image-zoom-wrapper">
+    <div id="image_feed" class="image_feed_embed">
+      <div id="stitched_image_wrapper" class="image-zoom-wrapper image-zoom-wrapper-embed">
         <div id="zoom-in" title="Zoom in"><p>+</p></div>
         <div id="zoom-out" title="Zoom out"><p>_</p></div>
         <img id="stitched_image" class="image-zoom" src="<%= @stitched_image %>">
         <span id="image_feed_timestamp"><%= @pretty_time %></span>
       </div>
-    </div>
-    <div id="show_timelapse_feed" style='background-image: url(<%= asset_path("#{@image_asset_name}_timelapse.png") %>);'>
-      <div class="feed_msg">
-        <div>Timelapse</div>
-        <p class="feed_msg_txt">(Real-time up to the last 10 min)</p>
-      </div>
-      <div class="feed_overlay"></div>
-    </div>
-    <div id="show_image_feed" style='background-image: url(<%= asset_path("#{@image_asset_name}_live.png") %>);'>
-      <div class="feed_msg">
-        <div>Live</div>
-        <p class="feed_msg_txt">(Real-time up to the last min)</p>
-      </div>
-      <div class="feed_overlay"></div>
     </div>
   </div>
 </div>

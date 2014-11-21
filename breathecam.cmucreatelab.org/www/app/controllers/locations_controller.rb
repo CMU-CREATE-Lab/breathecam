@@ -5,10 +5,13 @@ class LocationsController < ApplicationController
   layout 'application'
 
   def index
+    subdomain = request.subdomains(0).first
+    subdomain = "breathecam" if subdomain.blank?
     @location_id = params['location']
-    @root_url = "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam"
+    @root_url = "http://tiles.#{subdomain}.cmucreatelab.org"
     date_today = Date.today
-    img_path = "#{@root_url}/#{@location_id}/050-original-images/#{date_today.to_s}/latest_stitch/"
+    img_path = "#{@root_url}/images/#{@location_id}/050-original-images/#{date_today.to_s}/latest_stitch/"
+    Rails.logger.info(img_path);
     imageArray = []
     begin
       open(img_path) {|html|
@@ -37,6 +40,8 @@ class LocationsController < ApplicationController
     @viewable_date = (date_today - i + 1).to_s
 
     # We did not find any stitched images for today or yesterday. There is most likely a problem with the image collection...
+    Rails.logger.info("--------------------")
+    Rails.logger.info(imageArray)
     if imageArray.blank?
       @stitched_image = ""
       respond_to do |format|
@@ -47,5 +52,6 @@ class LocationsController < ApplicationController
     useTime = imageArray.first.scan(/^\d*/)[0].to_i
     @stitched_image = img_path + useTime.to_s + "_full" + ".jpg"
     @pretty_time = Time.at(useTime).to_datetime.strftime("%m/%d/%Y %I:%M %p")
+    @image_asset_name = Rails.application.assets["#{@location_id}.png"].nil? ? "default" : @location_id
   end
 end
