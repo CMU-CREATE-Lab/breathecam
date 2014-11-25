@@ -86,11 +86,12 @@ function getCaption() {
   return caption;
 }
 
+var fbShareUrl;
 function fbShare() {
   FB.ui({
     method: 'feed',
     name: 'Breathe Cam',
-    link: getLink(),
+    link: getLink(fbShareUrl),
     picture: getPicture(),
     caption: getCaption(),
     description: getDescription(),
