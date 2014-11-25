@@ -11,7 +11,7 @@
   <table>
     <tr>
       <td class="thumbnail">
-        <a href="/locations/heinz">
+        <a href="<%= url_for :controller => 'locations', :location => 'heinz'%>">
           <div>
             <%= image_tag("heinz.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Heinz</div>
@@ -22,7 +22,7 @@
     </tr>
     <tr>
       <td class="thumbnail">
-        <a href="/locations/trimont1">
+        <a href="<%= url_for :controller => 'locations', :location => 'trimont1'%>">
           <div>
             <%= image_tag("trimont1.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Trimont</div>
@@ -33,7 +33,7 @@
     </tr>
     <tr>
       <td class="thumbnail">
-        <a href="/locations/walnuttowers1">
+        <a href="<%= url_for :controller => 'locations', :location => 'walnuttowers1'%>">
           <div>
             <%= image_tag("walnuttowers1.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Walnut Towers</div>
@@ -44,7 +44,7 @@
     </tr>
     <tr>
       <td class="thumbnail">
-        <a href="/locations/pitt1">
+        <a href="<%= url_for :controller => 'locations', :location => 'pitt1'%>">
           <div>
             <%= image_tag("pitt1.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Benedum Hall</div>
