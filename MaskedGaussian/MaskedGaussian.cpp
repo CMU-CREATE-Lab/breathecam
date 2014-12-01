@@ -31,7 +31,7 @@ int main(int argc, char** argv )
 	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 	compression_params.push_back(100);
 
-	if (max < 20)   //if night then blur
+	if (max < 30)   //if night then blur
 	{
 		Mat gaus_blur;
 		GaussianBlur(image, gaus_blur, Size(15,15), 5, 5 );  //gaussian kernel for night time
