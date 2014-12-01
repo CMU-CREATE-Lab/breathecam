@@ -1,8 +1,15 @@
-OpenCv version that I used is OpenCV 2.4.9.
+##extract, and run
+cmake .
+make
 
+#cmakelist has -O3 flag for optimiztion
 
-* After making the file,Run the executalbe MaskedGaussian with the image and mask as argument
-* Example "./MaskedGaussian Image.jpg Mask.jpg"
-* The Resultant output will be saved in the directory as "inpaintedImage.jpg"
-* Now has explicit 100% compression while imwrite. Should be lossless.
-* I have disabled the option to show the image, so do "eog inpaintedImage.jpg" to view the output
+#threshold of 20 used for detecting day or night (max of absolute difference of channel 0 and channel 1. in grayscale , all channels should be same)
+
+#gaussina kernel size(15,15), sigmax=5 and sigmay=5 used
+
+##run as the following
+
+./MaskedGaussian {inputFilename} {inpainted_mask} {gaussian_mask} {outputFilename}
+
+#Masks for all three breathecams in this folder
