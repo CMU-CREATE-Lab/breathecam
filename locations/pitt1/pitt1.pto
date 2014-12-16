@@ -1,6 +1,6 @@
 # hugin project file
 #hugin_ptoversion 2
-p f2 w9532 h1845 v186  E0 R0 S1151,8052,85,1784 n"TIFF_m c:LZW r:CROP"
+p f2 w9532 h1845 v186  E0 R0 S1151,8052,85,1314 n"TIFF_m c:LZW r:CROP"
 m g1 i0 f0 m2 p0.00784314
 
 # image lines
