@@ -19,6 +19,7 @@ $jpegtran_path = $RUNNING_WINDOWS ? "jpegtran.exe" : "jpegtran"
 # Hugin tools
 $nona_path = $RUNNING_WINDOWS ? "nona.exe" : "nona"
 $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "enblend"
+$masker_path = "MaskedGaussian"
 
 $valid_image_extensions = [".jpg", ".lnk"]
 $default_num_jobs = 4
@@ -32,6 +33,8 @@ $skip_leader = false
 $input_date_from_file = false
 $camera_type = "breathecam"
 $skip_qtfaststart_append = false
+$skip_videos = false
+$apply_mask = false
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -114,6 +117,14 @@ class Compiler
         $camera_type = ARGV.shift
       elsif arg == "--skip-qtfaststart-append"
         $skip_qtfaststart_append = true
+      elsif arg == "--skip-videos"
+        $skip_videos = true
+      elsif arg == "--apply-mask"
+        $apply_mask = true
+      elsif arg == "-img-mask-inpaint"
+        $img_mask_inpaint_path = ARGV.shift
+      elsif arg == "-img-mask-gaus"
+        $img_mask_gaus_path = ARGV.shift
       end
     end
 
@@ -170,16 +181,17 @@ class Compiler
         file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
         if File.exists?(file)
           last_pull_date = Time.parse(File.open(file, &:readline))
+          exit if (last_pull_date.to_i > Time.now.to_i)
           $start_time = {}
           $start_time["hour"] = last_pull_date.strftime("%H").to_i
           $start_time["minute"] = last_pull_date.strftime("%M").to_i
           $start_time["sec"] = 0
           $current_day = Date.parse(last_pull_date.to_s).to_s
-          last_pull_date += (60 * $incremental_update_interval)
-          $end_time["hour"] = last_pull_date.strftime("%H").to_i
-          $end_time["minute"] = last_pull_date.strftime("%M").to_i
+          new_last_pull_date = last_pull_date + (60 * $incremental_update_interval)
+          $end_time["hour"] = new_last_pull_date.strftime("%H").to_i
+          $end_time["minute"] = new_last_pull_date.strftime("%M").to_i
           $end_time["sec"] = 0
-          $end_time["full"] = last_pull_date
+          $end_time["full"] = new_last_pull_date
         else
           calculate_rsync_input_range
         end
@@ -197,9 +209,24 @@ class Compiler
     unless File.exists?(path_to_definition_file)
       FileUtils.cp("#{File.dirname(__FILE__)}/default_definition.tmc", path_to_definition_file)
       json = open(path_to_definition_file) {|fh| JSON.load(fh)}
-      json['id'] = $camera_location
-      json['label'] = $camera_location
+      location_name = camera_name_remap($camera_location)
+      json['id'] = location_name
+      json['label'] = location_name
       open(path_to_definition_file, "w") {|fh| fh.puts(JSON.pretty_generate(json))}
+    end
+  end
+
+  def camera_name_remap(camera_location)
+    if (camera_location == "heinz")
+      return "north_shore"
+    elsif (camera_location == "trimont1")
+      return "downtown"
+    elsif (camera_location == "walnuttowers1")
+      return "mon_valley"
+    elsif (camera_location == "pitt1")
+      return "oakland"
+    else
+      return camera_location
     end
   end
 
@@ -273,7 +300,19 @@ class Compiler
     # We need to reference files locally now that we have rsynced everything over
     $input_path = new_input_path
     puts "[#{Time.now}] Finished rsyncing input images."
-    $skip_stitch ? create_tm : organize_images
+    if $skip_stitch
+      if Dir["#{$input_path}/*.jpg"].empty?
+        puts "No images found to be processed. Aborting."
+        if $do_incremental_update and $input_date_from_file
+          file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
+          File.open(file, 'w') {|f| f.write(Time.now)}
+        end
+        exit
+      end
+      create_tm
+    else
+      organize_images
+    end
   end
 
   def organize_images
@@ -377,6 +416,22 @@ class Compiler
       end
     end
     puts "[#{Time.now}] Stitching complete. Stitched #{match_count} out of #{count} possible frames."
+    $apply_mask ? apply_pano_mask : create_tm
+  end
+
+  def apply_pano_mask
+    puts "[#{Time.now}] Applying mask to frames."
+    stitched_images_path = File.join($working_dir, "0100-original-images")
+    files = Dir.glob("#{stitched_images_path}/*_full.*")
+    Parallel.each(files, :in_threads => $num_jobs) do |img|
+      begin
+        system("#{$masker_path} #{img} #{$img_mask_inpaint_path} #{$img_mask_gaus_path} #{img}")
+      rescue
+        # Ignore and move on
+        # TODO: Maybe do something in this case.
+      end
+    end
+    puts "[#{Time.now}] Done applying mask to frames."
     create_tm
   end
 
@@ -386,6 +441,7 @@ class Compiler
     $timemachine_master_output_dir = "#{$current_day}.timemachine"
     extra_flags = ""
     extra_flags += "--skip-leader" if $skip_leader
+    extra_flags += "--skip-videos --preserve-source-tiles" if $skip_videos
     # TODO: Assumes Ruby is installed and ct.rb is in the PATH
     Dir.chdir($working_dir) do
       system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}")

@@ -12,6 +12,9 @@ $location_id = $host
 $location_lookup_path = "/usr4/web/breathecam.cmucreatelab.org/www/public/locations.json"
 $do_latest_stitch = false
 $skip_rotate_for_latest_stitch = false
+$dzi_tiler = "/home/pdille/breathecam/makedeepzoom.py"
+$apply_mask = false
+$masker_path = "/home/pdille/breathecam/MaskedGaussian_lowres"
 
 $username = "admin"
 $password = "illah123"
@@ -43,6 +46,12 @@ while !ARGV.empty?
     @@current_camera = @@camera_list[ARGV.shift.to_i - 1]
   elsif arg == "--skip-rotate-for-latest-stitch"
     $skip_rotate_for_latest_stitch = true
+  elsif arg == "--apply-mask"
+    $apply_mask = true
+  elsif arg == "-img-mask-inpaint"
+    $img_mask_inpaint_path = ARGV.shift
+  elsif arg == "-img-mask-gaus"
+    $img_mask_gaus_path = ARGV.shift
   end
 end
 
@@ -108,10 +117,12 @@ def get_images
       contents = File.open(downtime_logger, "r"){ |file| file.read }
       contents_array = contents.split(" ")
       count = contents_array.last.to_i
-      system("mail -s '#{$location_id} breathecam back online [eom]' #{$downtime_email} < /dev/null") if (count > 1)
       File.delete(downtime_logger)
-      # Camera settings were lost, so set them back to default breathecam settings
-      set_breathecam_style
+      # Camera settings were most likely lost (camera down for at least 10 mins), so set them back to default breathecam settings
+      if (count > 1)
+        system("mail -s '#{$location_id} breathecam back online [eom]' #{$downtime_email} < /dev/null")
+        set_breathecam_style
+      end
     end
     puts "[#{Time.now}] Completed pulling images from #{$location_id}"
   rescue
@@ -139,7 +150,7 @@ def get_images
   end
 
   if $do_latest_stitch
-    stitch_latest(current_time, current_output_dir)
+    stitch_latest(current_time, current_output_dir, current_day)
   end
 end
 
@@ -201,7 +212,7 @@ def defaults(camera)
   arecont_set(camera, "daynight", "auto");
 end
 
-def stitch_latest(current_time, current_output_dir)
+def stitch_latest(current_time, current_output_dir, current_day)
   latest_stitch_dir = "#{current_output_dir}/latest_stitch"
   FileUtils.mkdir_p(latest_stitch_dir)
   files = Dir.glob("#{current_output_dir}/#{current_time}_image*.jpg")
@@ -224,10 +235,19 @@ def stitch_latest(current_time, current_output_dir)
     exit if !return_value
     return_value = system("#{$enblend_path} --no-optimize --compression=93 --fine-mask -o #{current_time}_full.jpg #{current_time}_0000.tif #{current_time}_0001.tif #{current_time}_0002.tif #{current_time}_0003.tif")
     exit if !return_value
-    Dir["#{latest_stitch_dir}/*.*"].reject{ |f| f["#{current_time}_full.jpg"] }.each do |f|
+    Dir["#{latest_stitch_dir}/*.*"].reject{ |f| f["#{current_time}_full.jpg"] || f["#{$location_id}.json"] }.each do |f|
       File.delete(f)
     end
+    #FileUtils.rm_rf("#{latest_stitch_dir}/tiles")
+    if $apply_mask
+      puts "[#{Time.now}] Applying masks."
+      `#{$masker_path} #{latest_stitch_dir}/#{current_time}_full.jpg #{$img_mask_inpaint_path} #{$img_mask_gaus_path} #{latest_stitch_dir}/#{current_time}_full.jpg`
+    end
+    puts "[#{Time.now}] Making deep zoom tiles."
+    system("python #{$dzi_tiler} #{latest_stitch_dir}/#{current_time}_full.jpg #{$location_id} #{current_day}")
   end
+
+  puts "[#{Time.now}] #{$location_id} extra processing completed."
 end
 
 def reload
