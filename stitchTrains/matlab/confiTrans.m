@@ -1,7 +1,7 @@
 function [x_optimal] = confiTrans(x_seed,confi_points, confi_perturb, big_im1,big_im2)
 %%
-im1 = big_im1(25:1175,:,:);
-im2 = big_im2(25:1175,:,:);
+im1 = big_im1(170:500,:,:);  %note this pixels should be changed as to which part of image to be considered
+im2 = big_im2(170:500,:,:);
 
 %convert to double precision grayscale images
 if (size(im1,3) == size(im2,3)) && (size(im1,3) == 3)
@@ -35,15 +35,15 @@ locs2 = round(matched_points2.Location);
 sprintf('The size of locs 1 is ');size(locs1)
 
 N           = size(locs1,1);
-% disp(['The number of points matching is ' , num2str(N)]);
-if (N >= confi_points)
+
+if (N >= confi_points)  %only if the number of points are greater than the threshold we set
     matches     = [(1:N)' (1:N)'];
     nIter       = 300;
     tol         = 2;
     [bestH,~,~] = ransacH(matches,locs1,locs2,nIter,tol);
     H2to1       = bestH;
-    if (abs(bestH(7) - x_seed) < confi_perturb)
-        x_optimal = H2to1(7);
+    if (abs(bestH(7) - x_seed) < confi_perturb)  % if the translation found from ransac is within the threshold
+        x_optimal = H2to1(7);   %consider only the x displacement from the homography matrix
         disp(['The value as per ransac observed is ', num2str(H2to1(7)), ' number of observations is ' ,num2str(N)]);
     else
         x_optimal = x_seed;
