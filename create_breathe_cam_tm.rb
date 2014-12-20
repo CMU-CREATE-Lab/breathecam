@@ -210,8 +210,10 @@ class Compiler
       FileUtils.cp("#{File.dirname(__FILE__)}/default_definition.tmc", path_to_definition_file)
       json = open(path_to_definition_file) {|fh| JSON.load(fh)}
       location_name = camera_name_remap($camera_location)
-      json['id'] = location_name
-      json['label'] = location_name
+      json["id"] = location_name
+      json["label"] = location_name
+      # Use default time parser unless we are using a breathecam specific camera
+      json["source"].delete("capture_time_parser") unless $camera_type == "breathecam"
       open(path_to_definition_file, "w") {|fh| fh.puts(JSON.pretty_generate(json))}
     end
   end
