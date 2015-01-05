@@ -674,7 +674,6 @@ class Compiler
     dir_to_rsync ||= "#{$timemachine_output_dir}"
     puts "[#{Time.now}] Rsyncing #{$timemachine_output_path}/#{dir_to_rsync} to #{$output_path}"
     system("rsync -a #{$timemachine_output_path}/#{dir_to_rsync} #{$output_path}")
-    rsync_location_json
   end
 
   def rsync_location_json
