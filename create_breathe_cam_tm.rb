@@ -21,7 +21,7 @@ $nona_path = $RUNNING_WINDOWS ? "nona.exe" : "nona"
 $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "enblend"
 $masker_path = "MaskedGaussian"
 
-$valid_image_extensions = [".jpg", ".lnk"]
+$valid_image_extensions = [".jpg", ".JPG", ".lnk"]
 $default_num_jobs = 4
 $rsync_input = false
 $rsync_output = false
@@ -291,19 +291,19 @@ class Compiler
       args = $input_path.split(":")
       host = args[0]
       src_path = args[1]
-      puts "[#{Time.now}] ssh #{host} \"find #{src_path}/#{$current_day} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\""
-      system("ssh #{host} \"find #{src_path}/#{$current_day} -name '*.jpg' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
+      puts "[#{Time.now}] ssh #{host} \"find #{src_path}/#{$current_day} -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\""
+      system("ssh #{host} \"find #{src_path}/#{$current_day} -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
       system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{$input_path}/#{$current_day}/ #{new_input_path}")
     else
       # Else grab the entire day of images
-      system("rsync -a #{$input_path}/#{$current_day}/*.jpg #{new_input_path}")
+      system("rsync -a #{$input_path}/#{$current_day}/*.[jJ][pP][gG] #{new_input_path}")
     end
 
     # We need to reference files locally now that we have rsynced everything over
     $input_path = new_input_path
     puts "[#{Time.now}] Finished rsyncing input images."
     if $skip_stitch
-      if Dir["#{$input_path}/*.jpg"].empty?
+      if Dir["#{$input_path}/*.[jJ][pP][gG]"].empty?
         puts "No images found to be processed. Aborting."
         if $do_incremental_update and $input_date_from_file
           file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
@@ -318,11 +318,12 @@ class Compiler
   end
 
   def organize_images
+    # TODO: Assumes images are of the format EPOCHDATE_image{1,2,3,4}.([jJ][pP][gG]|lnk)
     $organized_images_path = File.join($working_dir, "075-organized-raw-images")
     count = 0
     match_count = 0
     puts "[#{Time.now}] Organizing images..."
-    images = Dir.glob("#{$input_path}/*_image1.jpg").sort
+    images = Dir.glob("#{$input_path}/*_image1.[jJ][pP][gG]").sort
     num_images_being_processed = images.length
     if num_images_being_processed == 0
       puts "No images found to be processed. Aborting."
@@ -330,8 +331,9 @@ class Compiler
     end
     images.each do |img|
       count += 1
+      file_extension = File.extname(img)
       date = File.basename(img, ".*").split("_")[0]
-      unless File.exists?("#{$input_path}/#{date}_image2.jpg") && File.exists?("#{$input_path}/#{date}_image3.jpg") && File.exists?("#{$input_path}/#{date}_image4.jpg")
+      unless File.exists?("#{$input_path}/#{date}_image2#{file_extension}") && File.exists?("#{$input_path}/#{date}_image3#{file_extension}") && File.exists?("#{$input_path}/#{date}_image4#{file_extension}")
         puts "Skipping #{date} since images were missing for it."
         next
       end
@@ -342,19 +344,19 @@ class Compiler
         puts "Failed to create output directory. Please check read/write permissions on the output directory."
         return
       end
-      # Note: Windows Vista+ does support something that is essentially a symlink, but for now we will just stick with shortcuts that have worked with all versions of Windows
+      # Note: Windows Vista+ does support something that is essentially a symlink, but for now we will just stick with shortcuts that have worked with all versions of Windows up to Windows 7. Probably Windows 8 too but have not tested there.
       if $RUNNING_WINDOWS
         for i in 1..4
           Win32::Shortcut.new("#{dir}/#{date}_image#{i}" + ".lnk") do |s|
             # Windows only supports absolute shortcut paths, in order to get them to be relative we need a special program: http://www.csparks.com/Relative/index.html
-            s.path = "#{path}/#{date}_image#{i}.jpg"
+            s.path = "#{path}/#{date}_image#{i}#{file_extension}"
             s.show_cmd = Win32::Shortcut::SHOWNORMAL
             s.working_directory = Dir.getwd
           end
         end
       else
         for i in 1..4
-          File.symlink(File.expand_path("#{path}/#{date}_image#{i}.jpg"),"#{dir}/#{date}_image#{i}.jpg")
+          File.symlink(File.expand_path("#{path}/#{date}_image#{i}#{file_extension}"), "#{dir}/#{date}_image#{i}#{file_extension}")
         end
       end
       match_count += 1
@@ -375,9 +377,14 @@ class Compiler
     puts "[#{Time.now}] Rotating images #{rot_amt} degrees clockwise..."
     files = Dir.glob("#{$organized_images_path}/*/*.*").sort
     Parallel.each(files, :in_threads => $num_jobs) do |img|
-      next unless $valid_image_extensions.include? File.extname(img).downcase
+      file_extension = File.extname(img)
+      next unless $valid_image_extensions.include? file_extension.downcase
       count += 1
-      img = Win32::Shortcut.open(img).path if $RUNNING_WINDOWS && File.extname(img) == ".lnk"
+      if $RUNNING_WINDOWS && file_extension == ".lnk"
+        img = Win32::Shortcut.open(img).path
+        # Get the real file extension now
+        file_extension = File.extname(img)
+      end
       begin
         system("#{$jpegtran_path} -copy all -rotate #{rot_amt} -optimize -outfile  #{%Q{"#{img}"}} #{%Q{"#{img}"}}")
         match_count += 1
@@ -397,9 +404,14 @@ class Compiler
     stitched_images_path = File.join($working_dir, "0100-original-images")
     files = Dir.glob("#{$organized_images_path}/*/*_image1.*").sort
     Parallel.each(files, :in_threads => $num_jobs) do |img|
-      next unless $valid_image_extensions.include? File.extname(img).downcase
+      file_extension = File.extname(img)
+      next unless $valid_image_extensions.include? file_extension.downcase
       count += 1
-      img = Win32::Shortcut.open(img).path if $RUNNING_WINDOWS && File.extname(img) == ".lnk"
+      if $RUNNING_WINDOWS && file_extension == ".lnk"
+        img = Win32::Shortcut.open(img).path
+        # Get the real file extension now
+        file_extension = File.extname(img)
+      end
       date = File.basename(img, ".*").split("_")[0]
       parent_path = File.dirname(img)
       FileUtils.mkdir_p(stitched_images_path)
@@ -408,7 +420,7 @@ class Compiler
         return
       end
       begin
-        system("#{$nona_path} -o #{date}_ #{%Q{"#{$master_alignment_file}"}} #{%Q{"#{parent_path}/#{date}_image1.jpg"}} #{%Q{"#{parent_path}/#{date}_image2.jpg"}} #{%Q{"#{parent_path}/#{date}_image3.jpg"}} #{%Q{"#{parent_path}/#{date}_image4.jpg"}}")
+        system("#{$nona_path} -o #{date}_ #{%Q{"#{$master_alignment_file}"}} #{%Q{"#{parent_path}/#{date}_image1#{file_extension}"}} #{%Q{"#{parent_path}/#{date}_image2#{file_extension}"}} #{%Q{"#{parent_path}/#{date}_image3#{file_extension}"}} #{%Q{"#{parent_path}/#{date}_image4#{file_extension}"}}")
         system("#{$enblend_path} --no-optimize --compression=100 --fine-mask -o #{%Q{"#{stitched_images_path}/#{date}_full.jpg"}} #{date}_0000.tif #{date}_0001.tif #{date}_0002.tif #{date}_0003.tif")
         Dir.glob("#{date}_*.tif").each { |f| File.delete(f) }
         match_count += 1
