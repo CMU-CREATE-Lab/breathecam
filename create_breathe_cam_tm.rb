@@ -6,7 +6,6 @@ require 'fileutils'
 require 'date'
 require 'time'
 require 'json'
-#require 'shellwords'
 require 'parallel'
 
 $RUNNING_WINDOWS = /(win|w)32$/.match(RUBY_PLATFORM)
@@ -19,6 +18,8 @@ $jpegtran_path = $RUNNING_WINDOWS ? "jpegtran.exe" : "jpegtran"
 # Hugin tools
 $nona_path = $RUNNING_WINDOWS ? "nona.exe" : "nona"
 $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "enblend"
+
+# Masking
 $masker_path = "MaskedGaussian"
 
 $valid_image_extensions = [".jpg", ".JPG", ".lnk"]
@@ -35,6 +36,10 @@ $camera_type = "breathecam"
 $skip_qtfaststart_append = false
 $skip_videos = false
 $apply_mask = false
+$symlink_input = false
+$sort_by_exif_dates = false
+$start_time = {}
+$end_time = {}
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -47,13 +52,12 @@ class Compiler
       usage
     end
 
-    current_time = Time.now
-    puts "Start Time: #{current_time}"
+    $current_time = Time.now
+    puts "Start Time: #{$current_time}"
 
-    $end_time = {}
-    $end_time["full"] = current_time
-    $end_time["hour"] = current_time.strftime("%H").to_i
-    $end_time["minute"] = current_time.strftime("%M").to_i
+    $end_time["full"] = $current_time
+    $end_time["hour"] = $current_time.strftime("%H").to_i
+    $end_time["minute"] = $current_time.strftime("%M").to_i
     $end_time["sec"] = 0
 
     $input_path = ARGV[0]
@@ -95,9 +99,8 @@ class Compiler
         $current_day = ARGV.shift
       elsif arg == "-incremental-update-interval"
         # Force interval to be a multiple of 10.
-        # This is needed because we add a keyframe every 10 frames
-        # and thus do not need to worry about it when appending if we
-        # keep it this way.
+        # This is needed because we add a keyframe every 10 frames (breathecam specific)
+        # and thus do not need to worry about keyframes when appending if we keep it this way.
         $incremental_update_interval = (ARGV.shift.to_f / 10.0).ceil * 10
       elsif arg == "--skip-rotate"
         $skip_rotate = true
@@ -125,6 +128,12 @@ class Compiler
         $img_mask_inpaint_path = ARGV.shift
       elsif arg == "-img-mask-gaus"
         $img_mask_gaus_path = ARGV.shift
+      elsif arg == "-subsample-input"
+        $subsample_input = ARGV.shift.to_i
+      elsif arg == "--symlink-input"
+        $symlink_input = true
+      elsif arg == "--sort-by-exif-dates"
+        $sort_by_exif_dates = true
       end
     end
 
@@ -182,7 +191,6 @@ class Compiler
         if File.exists?(file)
           last_pull_date = Time.parse(File.open(file, &:readline))
           exit if (last_pull_date.to_i > Time.now.to_i)
-          $start_time = {}
           $start_time["hour"] = last_pull_date.strftime("%H").to_i
           $start_time["minute"] = last_pull_date.strftime("%M").to_i
           $start_time["sec"] = 0
@@ -201,7 +209,7 @@ class Compiler
       end
     end
     clear_working_dir
-    $rsync_input ? rsync_source_images : organize_images
+    $rsync_input || $symlink_input ? get_source_images : organize_images
   end
 
   def create_definition_file
@@ -233,12 +241,13 @@ class Compiler
   end
 
   def calculate_rsync_input_range
-    $start_time = {}
     $start_time["hour"] = $end_time["hour"]
     $start_time["minute"] = $end_time["minute"] - $incremental_update_interval
     if $start_time["minute"] < 0
       hour_diff = ($start_time["minute"].abs / 60.0).ceil
       $start_time["hour"] = $end_time["hour"] - hour_diff
+      # Handle daylight savings
+      $start_time["hour"] += 1 if not $current_time.dst? and ($current_time - $incremental_update_interval * 60).dst?
       $start_time["minute"] = (60 * hour_diff) - $start_time["minute"].abs
       if $start_time["hour"] < 0
         video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
@@ -281,29 +290,49 @@ class Compiler
     puts "[#{Time.now}] Finished removing old files."
   end
 
-  def rsync_source_images
+  def get_source_images
     puts "[#{Time.now}] Rsycning images from #{$input_path}/#{$current_day}"
     image_path = $skip_stitch ? "0100-original-images" : "050-raw-images"
     new_input_path = File.join($working_dir, image_path)
     FileUtils.mkdir_p(new_input_path)
-
-    if $do_incremental_update
-      args = $input_path.split(":")
-      host = args[0]
-      src_path = args[1]
-      puts "[#{Time.now}] ssh #{host} \"find #{src_path}/#{$current_day} -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\""
-      system("ssh #{host} \"find #{src_path}/#{$current_day} -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n' > /tmp/#{$camera_location}-files.txt\"")
-      system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{$input_path}/#{$current_day}/ #{new_input_path}")
-    else
-      # Else grab the entire day of images
-      system("rsync -a #{$input_path}/#{$current_day}/*.[jJ][pP][gG] #{new_input_path}")
+    args = $input_path.split(":")
+    host = args[0]
+    src_path = args[1] || args[0]
+    # Grab full day if we are not pulling in a specific time range
+    unless $do_incremental_update
+      $start_time["hour"] = 0
+      $start_time["minute"] = 0
+      $end_time["hour"] = 23
+      $end_time["minute"] = 59
+      $end_time["sec"] = 59
     end
-
+    file_list_command = "find #{src_path}/#{$current_day} -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}'"
+    subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
+    puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
+    if $symlink_input
+      if $do_incremental_update or $subsample_input
+        file_list = `#{file_list_command} #{subsample_command}`
+        file_list = file_list.split("\n")
+        file_list.each do |file|
+          system("ln -s #{file} #{new_input_path}/#{File.basename(file)}")
+        end
+      else
+        system("ln -s #{$input_path}/#{$current_day} #{new_input_path}")
+      end
+    else #rsync
+      if $do_incremental_update or $subsample_input
+        system("ssh #{host} \"#{file_list_command} -printf '%f\n' #{subsample_command} > /tmp/#{$camera_location}-files.txt\"")
+        system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{$input_path}/#{$current_day}/ #{new_input_path}")
+      else
+        system("rsync -a #{$input_path}/#{$current_day}/*.[jJ][pP][gG] #{new_input_path}")
+      end
+    end
     # We need to reference files locally now that we have rsynced everything over
     $input_path = new_input_path
     puts "[#{Time.now}] Finished rsyncing input images."
     if $skip_stitch
-      if Dir["#{$input_path}/*.[jJ][pP][gG]"].empty?
+      dir = Dir.glob("#{$input_path}/*.[jJ][pP][gG]") + Dir.glob("#{$input_path}/*/*.[jJ][pP][gG]")
+      if dir.empty?
         puts "No images found to be processed. Aborting."
         if $do_incremental_update and $input_date_from_file
           file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
@@ -454,10 +483,12 @@ class Compiler
     $timemachine_output_dir = $create_videoset_segment_directory ? "#{$current_day}-#{$incremental_update_interval}m.timemachine" : "#{$current_day}.timemachine"
     $timemachine_master_output_dir = "#{$current_day}.timemachine"
     extra_flags = ""
-    extra_flags += "--skip-leader" if $skip_leader
-    extra_flags += "--skip-videos --preserve-source-tiles" if $skip_videos
+    extra_flags += "--skip-leader " if $skip_leader
+    extra_flags += "--skip-videos --preserve-source-tiles " if $skip_videos
+    extra_flags += "--sort-by-exif-dates" if $sort_by_exif_dates
     # TODO: Assumes Ruby is installed and ct.rb is in the PATH
     Dir.chdir($working_dir) do
+      puts "ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}"
       system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}")
     end
     puts "Time Machine created."
@@ -498,8 +529,13 @@ class Compiler
     json["latest"]["date"] = new_latest
     json["latest"]["path"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{new_latest}.timemachine";
     json["datasets"]["#{$current_day}"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{$current_day}.timemachine"
-    open(path_to_json, "w") {|fh| fh.puts(JSON.generate(json))}
-    open(path_to_js, "w") {|fh| fh.puts("cached_breathecam=" + JSON.generate(json) + ";")}
+    tmp_time = Time.now
+    tmp_path_to_json = path_to_json + "_#{tmp_time}"
+    tmp_path_to_js = path_to_js + "_#{tmp_time}"
+    open(tmp_path_to_json, "w") {|fh| fh.puts(JSON.generate(json))}
+    open(tmp_path_to_js, "w") {|fh| fh.puts("cached_breathecam=" + JSON.generate(json) + ";")}
+    FileUtils.mv(tmp_path_to_json, path_to_json, :force => true)
+    FileUtils.mv(tmp_path_to_js, path_to_js, :force => true)
     puts "Successfully wrote #{$camera_location}.json"
   end
 
@@ -514,7 +550,7 @@ class Compiler
       args = $output_path.split(":")
       host = args[0]
       output_path = args[1]
-      extra_ssh_command = ". $HOME/.profile;"\
+      extra_ssh_command = ". $HOME/.profile;"
       # TODO: Appending script assumed to be in the same directory we ssh in. Also assumes ruby is installed and in the PATH.
       cmd = "ssh #{host} \"#{extra_ssh_command} ruby append_breathecam_videos.rb #{output_path}/#{$current_day}.timemachine #{output_path}/#{$timemachine_output_dir} #{$num_jobs}\""
       system(cmd)
@@ -557,58 +593,62 @@ class Compiler
         return
       end
 
-      # TODO: We assume the leader is always 70 frames. It would be nice to actually calculate it
-      # and create these frames on the fly, rather than use a pre-computed file.
-      # It is faster this way, but we cannot always assume this fixed size, which is true
-      # for a day of breathecam.
-      leader_path = File.join(File.expand_path(File.dirname(__FILE__)), "leader_70.mp4")
-      leader_bytes_per_pixel={
-        30 => 2701656.0 / (vid_width * vid_height * 90),
-        28 => 2738868.0 / (vid_width * vid_height * 80),
-        26 => 2676000.0 / (vid_width * vid_height * 70),
-        24 => 2556606.0 / (vid_width * vid_height * 60)
-      }
-      bytes_per_frame = vid_width * vid_height * leader_bytes_per_pixel[26]
-      leader_threshold = 1200000
-      estimated_video_size = bytes_per_frame * num_frames
-      add_leader = false
-      if estimated_video_size < leader_threshold
+      if $skip_leader
         new_leader = 0
+        add_leader = false
       else
-        minimum_leader_length = 2500000
-        leader_nframes = minimum_leader_length / bytes_per_frame
-        # Round up to nearest multiple of frames per keyframe
-        frames_per_keyframe = 10
-        leader_nframes = (leader_nframes / frames_per_keyframe).ceil * frames_per_keyframe
-        # The last two frames of the leader are actually dups of the first frames of the real video.
-        # Since we are using a pre-computed leader video (that does not include this), we need to take this into account.
-        # We subtract 1.9 (rather than 2) because browsers will show the leader if we go right up to the first frame of the video.
-        # This value prevents the leader from showing and prevents the first of the last 10 black frames from peeking through. Sigh.
-        new_leader = leader_nframes - 1.9
-        actual_leader = leader_nframes - 2.0
-        # The first time we add the leader we do not want to modify the start time, since
-        # this assumes a leader is already present in the master video.
-        if leader_for_master > 0
-          end_frame_for_master = actual_leader + num_frames
+        # TODO: We assume the leader is always 70 frames. It would be nice to actually calculate it
+        # and create these frames on the fly, rather than use a pre-computed file.
+        # It is faster this way, but we cannot always assume this fixed size, which is true
+        # for a day of breathecam.
+        leader_path = File.join(File.expand_path(File.dirname(__FILE__)), "leader_70.mp4")
+        leader_bytes_per_pixel={
+          30 => 2701656.0 / (vid_width * vid_height * 90),
+          28 => 2738868.0 / (vid_width * vid_height * 80),
+          26 => 2676000.0 / (vid_width * vid_height * 70),
+          24 => 2556606.0 / (vid_width * vid_height * 60)
+        }
+        bytes_per_frame = vid_width * vid_height * leader_bytes_per_pixel[26]
+        leader_threshold = 1200000
+        estimated_video_size = bytes_per_frame * num_frames
+        add_leader = false
+        if estimated_video_size < leader_threshold
+          new_leader = 0
         else
-          add_leader = true
+          minimum_leader_length = 2500000
+          leader_nframes = minimum_leader_length / bytes_per_frame
+          # Round up to nearest multiple of frames per keyframe
+          frames_per_keyframe = 10
+          leader_nframes = (leader_nframes / frames_per_keyframe).ceil * frames_per_keyframe
+          # The last two frames of the leader are actually dups of the first frames of the real video.
+          # Since we are using a pre-computed leader video (that does not include this), we need to take this into account.
+          # We subtract 1.9 (rather than 2) because browsers will show the leader if we go right up to the first frame of the video.
+          # This value prevents the leader from showing and prevents the first of the last 10 black frames from peeking through. Sigh.
+          new_leader = leader_nframes - 1.9
+          actual_leader = leader_nframes - 2.0
+          # The first time we add the leader we do not want to modify the start time, since
+          # this assumes a leader is already present in the master video.
+          if leader_for_master > 0
+            end_frame_for_master = actual_leader + num_frames
+          else
+            add_leader = true
+          end
         end
+        # END TODO
       end
-      # END TODO
 
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |video, index|
         next_segment_video = next_segment_videos[index]
 
         # Create a temp video file from the master that has the leader and black frames at the end removed.
         # We need double forward slashes for a links inside the .txt file below for things to work on Windows. Odd.
-        tmp_master = "#{File.dirname(video)}/#{File.basename(video,'.*')}-cut.mp4".gsub('/','//')
+        tmp_master = "#{File.dirname(video)}/#{File.basename(video,'.*')}-cut.mp4"
         system("ffmpeg -y -i #{video} -vframes #{end_frame_for_master} -vcodec copy -acodec copy #{tmp_master}")
 
         # Create a temp video from the new file without a leader included but does still have black frames at the end.
         # We need double forward slashes for a links inside the txt file below for things to work on Windows. Odd.
-        tmp_new_video = "#{File.dirname(next_segment_video)}/#{File.basename(next_segment_video,'.*')}-cut.mp4".gsub('/','//')
-
         if start_time_for_next_segment > 0.0
+          tmp_new_video = "#{File.dirname(next_segment_video)}/#{File.basename(next_segment_video,'.*')}-cut.mp4"
           system("ffmpeg -y -i #{next_segment_video} -ss #{start_time_for_next_segment} -vcodec copy -acodec copy #{tmp_new_video}")
         else
           tmp_new_video = next_segment_video
@@ -631,16 +671,22 @@ class Compiler
         File.delete(tmp_master + ".ts")
       end
 
+      tmp_time = Time.now
+
       # Update r.json with the new number of frames being added.
       master_r_json["frames"] = num_frames.to_i + additional_frame_count
       master_r_json["leader"] = new_leader
-      open(path_to_master_r_json, "w") {|fh| fh.puts(JSON.pretty_generate(master_r_json))}
+      tmp_path_to_master_r_json = path_to_master_r_json + "_#{tmp_time}"
+      open(tmp_path_to_master_r_json, "w") {|fh| fh.puts(JSON.pretty_generate(master_r_json))}
+      FileUtils.mv(tmp_path_to_master_r_json, path_to_master_r_json, :force => true)
 
       # Update tm.json with capture times for the new frames being added.
       master_tm_json = open(path_to_master_tm_json) {|fh| JSON.load(fh)}
       new_tm_json = open(path_to_new_tm_json) {|fh| JSON.load(fh)}
       master_tm_json["capture-times"] += new_tm_json["capture-times"]
-      open(path_to_master_tm_json, "w") {|fh| fh.puts(JSON.generate(master_tm_json))}
+      tmp_path_to_master_tm_json = path_to_master_tm_json + "_#{tmp_time}"
+      open(tmp_path_to_master_tm_json, "w") {|fh| fh.puts(JSON.generate(master_tm_json))}
+      FileUtils.mv(tmp_path_to_master_tm_json, path_to_master_tm_json, :force => true)
 
       # Update ajax_includes.js based on the new changes made to the json above.
       system("ruby #{path_to_ajax_includes_updater}")
@@ -691,7 +737,11 @@ class Compiler
   def rsync_location_json
     unless $create_videoset_segment_directory
       puts "[#{Time.now}] Rsyncing #{$camera_location}.js{on} to #{$output_path}"
-      system("rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{$output_path}")
+      args = $input_path.split(":")
+      host = args[0]
+      extra_ssh_command = ". $HOME/.profile;"
+      system("ssh #{host} \"#{extra_ssh_command} ruby modify_breathecam_json.rb #{$output_path} #{$camera_type} #{$camera_location} #{$current_day}\"")
+      #system("rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{$output_path}")
     end
   end
 
@@ -704,11 +754,6 @@ class Compiler
     puts "[#{Time.now}] Process Finished Successfully."
     puts "End Time: #{Time.now}"
   end
-
-  #def bash(command)
-  #  escaped_command = Shellwords.escape(command)
-  #  system("bash -c #{escaped_command}")
-  #end
 
   def usage
     puts "Usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE CAMERA_SETUP_LOCATION"
