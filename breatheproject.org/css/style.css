@@ -1,0 +1,3205 @@
+/*
+
+Theme Name: Chemistry 2014 V1.1 Responsive
+
+Theme URI:
+
+Description: Custom Theme
+
+Version: 1.1
+
+Author: Jeff Binando
+
+Author URI: http://www.createareaction.com
+
+Tags: chemistry, breathe
+
+*/
+
+
+
+@import "css/reset.css";
+
+@import "css/typography.css";
+
+@import "css/layout.css";
+
+@import "css/formalize.css";
+
+
+
+/*
+
+--------------------------------------------------------------
+
+Shared Elements
+
+--------------------------------------------------------------
+
+*/
+
+
+
+#closeWideScreen{display:none;}
+
+#current iframe{width:972px; height:547px;}
+
+#navhash{display:none; position:absolute; top:95px;}
+
+a {
+
+  text-decoration:none;
+
+  color:#00bef6;
+
+}
+
+
+
+a:hover {
+
+
+
+}
+
+
+
+#default-content a{color:#00779a !important;}
+
+
+
+p {
+
+    line-height:18px;
+
+}
+
+
+
+.quicksand {
+
+  margin-left:-2px;
+
+  font-weight:bold;
+
+}
+
+
+
+.boxtitle {
+
+  font-size:20px;
+
+  color:#FFF;
+
+  margin-bottom:10px;
+
+  letter-spacing:.75px;
+
+}
+
+
+
+.boxcta {
+
+  font-size:14px;
+
+  color:#00ccff;
+
+}
+
+
+
+.roundedsquare {
+
+
+
+  /*background: url(/wp-content/themes/customtheme/css/rgba.php?r=0&g=0&b=0&a=40) repeat;*/
+
+/*  background:rgba(0,0,0,0.4);*/
+
+  background: url(/wp-content/themes/customtheme/css/saved_color.png) repeat;
+
+  -webkit-border-radius: 8px;
+
+  -moz-border-radius: 8px;
+
+  border-radius: 8px;
+
+  /*behavior:url(/wp-content/themes/customtheme/css/border-radius.htc);*/
+
+  padding: 10px;
+
+    position:relative;
+
+  z-index:1;
+
+}
+
+
+
+.white.button {
+
+  background: #fff;
+
+  -webkit-border-radius: 8px;
+
+  -moz-border-radius: 8px;
+
+  border-radius: 8px;
+
+  /*behavior:url(/wp-content/themes/customtheme/css/border-radius.htc);*/
+
+  padding: 10px;
+
+}
+
+
+
+button{
+
+  cursor: pointer;
+
+  text-decoration:none;
+
+  border: none;
+
+  padding: 5px 14px 7px 15px;
+
+  color:rgb(255, 255, 255);
+
+  font-size:12px;
+
+  font-weight:bold;
+
+
+
+  border-radius:22px 22px 22px 22px;
+
+  -moz-border-radius:22px 22px 22px 22px;
+
+  -webkit-border-radius:22px 22px 22px 22px;
+
+
+
+  /*behavior:url(/wp-content/themes/customtheme/css/border-radius.htc);*/
+
+
+
+  box-shadow:0px 0px 10px rgba(0, 0, 0, 0.2);
+
+  -moz-box-shadow:0px 0px 10px rgba(0, 0, 0, 0.2);
+
+  -webkit-box-shadow:0px 0px 10px rgba(0, 0, 0, 0.2);
+
+
+
+  background-color: rgb(0, 204, 255);
+
+  background-image:linear-gradient(-90deg, rgb(0, 191, 243), rgb(0, 155, 217));
+
+  background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(0, 191, 243)), to(rgb(0, 155, 217)));
+
+  background-image:-moz-linear-gradient(-90deg, rgb(0, 191, 243), rgb(0, 155, 217));
+
+
+
+}
+
+button cufon{
+
+  z-index:10;
+
+}
+
+button:hover{
+
+  cursor: pointer;
+
+  text-decoration:none;
+
+  border:none;
+
+  padding: 5px 14px 7px 15px;
+
+  color:rgb(255, 255, 255);
+
+  font-size:12px;
+
+  font-weight:bold;
+
+  border-radius:22px 22px 22px 22px;
+
+  -moz-border-radius:22px 22px 22px 22px;
+
+  -webkit-border-radius:22px 22px 22px 22px;
+
+  box-shadow:0px 0px 10px rgba(0, 0, 0, 0.2);
+
+  -moz-box-shadow:0px 0px 10px rgba(0, 0, 0, 0.2);
+
+  -webkit-box-shadow:0px 0px 10px rgba(0, 0, 0, 0.2);
+
+  background-color: rgb(0, 204, 255);
+
+  background-image:linear-gradient(-90deg, rgb(0, 204, 255), rgb(17, 170, 255));
+
+  background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(0, 204, 255)), to(rgb(17, 170, 255)));
+
+  background-image:-moz-linear-gradient(-90deg, rgb(0, 204, 255), rgb(17, 170, 255));
+
+}
+
+
+
+.gradfade_small {
+
+  /* parent div must have position:relative */
+
+  bottom: 0;
+
+    position: absolute;
+
+    z-index: -1;
+
+}
+
+
+
+
+
+.dottedLine {
+
+  background-image:url(/wp-content/themes/customtheme/images/2px_dot.gif);
+
+  background-repeat:repeat-x;
+
+  height:1px;
+
+  margin-left:5px;
+
+  margin-right:5px;
+
+}
+
+
+
+
+
+/*
+
+--------------------------------------------------------------
+
+ html
+
+--------------------------------------------------------------
+
+*/
+
+
+
+html {
+
+    height: 100%;
+
+    background: #65676a no-repeat fixed center 0;
+
+}
+
+
+
+html.complete {
+
+  background-image: url('images/bg.jpg');
+
+}
+
+
+
+.bg {
+
+  width:100%;
+
+  height:100%;
+
+  position:absolute;
+
+  z-index:0;
+
+  top:0;
+
+  left:0;
+
+}
+
+
+
+.st_sharethis_custom {
+
+  background:none;
+
+}
+
+
+
+/*
+
+--------------------------------------------------------------
+
+ body
+
+--------------------------------------------------------------
+
+*/
+
+body {
+
+  font-family:'Helvetica Neue', Helvetica, Arial;
+
+  color:#fff; font-size:12px;
+
+  -webkit-font-smoothing: antialiased;
+
+}
+
+
+
+/*
+
+--------------------------------------------------------------
+
+ container
+
+--------------------------------------------------------------
+
+*/
+
+#container {
+
+  width:1012px;
+
+  text-align:left;
+
+  position:relative;
+
+  top:0;
+
+  left:0;
+
+  z-index:2;
+
+}
+
+
+
+/*#siteframe {
+
+   width:100%;
+
+   z-index:2;
+
+   overflow:hidden;
+
+   position:relative;
+
+}
+
+*/
+
+/*Mobile Slide Nav*/
+
+
+
+
+
+.devicemenu           { display:none; background:#333;}
+
+
+
+/*
+
+--------------------------------------------------------------
+
+ nav
+
+--------------------------------------------------------------
+
+*/
+
+
+
+
+
+
+
+
+
+#logoHitSpot {
+
+    left: 20px;
+
+    position: absolute;
+
+  width:206px;
+
+  height:30px;
+
+  background:url('images/logo.png') no-repeat;
+
+  top:15px;
+
+
+
+}
+
+
+
+#navbar {
+
+  background-image: url('images/nav-bg.png');
+
+    position: absolute;
+
+  width: 1012px;
+
+  height:53px;
+
+  margin-top:8px;
+
+  padding-top:10px;
+
+  z-index:10;
+
+  top:25px;
+
+}
+
+
+
+#parentnav {
+
+  float:right;
+
+  text-transform: uppercase;
+
+  margin-top:4px;
+
+}
+
+#parentnav li {
+
+/*  border:solid 1px green;*/
+
+  float:left;
+
+}
+
+
+
+#parentnav li a:hover{
+
+color:#fff;
+
+}
+
+
+
+.navitem {
+
+  display:block;
+
+  font-weight:bold;
+
+  background-color:#333;
+
+  cursor:pointer;
+
+  -webkit-border-top-left-radius: 8px;
+
+  -webkit-border-top-right-radius: 8px;
+
+  -moz-border-radius-topleft: 8px;
+
+  -moz-border-radius-topright: 8px;
+
+  border-top-left-radius: 8px;
+
+  border-top-right-radius: 8px;
+
+  color: #0CF;
+
+  height: 35px;
+
+  position:relative;
+
+  padding:14px 23px 0px 23px;
+
+  font-size: 18px;
+
+}
+
+
+
+.navitem:hover {
+
+  background-color:#464646;
+
+}
+
+/*
+
+.navitem:hover, .subnavitem:hover {
+
+  background-color:#464646;
+
+}
+
+*/
+
+
+
+/*#share, #share:hover {
+
+  background-color: transparent;
+
+  -webkit-border-top-left-radius: 0px;
+
+  -webkit-border-top-right-radius: 0px ;
+
+  -moz-border-radius-topleft: 0px ;
+
+  -moz-border-radius-topright: 0px ;
+
+
+
+  display: block;
+
+  padding-left: 23px;
+
+  padding-right: 23px;
+
+  padding-top: 18px;
+
+  position: relative;
+
+}*/
+
+
+
+/*
+
+--------------------------------------------------------------
+
+ subnav
+
+--------------------------------------------------------------
+
+*/
+
+.subnav {
+
+  -webkit-border-bottom-left-radius: 8px;
+
+  -webkit-border-bottom-right-radius: 8px;
+
+  -webkit-border-top-right-radius: 8px;
+
+  -moz-border-radius-bottomleft: 8px;
+
+  -moz-border-radius-bottomright: 8px;
+
+  -moz-border-radius-topright: 8px;
+
+  border-bottom-left-radius: 8px;
+
+  border-bottom-right-radius: 8px;
+
+  border-top-right-radius: 8px;
+
+
+
+  background-color:#464646;
+
+
+
+  font-weight:bold;
+
+  /*height: 124px;*/
+
+  position: absolute;
+
+  width: 171px;
+
+  padding-left: 10px;
+
+  padding-right: 14px;
+
+  display: none;
+
+
+
+}
+
+
+
+
+
+.subnav li {
+
+  border-top:dotted 1px #7e7e7e;
+
+}
+
+.subnav .topitem {
+
+  border-top:none;
+
+}
+
+.subnavitem {
+
+  height:auto;
+
+  cursor:pointer !important;
+
+  width:168px;
+
+  float:none;
+
+  color:#00ccff;
+
+  display:block;
+
+  font-size:16px;
+
+  padding-top:8px;
+
+  padding-bottom:10px;
+
+  /*border-top:dotted 1px #7e7e7e;*/
+
+  padding-left:10px;
+
+}
+
+
+
+.navcurve{
+
+    margin-left: 84px;
+
+    margin-top: -14px;
+
+    position: absolute;
+
+  display:none;
+
+}
+
+
+
+#nav-wrap-learn .subnav { width: 220px;Â }
+
+#nav-wrap-learn .subnav .subnavitem { width: 217px; }
+
+
+
+/*
+
+--------------------------------------------------
+
+   LIGHTBOX (all)
+
+--------------------------------------------------
+
+*/
+
+
+
+.lightbox {
+
+  position:absolute;
+
+  background-color:#fff;
+
+  width:654px;
+
+  height:425px;
+
+
+
+  -webkit-border-radius: 8px;
+
+  -moz-border-radius: 8px;
+
+  border-radius: 8px;
+
+    padding: 10px;
+
+
+
+  -moz-box-shadow: inset 0 0 8px #888;
+
+  -webkit-box-shadow: inset 0 0 8px #888;
+
+  box-shadow: inner 0 0 8px #888;
+
+
+
+  z-index:12;
+
+
+
+  opacity:0;
+
+}
+
+
+
+.lightbox .closebtn {
+
+  cursor:pointer;
+
+    position: absolute;
+
+    right: -15px;
+
+    top: -14px;
+
+}
+
+
+
+#shade {
+
+  position:absolute;
+
+  background: url(/wp-content/themes/customtheme/css/rgba.php?r=0&g=0&b=0&a=40) repeat;
+
+  background-color:rgba(0,0,0,1);
+
+  width:100%;
+
+  height:100%;
+
+  top:0px;
+
+  left:0px;
+
+  z-index:11;
+
+}
+
+
+
+/*
+
+---------------------------------------------------------------------------
+
+    LARGE FOOTER
+
+----------------------------------------------------------------------------
+
+*/
+
+#footer_container {
+
+    height: 274px;
+
+    width: 1010px;
+
+  margin-bottom: 10px;
+
+  margin-top: 20px;
+
+  background-image:url('./images/footer_bg.png');
+
+}
+
+#footer_left, #footer_middle, #footer_right{
+
+  float:left;
+
+  width:340px;
+
+  height: 214px;
+
+}
+
+
+
+#footer_right{
+
+  width:323px;/* THANKS. */
+
+}
+
+
+
+#footer_bottom {
+
+  padding-left: 5px;
+
+}
+
+
+
+#subfooter{
+
+  font-weight:bold;
+
+  color:#D7D7D7;
+
+  margin-left:10px;
+
+  padding-bottom:30px;
+
+}
+
+
+
+
+
+/* Join Us Form */
+
+#join_us_content{
+
+
+
+}
+
+#footer_email {
+
+  margin-top:55px;
+
+}
+
+#checkboxContainer {
+
+/*  margin-top: 119px;*/
+
+/*  width: 317px;*/
+
+}
+
+#checkboxContainer p {
+
+  float: left;
+
+    line-height: 13px;
+
+    width: 291px;
+
+}
+
+
+
+#footer_errorContainer {
+
+  font-size: 11px;
+
+/*    margin-top: 101px;*/
+
+/*    padding-left: 19px;*/
+
+/*  position:absolute;*/
+
+}
+
+
+
+#submitbutton, #checkboxContainer {
+
+/*  position:absolute;*/
+
+}
+
+#submitbutton {
+
+  margin-left: 207px;
+
+    margin-top: 66px;
+
+}
+
+#footer_fullname, #footer_email {
+
+/*  position:absolute;*/
+
+  z-index:50;
+
+}
+
+
+
+#joinForm #footer_fullname, #joinForm #footer_email  {
+
+
+
+  border:0px;
+
+  -webkit-border-radius: 8px;
+
+  -moz-border-radius: 8px;
+
+  border-radius: 8px;
+
+
+
+    color: #959595;
+
+    font-size: 11px;
+
+    height: auto;
+
+    margin-bottom: 8px;
+
+    padding: 14px;
+
+    width: 195px;
+
+
+
+}
+
+
+
+#join_container button{
+
+  margin-left:8px;
+
+}
+
+
+
+#join_container input.error {
+
+  background-color:#eedddd;
+
+  color:#AA4444;
+
+
+
+}
+
+#footer_errorContainer {
+
+  display:none;
+
+  margin-bottom:5px;
+
+  color: #FF9999;
+
+}
+
+
+
+#footer_errorContainer label{
+
+  display:block;
+
+}
+
+
+
+#formText {
+
+  font-weight:bold;
+
+}
+
+
+
+#formThankYou {
+
+  display:none;
+
+  font-weight:bold;
+
+}
+
+#formThankYou button {
+
+    height: 42px;
+
+    margin-left: 63px;
+
+    margin-top: 16px;
+
+}
+
+
+
+
+
+/* Checkbox */
+
+#joinForm input#footer_check {
+
+  float: left;
+
+  width: 23px;
+
+  behavior:none;
+
+  border:none;
+
+
+
+}
+
+#joinForm #checkboxContainer{
+
+  color: #999999;
+
+  font-size: 11px;
+
+
+
+}
+
+#join_container #checkboxContainer p {
+
+    float: left;
+
+    /*padding-top: 3px;*/
+
+    width: 280px;
+
+}
+
+
+
+#join_us_content #checkboxContainer {
+
+  margin-bottom:5px;
+
+  clear:both;
+
+  overflow:hidden;
+
+  zoom:1.0;
+
+}
+
+
+
+#join_us_content .boxtitle { padding-left:6px; }
+
+#join_us_content #formText { display:block; margin-bottom:12px; padding-left:6px; font-weight:bold; padding-right: 6px; }
+
+#join_us_content #footer_errorContainer { clear:both; }
+
+#join_us_content ul { list-style-type:none; }
+
+#join_us_content ul li {margin:0px 0px 10px 0px; }
+
+/*#join_us_content li a { display:block; width:216px; height:43px; overflow:hidden; text-indent:-9999em; }
+
+#join-individual a { background:url(images/joinus-individual.png) no-repeat; }
+
+#join-group a { background:url(images/joinus-group.png) no-repeat; }*/
+
+
+
+#join_us_content input { margin-bottom:8px; padding:9px; width:176px; height:auto; font-size:11px; color:#959595; border:none; -webkit-border-radius:8px; -moz-border-radius:8px; border-radius:8px; }
+
+input#join_zipcode { width:86px; margin-left:9px; }
+
+input#join_emailconfirm,
+
+input#join_fullname,
+
+input#join_zipcode { float:left; }
+
+#join_us_content #submitbutton { display:block; float:left; margin-top:1px; margin-left:9px; padding-top:7px; padding-bottom:8px; }
+
+input#join_check { clear:both; display:block; float:left; margin:0 9px 0 0; padding:0; height:auto; width:auto; }
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+------------------------------
+
+Middle Row: Facebook
+
+------------------------------
+
+*/
+
+#footer_middle{
+
+
+
+}
+
+
+
+#fblikebutton{
+
+    float: left;
+
+    margin-left: 14px;
+
+    margin-top: 65px;
+
+    width: 253px;
+
+    height: 130px;
+
+}
+
+#fblikebutton a {
+
+    display: block;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+
+}
+
+#fblogo{
+
+  float: left;
+
+    margin-left: 18px;
+
+    margin-top: 64px;
+
+}
+
+
+
+
+
+/*
+
+------------------------------
+
+Right Row: Facebook
+
+------------------------------
+
+*/
+
+#footer_right {
+
+
+
+}
+
+
+
+#tweet-container {
+
+  margin-left: 18px;
+
+    margin-top: 63px;
+
+    width: 277px;
+
+}
+
+
+
+#tweetTime{
+
+  font-size:10px;
+
+  color:#666;
+
+  display:block;
+
+  margin-top:5px;
+
+}
+
+
+
+
+
+#follow_us{
+
+  float: right;
+
+    padding-right: 18px;
+
+    padding-top: 10px;
+
+}
+
+
+
+
+
+/* SHARED FOOTER ELEMENTS (normal and short footer) */
+
+
+
+#shareitems {
+
+    margin-left: 5px;
+
+    padding-top: 4px;
+
+  float: left;
+
+  width:300px;
+
+}
+
+
+
+#shareitems li {
+
+  display: inline;
+
+    margin-right: 7px;
+
+}
+
+
+
+#footernav{
+
+    float: left;
+
+    margin-left: 317px;
+
+    padding-top: 17px;
+
+}
+
+
+
+#footernav li {
+
+  display:inline;
+
+  padding-left:10px;
+
+  padding-right:10px;
+
+}
+
+
+
+
+
+.footernavitem {
+
+  text-decoration:none;
+
+  font-weight:bold;
+
+  font-size:14px;
+
+  color:#00CCFF;
+
+}
+
+
+
+.footernavitem:hover {
+
+
+
+}
+
+
+
+
+
+
+
+/* NEWS + EVENTS MODULES */
+
+/*  -------- News From Breathe -------- */
+
+
+
+#news_container{
+
+
+
+}
+
+#news_from_breathe{
+
+
+
+    position: relative;
+
+}
+
+
+
+.news-sidebar{
+
+  width:280px;
+
+  margin-left: 17px;
+
+}
+
+
+
+#rssicon{
+
+  position:absolute;
+
+  top:0px;
+
+  right:0px;
+
+}
+
+
+
+
+
+#seeAllNews {
+
+  float:right;
+
+  padding-left:20px;
+
+  margin-top:-11px;
+
+}
+
+
+
+.news_post {
+
+  font-weight:bold;
+
+  border-bottom:dotted 1px #d7d7d7;
+
+  margin-bottom:15px;
+
+  margin-top:15px;
+
+}
+
+
+
+.news_post_date {
+
+  color:#d7d7d7;
+
+  margin-bottom:5px;
+
+}
+
+
+
+.news_post_title {
+
+  color:#00ccff;
+
+  margin-bottom:10px;
+
+  font-size:14px;
+
+}
+
+
+
+.post_body a { color:#287fa9; }
+
+
+
+.post_body img {
+
+  max-width: 100%;
+
+  height: auto;
+
+}
+
+/* Images */
+
+.entry-content img,
+
+.comment-content img,
+
+.widget img {
+
+max-width: 97.5%; /* Fluid images for posts, comments, and widgets */
+
+}
+
+img[class*="align"],
+
+img[class*="wp-image-"] {
+
+height: auto; /* Make sure images with WordPress-added height and width attributes are scaled correctly */
+
+}
+
+img.size-full {
+
+max-width: 97.5%;
+
+width: auto; /* Prevent stretching of full-size images with height and width attributes in IE8 */
+
+}
+
+
+
+
+
+
+
+
+
+.cff-item   {background:#4F5457; padding:10px !important; max-width:305px; border:none !important;}
+
+.cff-item a     {text-decoration:none !important;}
+
+.cff-author   {border:none; text-decoration:none !important; color:#00CCFF !important;}
+
+.cff-likebox  {padding:10px !important; max-width:305px !important;}
+
+#facebook {color:#ffffff !important;}
+
+/*events*/
+
+#upcoming_event {
+
+  position:relative;
+
+  /*margin-top: 24px;*/
+
+}
+
+
+
+#event_icon{
+
+    background-image: url("/news/wp-content/themes/customtheme/news-images/event_icon.png");
+
+    color: #333333;
+
+    font-size: 18px;
+
+    height: 26px;
+
+    padding-left: 5px;
+
+    padding-top: 6px;
+
+    position: absolute;
+
+    right: 12px;
+
+    top: 8px;
+
+    width: 28px;
+
+  letter-spacing: -1px;
+
+}
+
+
+
+#upcoming_event_txt {
+
+  margin-bottom: 10px;
+
+    margin-top: 10px;
+
+    width:290px;
+
+}
+
+
+
+.event_link {
+
+  color:#fff;
+
+}
+
+
+
+#homepagefix{
+
+  display:none;
+
+}
+
+
+
+/* Rev 1 */
+
+.tweet {
+
+  color: #ccc;
+
+}
+
+
+
+.tweet + .tweet {
+
+  margin-top: 10px;
+
+}
+
+
+
+.event {
+
+  padding: 5px 5px 12px;
+
+  margin: 0 0 8px;
+
+  border-bottom: 1px dotted #ccc;
+
+}
+
+
+
+#speakMeterContainer, #pledgesMeterContainer {
+
+  display: none;
+
+}
+
+
+
+/*#searchform {
+
+  position: relative;
+
+  margin: 10px 20px 0 0;
+
+}*/
+
+
+
+/*#searchform label {
+
+  position: absolute;
+
+}*/
+
+
+
+/*#searchform #query {
+
+  width: 107px;
+
+  height: 31px;
+
+  background: transparent url('images/search_input_bg.png') 0 0 no-repeat;
+
+  border: 0;
+
+  text-transform: uppercase;
+
+  color: #00ccff;
+
+  font-size: 16px;
+
+  line-height: 1em;
+
+}*/
+
+
+
+/*#searchform #query::-webkit-input-placeholder {
+
+  color: #00ccff;
+
+}*/
+
+
+
+/*#searchform #query:-moz-placeholder {
+
+  color: #00ccff;
+
+}
+
+
+
+input:focus {
+
+  outline: 0;
+
+}
+
+*/
+
+
+
+
+
+
+
+/*#searchform #searchsubmit {
+
+  background: transparent url('images/icon_search.png') 0 0 no-repeat;
+
+  width: 25px;
+
+  height: 26px;
+
+  border: 0;
+
+  font-size: 0;
+
+}
+
+*/
+
+#top.autosize {
+
+  position: relative;
+
+  height: auto !important;
+
+  top: 80px;
+
+  padding-bottom: 80px;
+
+}
+
+
+
+/*====================== CHEMISTRY STYLES ==============================*/
+
+.right15        {margin-right:15px;}
+
+.spacer5        {height:5px; line-height:5px;}
+
+.spacer10       {height:10px; line-height:10px;}
+
+.spacer15       {height:15px; line-height:15px; display:block;}
+
+.spacer50       {height:50px; line-height:50px;}
+
+.clear          {clear:both !important; margin:0 !important; padding:0 !important;}
+
+.pad10          {padding:10px;}
+
+.floatLeft        {float:left;}
+
+.floatRight       {float:right;}
+
+.content-block      {background:url('images/transparent-bg.png'); border-radius:10px; padding:10px 0px 10px 0px;}
+
+.content-block-breathe-cam      {background: #373a3c; border-radius: 0px; padding: 0px;}
+
+.content-block p    {color:#fff; font-size:13px; }
+
+.col-1          {width:325px; float:left;}
+
+.col-2          {width:665px; float:left;}
+
+.col-2-breathe-cam      {width:807px;}
+
+.col-3          {width:1005px; float:left;}
+
+.block-title      {-webkit-font-smoothing: antialiased; font-family: 'quicksandregular' !important; color:#fff; font-size:20px; text-transform:uppercase;
+
+             margin:0px 0px 10px 10px; display:block; font-weight:bold;}
+
+.row          {}
+
+.gray-area        {background:#4f5457; padding:10px; }
+
+.gray-area-breathe-cam      {padding-left: 12px; padding-right: 12px; padding-top: 13px; padding-bottom: 12px; background: none}
+
+
+
+ul.breathe-cam-list, ol.breathe-cam-list {padding-left: 27px; font-size: 15px; padding-top: 12px}
+
+li.breathe-cam-list-item {list-style: inherit; list-style-type: disc;}
+
+li.breathe-cam-list-item-num {list-style: inherit; list-style-type: decimal;}
+
+p.breathe-cam-text {font-size: 15px}
+
+.content_toggle {cursor: pointer}
+
+img.breathe-cam-tutorial {max-width: 100%; border: 1px solid #434343; margin-top: 20px;}
+
+img.breathe-cam-tutorial-gif {max-width: 100%; border: 1px solid #434343; visibility: visible}
+
+img.breathe-cam-tutorial-gif-big {position: absolute; display:none; margin-top: -149px; border: 1px solid #434343;}
+
+.breathe-cam-gif-container:hover img.breathe-cam-tutorial-gif-big {display:block;}
+
+.breathe-cam-gif-container:hover img.breathe-cam-tutorial-gif {visibility: hidden;}
+
+.breathe-cam-bold-text {font-weight: bold}
+
+.breathe-cam-gallery-text {padding-right: 13px; padding-top: 5px}
+
+.collapsible {display: none}
+
+
+
+.blue-link        {color:#00bef6; font-family:Arial, Helvetica, sans-serif; font-size:14px; text-decoration:none;
+
+             font-weight:bold; margin-bottom:5px; margin-top:5px;}
+
+.white-link       {color:#fff; font-family:Arial, Helvetica, sans-serif; font-size:12px; text-decoration:none;
+
+             margin-bottom:5px; margin-top:5px;}
+
+.white-link:hover   {color:#00bef6;}
+
+
+
+.blue-btn       {padding:7px; background:#00bef6; color:#fff; font-weight:bold; font-size:16px; text-decoration:none;                              font-family: 'quicksandbold'; text-transform:uppercase; border-radius:20px; text-align:center; display:block;
+
+             margin:0px 0px 0px 10px; max-width:250px;}
+
+.col-1 .blue-btn    {margin:0 auto;}
+
+.borderline       {height:1px; width:100%; background:#515151; display:block; margin:10px 0px 10px 0px;}
+
+#page-title       {color:#fff; font-size:30px; font-family: 'quicksandbold'; text-transform:uppercase;}
+
+#rss            {float:right; color:#fff; font-size:16px; font-family: 'quicksandbold';}
+
+#rss img          {margin-bottom:-10px;}
+
+#share-page       {float:right; color:#fff; font-size:16px; font-family: 'quicksandbold'; float:right; margin-top:10px;}
+
+#share-page img     {margin-bottom:-5px;}
+
+#share-page a     {text-decoration:none; color:#fff; font-weight:bold; font-family: 'quicksandbold'; }
+
+.fb-img         {float:left;}
+
+.fb-post        {color:#e2e2e2; font-size:12px; font-family:Arial, Helvetica, sans-serif; font-weight:bold; width:200px; float:left; margin:0px 0px 0px 20px                             ;}
+
+.fb-like        {text-decoration:none; color:#858585; font-size:14px; font-weight:bold; font-family:Arial, Helvetica, sans-serif; }
+
+#press-contact span   {color:#e2e2e2; font-size:14px; font-family:Arial, Helvetica, sans-serif; font-weight:bold; width:200px;}
+
+
+
+/*Header*/
+
+#share          {float:right; margin:0px 5px 0px 0px; padding:15px 0px 0px 0px; display:block;}
+
+#share span       {float:right;margin-right:15px;}
+
+#share a        {float:right; margin-right:15px;}
+
+#share span       {float:right;margin-right:15px; color:#fff;  font-family: 'quicksandbold' !important;}
+
+#searchform     {float:right; height:30px; border-radius:10px; background:#4f4f4f; margin:10px 20px 0px 20px; padding-right:10px;   }
+
+#query          {border:none; background:#4f4f4f; border-radius:10px 0px 0px 10px; float:left; padding:5px 0px 5px 10px; color:#fff;
+
+             font-family: 'quicksandbold' !important; height:30px; }
+
+#searchsubmit         {background:url('images/search-icon.png') no-repeat center; border:none; height:30px; width:20px;}
+
+#searchsubmit:hover    {cursor:pointer}
+
+#footerbar        {display:none;}
+
+/* Footer */
+
+#footer         {background:#333333;}
+
+#heinz-logo       {margin:15px 0px 15px 0px; float:left;}
+
+#terms          {margin:15px 0px 15px 0px; float:right;}
+
+.footer-col       {float:left; width:310px; border-right:solid 1px #515151;}
+
+.last-child       {border-right:none;}
+
+.footer-col strong    {color:#b4b4b4; font-size:16px; font-family: 'quicksandbold' !important; margin:0px 0px 10px 0px; display:block;}
+
+.footer-col span    {color:#858585; font-size:12px; font-family:Arial, Helvetica, sans-serif;}
+
+.social-links     {display:block; text-decoration:none; font-size:14px; font-weight:bold; font-family:Arial, Helvetica, sans-serif; color:                               #858585; margin:0px 0px 10px 0px; }
+
+#social-icons     {float:left; margin:10px 0px 0px 0px;}
+
+#social-names     {float:left; margin:10px 0px 0px 15px;}
+
+footer          {padding:10px 10px 0px 10px; margin:10px 0px 0px 0px; border-top:solid 1px #515151;}
+
+footer span       {color:#858585; font-family:Arial, Helvetica, sans-serif; font-size:14px; }
+
+.footer-link      {text-decoration:none; font-size:14px; font-family:Arial, Helvetica, sans-serif; color:#00bef6; float:right; margin:0px 10px 0px 10px;}
+
+.footer-link-divider  {float:right; color:#b4b4b4; font-size:14px; font-family:Arial, Helvetica, sans-serif;}
+
+.borderline       {height:1px; width:100%; background:#515151; display:block; margin:10px 0px 10px 0px;}
+
+/*Home Page*/
+
+#learn          {margin:0px 15px 0px 0px;}
+
+#breath-project     {margin:0px 15px 0px 0px;}
+
+#breath-project img   {float:left;}
+
+#breath-project p   {float:left; max-width:450px; margin:0px 0px 0px 20px;}
+
+#breath-meter img   {float:left;}
+
+#breath-meter p       {float:left; max-width:190px; margin:0px 0px 0px 10px;}
+
+#act          {margin:0px 15px 0px 0px;}
+
+#act img        {margin:0 auto; display:block;}
+
+.date         {color:#fff; /*font-weight:bold;*/ font-family:Arial, Helvetica, sans-serif; font-size:12px; }
+
+.post-title         {color:#00bef6; font-weight:bold; font-family:Arial, Helvetica, sans-serif; font-size:12px; }
+
+.post-desc        {color:#e2e2e2; font-size:12px; font-family:Arial, Helvetica, sans-serif; display:block;
+
+             margin:10px 0px 10px 0px; font-weight:bold;}
+
+#carousel .slides_container   {height:414px;}
+
+#carousel .slide img  {height:414px;}
+
+#video_thumb        {display:block; margin:0 auto;}
+
+/*About Page*/
+
+#about-text       {float:left; width:650px; color:#fff; font-size:13px;}
+
+
+
+.testimonial-text     {color:#fff; font-weight:bold; font-family:Arial, Helvetica, sans-serif; font-size:12px; }
+
+.testimonial-name   {color:#00bef6; font-weight:bold; font-family:Arial, Helvetica, sans-serif; font-size:12px; display:block; }
+
+/*News Page*/
+
+.fb-img         {float:left;}
+
+.fb-post        {color:#e2e2e2; font-size:12px; font-family:Arial, Helvetica, sans-serif; font-weight:bold; width:200px; float:left; margin:0px 0px 0px 20px                             ;}
+
+.fb-like        {text-decoration:none; color:#858585; font-size:14px; font-weight:bold; font-family:Arial, Helvetica, sans-serif; }
+
+#press-contact span   {color:#e2e2e2; font-size:14px; font-family:Arial, Helvetica, sans-serif; font-weight:bold; width:200px;}
+
+#sub-nav        {margin:0; padding:5px 0px 0px 0px;}
+
+#sub-nav li       {float:left; list-style:none; margin:0px 0px 0px 20px;}
+
+#sub-nav li a     {text-decoration:none; text-transform:uppercase; color:#02b8eb; font-family: 'quicksandbold'; font-size:16px;}
+
+#sub-nav li a:hover   {color:#fff;}
+
+.post-content-block     {background:#ffffff; border-radius:10px; overflow:hidden;}
+
+.post-content-block p   {color:#000; font-size:13px; font-family:Arial, Helvetica, sans-serif;}
+
+#eventsnavhash      {margin-left: 715px;position: absolute;top:95px;}
+
+
+
+.post-date-box      {background:#00bef3; border-radius:5px; text-align:center; width:80px; float:left; margin:0px 20px 0px 0px;}
+
+.post-month       {font-size:18px; font-family: 'quicksandbold'; text-transform:uppercase; color:#333; display:block; }
+
+.post-day       {font-size:42px; font-family: 'quicksandbold'; text-transform:uppercase; color:#333; display:block; }
+
+.post-year        {font-size:14px; font-family: 'quicksandbold'; text-transform:uppercase; color:#fff; display:block; }
+
+.gray-bg        {background:#f4f4f4;  border-radius: 5px 5px 0px 0px;}
+
+.post-info        {margin:45px 0px 15px 0px; float:left; width:500px;}
+
+.post-info span     {font-size:14px; font-family:Arial, Helvetica, sans-serif; color:#333333; font-weight:bold; display:block;}
+
+.post-info span a   {color:#333333;}
+
+.post-info strong   {font-size:20px; font-family:Arial, Helvetica, sans-serif; color:#000000;}
+
+.post-info strong a   {color:#000000;}
+
+.comment-read-more-box  {background:#f4f4f4; padding:10px; border-radius:0px 0px 10px 10px; }
+
+.comment-read-more    {float:right; color:#333; font-weight:bold; }
+
+.archive-dd       {border:1px solid #4F5457; background:#374045; font-family: 'quicksandbold'; font-size:16px; color:#fff; margin:0px 10px 0px 10px; float:right;}
+
+.archive-dd option    {font-family: 'quicksandbold'; font-size:16px; color:#fff; padding-right:15px;}
+
+/*--Breathe Meter --*/
+
+#breathe-meter-top    {margin-bottom:15px;  padding-top:80px;}
+
+#learn-navhash      {position: absolute; margin-left: 525px; top: 95px;}
+
+#select-city      {border:#4F5457 solid 1px; background:#374045; font-family: 'quicksandbold'; font-size:18px; color:#fff; margin:0px 10px 0px 10px; float:right; max-width:302px;}
+
+#select-city option   {font-family: 'quicksandbold'; font-size:18px; color:#fff; border:none;}
+
+#meter-left       {float:left; width:380px;}
+
+#meter-center     {float:left; width:180px;}
+
+#meter-center strong    {color:#fff; font-family: 'quicksandbold'; font-size:18px; display:block; text-align:center;}
+
+#meter-right      {float:left; width:380px;}
+
+.orange         {color:#fd9b3b;}
+
+.light-blue       {color:#3cd5f0;}
+
+.city-name        {font-size:30px; font-family: 'quicksandbold'; display:block; text-transform:uppercase; text-align:center;}
+
+#blue-meter         {width:46px; height:11px; background:url('images/blue-meter.png') no-repeat; float:right;}
+
+#orange-meter     {width:46px; height:11px; background:url('images/orange-meter.png') no-repeat; float:left;}
+
+#meter-lines      {width:31px; height:303px; background:url('images/meter-lines.png') center no-repeat; margin:0 auto; display:block;}
+
+.cloud-box        {width:330px; height:164px; padding:90px 0px 0px 0px; display:block; margin:0 auto;}
+
+#pgh-number       {font-size:60px; font-family: 'quicksandbold'; color:#fd9b3b; display:block; text-align:center;}
+
+#city-number      {font-size:60px; font-family: 'quicksandbold'; color:#3ccfe9; display:block; text-align:center;}
+
+#meter-disclaimer   {color:#b4b4b4; font-size:10px; font-family:"Arial Black", Gadget, sans-serif; float:right; font-weight:500px;
+
+             margin:10px 10px 0px 0px;}
+
+#howYouCanHelp      {margin:0px 15px 0px 0px;}
+
+
+
+/*Act Pages*/
+
+
+
+.act-center-content img {width:141px; height:141px; display:block; margin:0 auto;}
+
+.act-center-content div {color:#b261a6; font-size:24px; text-align:center; font-family: 'quicksandregular'; font-weight:bold; }
+
+.act-center-content div p {font-size:13px !important; font-family:Arial, Helvetica, sans-serif !important;}
+
+.act-center-content strong  {color:#fff; font-size:18px; text-align:center; font-family: 'quicksandbold'; text-transform:uppercase; margin-top:10px; display:block;}
+
+#act-icon-container   {display:block; margin:0 auto;}
+
+.act-icons        {margin:0px 20px 0px 20px; float:left;}
+
+#act-nav-left     {background:url('images/act-nav-left.png') no-repeat center; width:15px; height:29px; display:block;
+
+            float:left; margin-top:70px;}
+
+#act-nav-right      {background:url('images/act-nav-right.png') no-repeat center; width:15px; height:29px; display:block;
+
+            float:right; margin-top:70px;}
+
+.act-center-content   {display:none;}
+
+.gov_bottom       {display:none;}
+
+#citizen-spotlight    {width:645px;}
+
+#citizen_topgrad    {left: -6px; position: absolute; top: -140px; width: 657px; z-index: -1;}
+
+#citizen-spotlight
+
+.boxtitle       {margin-bottom:16px;}
+
+.citizen        {border-bottom: 1px dotted white; float: left; height: 133px; margin-bottom: 22px; margin-right: 19px; width: 300px;}
+
+.citizenThumb       {float:left; width: 88px; height: 88px; border:solid 3px #ebebeb;}
+
+.citizenContent     {float: left; margin-left: 10px; width: 192px;}
+
+.citizenTitle       {font-size:14px; font-weight:bold;}
+
+.citizenLink      {float:right;}
+
+#citizen-spotlight button {margin-left: 234px;margin-top: 8px;}
+
+
+
+
+
+#leftcolumn {
+
+
+
+    float: left;
+
+    margin-right: 30px;
+
+    padding-left: 10px;
+
+    width: 640px;
+
+
+
+}
+
+
+
+#titlecopy {
+
+  height:106px;
+
+  width:486px;
+
+  float:left;
+
+}
+
+
+
+#pledgesMeterContainer{
+
+  float:right;
+
+  width:146px;
+
+  text-align:center;
+
+  margin-top:30px;
+
+}
+
+
+
+#pledgesMeter {
+
+  overflow:hidden;
+
+  -webkit-border-radius: 22px;
+
+  -webkit-border-radius: 22px;
+
+  -moz-border-radius: 22px;
+
+  -moz-border-radius: 22px;
+
+  border-radius: 22px;
+
+  border-radius: 22px;
+
+
+
+    background-color: #7C7C7C;
+
+    border: 8px solid #464646;
+
+    height: 25px;
+
+    overflow: hidden;
+
+    width: 130px;
+
+}
+
+
+
+#bar {
+
+    background-color: #F26522;
+
+    height: 100%;
+
+    width: 0%;
+
+  -webkit-border-radius: 22px;
+
+  -webkit-border-radius: 22px;
+
+  -moz-border-radius: 22px;
+
+  -moz-border-radius: 22px;
+
+  border-radius: 22px;
+
+  border-radius: 22px;
+
+}
+
+#number {
+
+  position:relative;
+
+  top:-25px;
+
+  font-size:18px;
+
+  font-weight:bold;
+
+}
+
+
+
+#pledgesMeterLabel{
+
+  font-size:10px;
+
+  margin-left:6px;
+
+}
+
+
+
+*/
+
+#pledgesModuleContainer {
+
+  position:relative;
+
+/*    background-image: url("../images/act_bubblebg.png");*/
+
+    clear: both;
+
+/*    height: 364px;*/
+
+    width: 616px;
+
+  padding-top: 8px;
+
+/*  background-repeat: no-repeat;*/
+
+  /*z-index:-1;*/
+
+}
+
+
+
+#pledgesModuleNav { padding: 45px 0 0; overflow:hidden; display: block; width: 100%; margin: 0;}
+
+#pledgesModuleNav .row { display: block; padding: 0 0 15px; overflow:hidden; zoom:1.0; width: 100%; margin: 0;}
+
+#pledgesModuleNav .row li { display:inline-block; zoom:1; *display: inline; vertical-align: top; width:60px; height:60px; margin:0 18px 18px; overflow:hidden; }
+
+#pledgesModuleNav .row img { display:block; position:relative; top:0px; cursor:pointer; }
+
+#pledgesModuleNav .alt { padding-left:38px; }
+
+
+
+/*.pledgesNavIcon {
+
+  cursor:pointer;
+
+  position:relative;
+
+  top:0px;
+
+  margin-left:40px;
+
+}*/
+
+#pledgesModuleContent{
+
+  width:494px;
+
+}
+
+
+
+#pledgesModuleFooter {
+
+    border-top: 1px dotted white;
+
+    bottom: 0;
+
+    height: 32px;
+
+    margin:20px 20px 0;
+
+    padding-top: 16px;
+
+/*    position: absolute;*/
+
+    text-align: right;
+
+/*    width: 600px;*/
+
+}
+
+
+
+#createYourOwn {
+
+  cursor:pointer;
+
+  color:#00ccff;
+
+}
+
+
+
+#createYourOwn:hover {
+
+  color:#fff;
+
+}
+
+
+
+.pledge {
+
+  min-height: 138px;
+
+  padding: 10px 0 0 158px;
+
+  background-position: left center;
+
+  background-repeat: no-repeat;
+
+}
+
+
+
+.pledge_title{
+
+  font-weight:bold;
+
+  font-size:18px;
+
+  margin-bottom:10px;
+
+}
+
+
+
+.pledge_body{
+
+  font-size:12px;
+
+}
+
+
+
+#pledgeThisButton{
+
+/*
+
+    clear: both;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    margin-left: 257px;
+
+    margin-top: 20px;
+
+    padding: 9px 16px 11px;
+
+
+
+    clear: both;
+
+*/
+
+
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    left: 220px;
+
+
+
+    padding: 9px 16px 11px;
+
+    position:relative;
+
+    margin-top:20px;
+
+
+
+}
+
+
+
+#leftNavArrow, #rightNavArrow, #pledgesModuleContent{
+
+  float:left;
+
+}
+
+
+
+#leftNavArrow, #rightNavArrow{
+
+  margin-left:13px;
+
+  margin-right:13px;
+
+  margin-top: 53px;
+
+  cursor:pointer;
+
+  opacity:.5;
+
+}
+
+
+
+#leftNavArrow:hover, #rightNavArrow:hover{
+
+  opacity:1;
+
+}
+
+
+
+/*Search Page*/
+
+
+
+.post     {display:block; margin:0px 0px 15px 0px; width:100%; border-bottom:solid 1px #fff; padding:0px 0px 10px 0px;}
+
+
+
+/*Air Quality Meter */
+
+
+
+#air-quality {
+
+  width: 266px;
+
+  height: 118px;
+
+  padding: 15px 15px;
+
+  float: left;
+
+  text-transform: uppercase;
+
+}
+
+#air-quality .title {
+
+  margin-bottom: 8px;
+
+}
+
+
+
+#air-quality .meter {
+
+  position: relative;
+
+  border-bottom: 1px dotted #ccc;
+
+  padding-bottom: 6px;
+
+  margin-bottom: 6px;
+
+}
+
+
+
+#air-quality .meter .arrow {
+
+  position: absolute;
+
+  top: -8px;
+
+  left: -9px;
+
+}
+
+
+
+#air-quality .meter .label {
+
+  position: relative;
+
+  display: inline-block;
+
+  zoom: 1; *display: inline;
+
+  vertical-align: top;
+
+  padding-top: 3px;
+
+}
+
+
+
+#air-quality #tomorrow {
+
+  font-size: 10px;
+
+}
+
+
+
+#air-quality #tomorrow .box {
+
+  display: inline-block;
+
+  zoom: 1; *display: inline;
+
+  color: #fff;
+
+  margin-left: 2px;
+
+  padding: 0px 5px 2px;
+
+  line-height: 1em;
+
+  vertical-align: top;
+
+}
+
+#air-quality #tomorrow .box.green  {background: #00E400;}
+
+#air-quality #tomorrow .box.yellow {background: yellow; color: #000;}
+
+#air-quality #tomorrow .box.orange {background: #FF7E00;}
+
+#air-quality #tomorrow .box.red    {background: red;}
+
+#air-quality #tomorrow .box.purple {background: #99004C;}
+
+#air-quality #tomorrow .box.maroon {background: #7E0023;}
+
+.current-menu-item{color:#fff;}
+
+/*Industry Breakdown Page*/
+
+.ss-excerpt a           {display:none;}
+
+.ssReadMore             {display:block !important;}
+
+.ss-content             {display:none;}
+
+#ssArchive              {display:none}
+
+#industry-story           {overflow:hidden;}
+
+#tot-em-number strong       {display:none;}
+
+.closeInfo              {display:none;}
+
+#tot-em-number            {background:url(images/industry-cloud.png); width:250px; height:101px; padding:50px 0px 0px 20px;
+
+                   margin:20px 0px 30px 50px;}
+
+#tot-em-number img          {float:left; margin:20px 10px 0px 20px;}
+
+#tot-em-number strong       {color:#4f4f4f; font-family: 'quicksandregular'; font-weight:bold;
+
+                   font-size:55px;  letter-spacing:-5px;}
+
+#tot-em-number sup          {color:#4f4f4f; font-family: 'quicksandregular'; font-weight:bold;
+
+                   font-size:15px;letter-spacing:0px;}
+
+#city-img             {margin:20px 0px 0px 20px;}
+
+#rollover             {float:left; margin:170px 30px 0px 30px;}
+
+#industry-bars            {float:left; margin:0px 0px 0px 20px; position:relative; height:405px;  display:none;}
+
+.bar-col              {width:50px; float:left; margin:0px 20px 0px 0px; text-align:center; position:absolute; bottom:0px;}
+
+.bar-col:hover            {cursor:pointer;}
+
+.bar-col img            {margin:0 auto; display:block;}
+
+.blue-bar             {width:100%; background:#00bef3; border-radius:5px; margin:10px 0px 10px 0px;}
+
+.bar-col strong           {font-family: 'quicksandregular'; font-weight:bold; color:#fff; font-size:18px;}
+
+.white-line             {height:1px; width:100%; background:#fff; margin:3px 0px 3px 0px;}
+
+.bar-col span           {font:Arial, Helvetica, sans-serif; color:#fff; font-weight:bold; font-size:14px;}
+
+#barCol-1             {left:20px;}
+
+#barCol-2             {left:90px;}
+
+#barCol-3             {left:160px;}
+
+#barCol-4             {left:230px;}
+
+#barCol-5             {left:300px;}
+
+#barCol-6             {left:370px;}
+
+#barCol-1 .blue-bar         {height:0px;}
+
+#barCol-2 .blue-bar         {height:0px;}
+
+#barCol-3 .blue-bar         {height:0px;}
+
+#barCol-4 .blue-bar         {height:0px;}
+
+#barCol-5 .blue-bar         {height:0px;}
+
+#barCol-6 .blue-bar         {height:0px;}
+
+#howCanYouHelp            {margin:0px 15px 0px 0px;}
+
+.tooltip{
+
+    position:absolute;
+
+    z-index:999;
+
+    left:-9999px;
+
+    background:#fff;
+
+    padding:10px;
+
+  border-radius:10px;
+
+    width:330px;
+
+  display:none;
+
+  box-shadow:#373f41 2px 2px 7px;
+
+}
+
+
+
+.tooltip p{
+
+    color:#4f4f4f;
+
+  font-size:13px;
+
+}
+
+.micModalContent          {width:250px;}
+
+.tooltip strong           {color:#333333; font-size:18px; font-family:Arial, Helvetica, sans-serif;}
+
+.tooltip img            {float:left; margin:0px 15px 0px 0px; }
+
+.tooltip-html           {display:none;}
+
+.ss-filter              {display:none;}
+
+#ss-filter-dd           {margin:0px 0px 0px 10px; display:block; background:url(images/blue-link-arrow.jpg) #333 no-repeat right; color:#fff; font-family: 'quicksandregular'; border:none; font-weight:bold;}
+
+#viewing              {margin:0px 10px 0px 10px; float:left; font-size:15px; font-family: 'quicksandregular';}
+
+.homepage-col-1           {position:relative;}
+
+.homepage-col-1 .blue-btn     {width:250px; left:30px;}
+
+.hp-blue-btn-spacer         {height:32px;}
+
+#breathe-cam            {width:100%; height:689px; overflow: hidden;}
+
+#airRealTime            {margin:0px 15px 0px 0px;}
+
+.showMobile             {display:none;}
+
+.showPhone              {display:none;}
+
+#right-menu             {float:right; margin:20px 20px 0px 0px; font-family: 'quicksandregular';
+
+                   font-weight:bold; color:#fff; font-size:20px; display:none;}
+
+#slide-menu             {background:#333; width:200px; height:100%; position:fixed; z-index:5; display:none;}
+
+.AQI-meter              {font-family: 'quicksandregular'; font-weight:bold; margin:5px 0px 5px 0px;}
+
+#reports-categories-mobile      {display:none; background:url(images/blue-link-arrow.jpg) #333 no-repeat right; color:#fff; font-family: 'quicksandregular'; border:none; font-weight:bold;}
+
+.learn-filter           {border:none; font-weight:bold !important;}
+
+#sidr-right             {display:none;}
+
+#sidr-right #searchform       {float:none; margin:0; background:#333333;}
+
+#sidr-right #query          {width:190px; background:#333333;}
+
+#sidr-right strong          {color:#b4b4b4; font-size:16px; font-family: 'quicksandbold' !important; margin:0px 0px 10px 0px; display:block;}
+
+#sidr-right #air-quality      {width:230px; padding:0; float:none;}
+
+#sidr-right #air-quality .meter .bar{width:230px;}
+
+#sidr-right .footer-link      {display:block; float:none; margin:0px 0px 5px 0px; border-bottom:1px solid #515151; padding:0px 0px 5px 0px;}
+
+#sidr-right .navitem        {background:none; border-bottom:1px solid #515151; padding-bottom:20px;}
+
+#sidr-right ul            {clear:both; display:block; height:auto;}
+
+#sidr-right ul li         {clear:both; display:block; height:auto;}
+
+#sidr-right ul li a         {display:block; width:155px;}
+
+.mobileNavDD            {width:20px !important;}
+
+#sidr-right .sub-menu       {margin-top:10px; display:none;}
+
+#sidr-right .sub-menu li      {padding-left:0px;}
+
+.mobileMenuBorder         {border-top:solid 1px #515151;}
+
+#sidr-right .menu-top-nav-container {height:auto;}
+
+.mobileNavDD            {float:right; height:20px; width:20px; display:block; background:url(images/mobile-nav-arrow.jpg) no-repeat;
+
+                  margin:5px 0px 0px 0px; }
+
+#cityComparison           {font-family: 'quicksandregular';}
+
+#cityComparison span        {color:#00bef6; font-weight:bold;}
+
+.compareCity            {margin:0px 0px 0px 10px; text-transform:uppercase;}
+
+#views-past             {width:680px;}
+
+.viewThumbnail            {width:200px; height:100px; display:block; overflow:hidden; background:#fff;}
+
+.viewThumbnail  img         {display:block; margin:0 auto;}
+
+.vopContainer           {float:left; margin:0px 10px 20px 10px;}
+
+
+
+/*====================== RESPONSIVE CODE BELOW =============================*/
+
+
+
+@media only screen and (max-width: 767px) {
+
+#views-past           {width:300px; display:none;}
+
+#breathe-cam          {height: 689px}
+
+.homepage-col-1 .blue-btn   { left:0px;}
+
+#page-title           {font-size:24px;}
+
+#share a, #share span     {display:none;}
+
+#learn-navhash          {display:none;}
+
+#navhash            {display:none;}
+
+#airRealTime          {float:none; display:block; margin:0px 0px 0px 0px; width: 300px}
+
+.hp-blue-btn-spacer       {display:none;}
+
+.showPhone            {display:block;}
+
+.hidePhone            {display:none;}
+
+#navbar             {width:300px; background:url(images/nav-bg-mobile.png);}
+
+.col-2              {width:300px; float:none;}
+
+.col-3              {width:300px; float:none;}
+
+.col-1              {width:300px; float:none;}
+
+.hideMobile           {display:none;}
+
+.showMobile           {display:block;}
+
+#footer             {display:none;}
+
+#heinz-links          {display:none;}
+
+#parentnav            {display:none;}
+
+#right-menu           {display:block;}
+
+#page-title           {text-align:center;}
+
+.page-item-499          {display:none;}
+
+#checkboxContainer p      {width:210px !important;}
+
+#join_zipcode         {margin:0px 0px 8px 0px !important;}
+
+/*Home Page*/
+
+#video              {width:280px !important;}
+
+#video_thumb          {width:280px;}
+
+#breath-project         {margin:0px 0px 0px 0px; float:none;}
+
+#breath-project p       {width:170px;}
+
+#breath-meter         {margin:0px 15px 0px 0px;}
+
+#act              {margin:0px 15px 0px 0px;}
+
+#learn              {margin:0px 0px 0px 0px;}
+
+#container            {width:300px;}
+
+#main-col           {width:100% !important;}
+
+#carousel           {width:100% !important; height:320px !important; border-radius:10px; margin:0 !important;}
+
+#carousel .slide img      {width:300px !important; height:124px !important;}
+
+#carousel .slide        {width:300px !important; height:320px !important;}
+
+#carousel .slides_container   {height:320px !important;}
+
+#carousel .pagination     {top:100px; height:20px;}
+
+#carousel .slide .txt-overlay   {position: absolute !important; top: 120px !important; left: 0px !important;
+
+                 height:180px !important; width: 280px !important; padding: 10px !important;
+
+                 background:#333 !important; border-radius:0px 0px 10px 10px !important;}
+
+/*About Page*/
+
+#about-testimonials       {width:300px;}
+
+#about-text           {width:280px !important;}
+
+#coalition            {width:280px !important;}
+
+#coalition_partners       {display:none;}
+
+#coalition_scrollbar      {width:260px !important;}
+
+#coalition_scrollbar .viewport  {width:240px !important; padding:0px !important; height:300px !important;}
+
+.scrollbar            {height:300px !important;}
+
+.track              {height:300px !important;}
+
+.thumb              {height:88px; !important}
+
+.lightbox             {width:260px !important; height:187px !important;}
+
+/*Emession Map Page*/
+
+#mapcontent .scrollbar, #mapcontent .track{height:180px !important;}
+
+#overview           {height:auto !important;}
+
+#overview-default .buttons    {padding:0 !important; margin:0px 50px 0px 0px !important; }
+
+#overview-icon .buttons     {padding:0 !important;}
+
+#map              {width:270px !important; height:300px !important;}
+
+#google-maps          {width:270px !important; height:auto !important;}
+
+#map-control-zoom       {left:15px !important;}
+
+#map-control-type       {left:65px !important;}
+
+#map-legend           {left:55px !important;bottom:0px !important; top:280px !important;}
+
+/*Learn Page*/
+
+.cat-title            {width:280px !important; margin:0px 0px 10px 0px !important; padding-top:0px !important;}
+
+.cat-title a.top        {float:left !important; margin:10px 0px 20px 0px !important; display:block !important;}
+
+#reports            {width:280px !important;}
+
+.cat-title .name        {float:none !important;}
+
+.learn-graph          {height:60px !important; top:0px !important; padding-top:90px; }
+
+.learnDotRollover       {display:none !important;}
+
+#topgraphic           {display:none !important;}
+
+#take-action          {width:300px;}
+
+.actionBubble         {width:265px !important;}
+
+.report             {width:280px !important;}
+
+.hash             {margin-right:0px !important;}
+
+.actionBubble .boxtitle     {margin-left:10px;}
+
+/*#reports-categories li      {display:block !important; height:20px; width:280px !important;}
+
+#reports-categories li a    {height:10px !important; padding:0px !important;}*/
+
+#reports-categories       {display:none;}
+
+#reports-categories-mobile    {display:block;}
+
+/*Media Gallery Page*/
+
+#current            {width:100% !important; height:auto !important;}
+
+.vid-preview          {width:100% !important; height:auto !important;}
+
+.vid-preview-img        {width:100% !important;}
+
+#media-select .items      {width:190px !important;}
+
+#current iframe         {width:280px; height:157px;}
+
+/*Breathe Meter Page*/
+
+#meter-left           {width:250px;}
+
+#meter-right          {display:none;}
+
+#meter-center         {display:none;}
+
+#pgh-cloud            {width:250px;}
+
+#city-cloud           {width:250px;}
+
+#select-city          {display:none;}
+
+#howYouCanHelp          {margin:0px 0px 0px 0px; width:300px; float:none;}
+
+#pgh-number           {font-size:40px;}
+
+.cloud-box            {height:125px; padding:70px 0px 0px 0px;}
+
+#blue-meter             {width:26px; height:11px; background:url('images/blue-meter-mobile.png') no-repeat;}
+
+#orange-meter         {width:26px; height:11px; background:url('images/orange-meter-mobile.png') no-repeat;}
+
+#meter-center         {width:120px;}
+
+/*Act Page*/
+
+.pledge             {width:200px !important; margin-right:0 !important;}
+
+#events-list          {width:300px;}
+
+#upcoming_event_txt       {width:100%;}
+
+#volunteer-block        {width:300px;}
+
+#pledgesModuleContent     {width:200px !important;}
+
+#leftNavArrow         {margin-left:0 !important; margin-right:5px !important;}
+
+#rightNavArrow          {margin-left:5px !important; margin-right:0 !important;}
+
+#pledgeThisButton       {left:0px !important;}
+
+#pledgeFormContainer      {width:250px !important;}
+
+#pledgeFormContainer textarea {width:250px !important;}
+
+#pledgeFormContainer input    {margin-left:0 !important;}
+
+#state              {margin-left:0 !important;}
+
+#pledgeFormContainer #pledgesubmitbutton {margin-left:0 !important; margin-bottom:0 !important;}
+
+#pledgeFormContainer #title, #pledgeFormContainer #company, #pledgeFormContainer #address{width:250px !important;}
+
+/*Making it Count Page*/
+
+#rollover           {display:none;}
+
+#micLeft            {display:none;}
+
+#industry-bars          {float:none; margin:0px 0px 0px 125px; height:300px;}
+
+#howCanYouHelp          {width:300px;}
+
+#industry-bars          {margin:0;}
+
+#barCol-1             {left:0px;}
+
+#barCol-2             {left:40px;}
+
+#barCol-3             {left:90px;}
+
+#barCol-4             {left:140px;}
+
+#barCol-5             {left:190px;}
+
+#barCol-6             {left:240px;}
+
+.bar-col              {width:30px; margin:0px 0px 0px 0px;}
+
+.bar-col span           {font-size:12px;}
+
+.bar-col strong           {font-size:14px;}
+
+.bar-col img            {width:30px; height:auto;}
+
+.closeInfo              {display:block;}
+
+.tooltip              {width:230px;}
+
+.micModalContent          {width:230px;}
+
+/*News Pages*/
+
+#press-contact          {width:300px;}
+
+.post-info            {width:250px;}
+
+.archive-dd           {float:none; margin:0 auto; display:block;}
+
+#rss                {float:none; margin:20px 0px 0px 0px;}
+
+/*Act Business Page*/
+
+.business           {float:none !important; width:280px !important; margin-right:0px !important; height:auto !important;}
+
+.businessContent        {width:auto !important;}
+
+#citizen-spotlight        {width:280px !important;}
+
+.businessContent        {margin-left:0px !important; margin:10px 0px 10px 0px;}
+
+#business-act-icons       {display:none;}
+
+#sub-nav li           {float:none; text-align:center; margin:0px 0px 5px 0px;}
+
+#filterhash           {display:none;}
+
+/*Act Government Page*/
+
+#gov-act-icons          {display:none;}
+
+.gov_bottomLeft, .gov_bottomRight{width:280px !important; float:none !important;}
+
+.gov_topRight         {width:280px !important;}
+
+.gov_bottomRight        {margin-left:0px !important;}
+
+.gov_topLeft          {margin:0 auto; float:none !important;}
+
+/*Act Individual Page*/
+
+#pledgesModuleNav       {display:none !important;}
+
+.citizen            {width:280px !important; height:auto !important;}
+
+.citizenContent         {width: 150px !important; margin-bottom:10px !important; }
+
+#pledgesModuleContainer     {width:280px !important;}
+
+#pledgesModuleContent     {}
+
+#largePledgeIcon        {width:138px; height:138px; display:block; float:left;}
+
+
+
+}
+
+
+
+/*Tablet*/
+
+@media only screen and (min-width: 768px) and (max-width: 1000px) {
+
+.vopContainer         {margin:0px 12px 20px 12px;}
+
+#views-past           {width:700px;}
+
+#learn-navhash          {display:none;}
+
+#navhash            {display:none;}
+
+#navbar             {width:700px; background:url(images/nav-bg-tablet.png);}
+
+.col-2              {width:700px;}
+
+.col-3              {width:700px;}
+
+.col-1              {width:340px;}
+
+.hideMobile           {display:none;}
+
+.showMobile           {display:block;}
+
+#footer             {display:none;}
+
+#heinz-links          {display:none;}
+
+#parentnav            {display:none;}
+
+#right-menu           {display:block;}
+
+#checkboxContainer p      {width:210px !important;}
+
+#join_zipcode         {margin:0px 0px 8px 0px !important;}
+
+/*Home Page*/
+
+#breath-project         {margin:0px 0px 0px 0px; float:none;}
+
+#breath-meter         {margin:0px 15px 0px 0px;}
+
+#act              {margin:0px 15px 0px 0px;}
+
+#learn              {margin:0px 0px 0px 0px;}
+
+#container            {width:700px;}
+
+#main-col           {width:100% !important;}
+
+#carousel           {width:100% !important; height:290px !important; border-radius:10px;}
+
+#carousel .slide img      {width:700px !important; height:290px !important;}
+
+#carousel .slide        {width:700px !important; height:290px !important;}
+
+#carousel .slides_container   {height:290px !important;}
+
+/*About Page*/
+
+#about-testimonials       {width:700px;}
+
+#about-text           {width:350px !important;}
+
+/*Learn Page*/
+
+.learn-graph          {height:130px !important;}
+
+.learnDotRollover       {display:none !important;}
+
+#topgraphic           {display:none !important;}
+
+#take-action          {width:700px;}
+
+.actionBubble         {width:660px !important;}
+
+/*Emession Map Page*/
+
+#map              {width:390px !important;}
+
+#google-maps          {width:670px !important;}
+
+#map-control-type       {left:400px !important;}
+
+#map-legend           {left:400px !important;}
+
+/*Media Gallery Page*/
+
+#current            {width:100% !important; height:auto !important;}
+
+.vid-preview          {width:100% !important; height:auto !important;}
+
+.vid-preview-img        {width:100% !important;}
+
+#media-select .items      {width:590px !important;}
+
+#current iframe         {width:680px; height:447px;}
+
+/*Breathe Meter Page*/
+
+#meter-left           {width:275px;}
+
+#meter-right          {width:275px;}
+
+#pgh-cloud            {width:250px;}
+
+#city-cloud           {width:250px;}
+
+#pgh-number           {font-size:40px;}
+
+#city-number          {font-size:40px;}
+
+.city-name            {font-size:20px}
+
+#howYouCanHelp          {margin:0px 0px 0px 0px; width:700px; float:none;}
+
+.cloud-box            {height:125px; padding:70px 0px 0px 0px;}
+
+#blue-meter             {width:26px; height:11px; background:url('images/blue-meter-mobile.png') no-repeat;}
+
+#orange-meter         {width:26px; height:11px; background:url('images/orange-meter-mobile.png') no-repeat;}
+
+#meter-center         {width:120px;}
+
+/*Act Page*/
+
+#events-list          {width:700px;}
+
+#upcoming_event_txt       {width:100%;}
+
+#volunteer-block        {width:700px;}
+
+/*Making it Count Page*/
+
+#industry-bars          {float:none; margin:0px 0px 0px 125px; height:300px;}
+
+#howCanYouHelp          {width:300px;}
+
+#industry-bars          {margin:0;}
+
+#barCol-1           {left:0px;}
+
+#barCol-2           {left:40px;}
+
+#barCol-3           {left:90px;}
+
+#barCol-4           {left:140px;}
+
+#barCol-5           {left:190px;}
+
+#barCol-6           {left:240px;}
+
+.bar-col            {width:30px; margin:0px 0px 0px 0px;}
+
+.bar-col span         {font-size:12px;}
+
+.bar-col strong         {font-size:14px;}
+
+.bar-col img          {width:30px; height:auto;}
+
+#rollover           {display:none;}
+
+#micLeft            {}
+
+#industry-bars          {float:none; margin:110px 0px 0px 380px; height:300px; }
+
+#howCanYouHelp          {width:700px;}
+
+.closeInfo            {display:block;}
+
+/*Category Page*/
+
+#press-contact          {width:700px;}
+
+/*Breathe Cam Page*/
+
+#airRealTime                                    {margin:0px 0px 0px 0px; width:700px;}
+
+/*News Pages*/
+
+
+
+}
