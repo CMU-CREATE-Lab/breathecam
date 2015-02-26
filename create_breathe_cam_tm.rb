@@ -31,6 +31,7 @@ $skip_rotate = false
 $run_append_externally = false
 $skip_stitch = false
 $skip_leader = false
+$skip_trailer = false
 $input_date_from_file = false
 $camera_type = "breathecam"
 $skip_qtfaststart_append = false
@@ -40,6 +41,8 @@ $symlink_input = false
 $sort_by_exif_dates = false
 $start_time = {}
 $end_time = {}
+$append_inplace = false
+$future_appending_frames = 17000
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -114,6 +117,8 @@ class Compiler
         $skip_stitch = true
       elsif arg == "--skip-leader"
         $skip_leader = true
+      elsif arg == "--skip-trailer"
+        $skip_trailer = true
       elsif arg == "--input-date-from-file"
         $input_date_from_file = true
       elsif arg == "-camera-type"
@@ -134,6 +139,10 @@ class Compiler
         $symlink_input = true
       elsif arg == "--sort-by-exif-dates"
         $sort_by_exif_dates = true
+      elsif arg == "--append-inplace"
+        $append_inplace = true
+      elsif arg == "-future-appending-frames"
+        $future_appending_frames = ARGV.shift.to_i
       end
     end
 
@@ -156,7 +165,7 @@ class Compiler
     end
 
     if File.exists?(File.join($working_dir, "WIP"))
-      puts "[#{Time.now}] A file called 'WIP' was detected in '#{$working_dir}', which indicates that this working directory is already in the middle of processing. Aborting."
+      puts "[#{Time.now}] A file called 'WIP' was detected in '#{$working_dir}', which indicates that this working directory is already in the middle of processing. Exiting new process."
       exit
     end
 
@@ -178,28 +187,49 @@ class Compiler
     puts "Starting process."
 
     at_exit do
-      FileUtils.rm(File.join($working_dir,"WIP"))
+      FileUtils.rm(File.join($working_dir, "WIP"))
     end
 
     FileUtils.mkdir_p($working_dir)
-    FileUtils.touch(File.join($working_dir,"WIP"))
+    FileUtils.touch(File.join($working_dir, "WIP"))
     create_definition_file
 
     if $do_incremental_update
       if $input_date_from_file
         file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
         if File.exists?(file)
+          time_chunk_in_seconds = (60 * $incremental_update_interval)
           last_pull_date = Time.parse(File.open(file, &:readline))
-          exit if (last_pull_date.to_i > Time.now.to_i)
-          $start_time["hour"] = last_pull_date.strftime("%H").to_i
-          $start_time["minute"] = last_pull_date.strftime("%M").to_i
-          $start_time["sec"] = 0
+          time_diff = (Time.now - last_pull_date).floor
+          puts "[#{Time.now}] Time drift: #{time_diff} vs #{time_chunk_in_seconds}"
+          if (time_diff < 0)
+            puts "[#{Time.now}] Last pull date is greater than the current time. Exiting process."
+            exit
+          end
+          if (time_diff > time_chunk_in_seconds)
+            num_minutes = (time_diff / 60)
+            time_chunk_in_seconds = time_diff
+            puts "[#{Time.now}] Gap greater than #{$incremental_update_interval} minutes. Now processing a #{num_minutes} minute chunk."
+          elsif (time_diff < time_chunk_in_seconds)
+            puts "[#{Time.now}] Gap less than #{$incremental_update_interval} minutes, which is less than the minimum segment. Exiting process."
+            exit
+          end
+          $start_time["hour"] = last_pull_date.hour
+          $start_time["minute"] = last_pull_date.min
+          $start_time["sec"] = "00"
           $current_day = Date.parse(last_pull_date.to_s).to_s
-          new_last_pull_date = last_pull_date + (60 * $incremental_update_interval)
-          $end_time["hour"] = new_last_pull_date.strftime("%H").to_i
-          $end_time["minute"] = new_last_pull_date.strftime("%M").to_i
-          $end_time["sec"] = 0
-          $end_time["full"] = new_last_pull_date
+          new_last_pull_date = last_pull_date + time_chunk_in_seconds
+          $end_time["hour"] = new_last_pull_date.hour
+          $end_time["minute"] = new_last_pull_date.min
+          $end_time["sec"] = "00"
+          $end_time["full"] = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{$end_time['sec']}"
+          if ($start_time["hour"] > $end_time["hour"])
+            $end_time["hour"] = 23
+            $end_time["minute"] = 59
+            $end_time["sec"] = 59
+            new_day = Date.parse($current_day) + 1
+            $end_time["full"] = "#{new_day} 00:00:00"
+          end
         else
           calculate_rsync_input_range
         end
@@ -306,7 +336,7 @@ class Compiler
       $end_time["minute"] = 59
       $end_time["sec"] = 59
     end
-    file_list_command = "find #{src_path}/#{$current_day} -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}'"
+    file_list_command = "find #{src_path}/#{$current_day} -path #{src_path}/#{$current_day}/latest_stitch -prune -o -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
     subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
     puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
     if $symlink_input
@@ -479,10 +509,11 @@ class Compiler
   end
 
   def create_tm
-    puts "Creating Time Machine..."
+    puts "[#{Time.now}] Creating Time Machine..."
     $timemachine_output_dir = $create_videoset_segment_directory ? "#{$current_day}-#{$incremental_update_interval}m.timemachine" : "#{$current_day}.timemachine"
     $timemachine_master_output_dir = "#{$current_day}.timemachine"
     extra_flags = ""
+    extra_flags += "--skip-trailer " if $skip_trailer
     extra_flags += "--skip-leader " if $skip_leader
     extra_flags += "--skip-videos --preserve-source-tiles " if $skip_videos
     extra_flags += "--sort-by-exif-dates" if $sort_by_exif_dates
@@ -491,11 +522,11 @@ class Compiler
       puts "ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}"
       system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}")
     end
-    puts "Time Machine created."
+    puts "[#{Time.now}] Time Machine created."
     add_entry_to_json
-    rsync_output_files if $rsync_output && $run_append_externally
-    append_new_segments if $create_videoset_segment_directory
-    rsync_output_files($timemachine_master_output_dir) if $rsync_output && !$run_append_externally
+    rsync_output_files if $rsync_output and $run_append_externally
+    append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
+    rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
     rsync_location_json if $rsync_location_json
     trim_ssd if $ssd_mount
     completed_process
@@ -544,8 +575,6 @@ class Compiler
     # Rsync does allow us to send partial data and thus only the new segments would be sent, which we will take advantage of if we can, but if
     # we do not have rsync, at least the append script is separate and we have the choice to handle things outside this master script.
     output_path = $timemachine_output_path
-    ssh_to_host_param = ""
-    extra_ssh_command = ""
     if $rsync_output && $run_append_externally
       args = $output_path.split(":")
       host = args[0]
@@ -557,12 +586,83 @@ class Compiler
     else
       # TODO: Appending script assumed to be in the same directory from which we called the script currently running. Also assumes ruby is installed and in the PATH.
       #cmd = "ruby #{File.join(File.dirname(__FILE__), 'append_breathecam_videos.rb')} #{output_path}/#{$timemachine_master_output_dir} #{output_path}/#{$timemachine_output_dir} #{$num_jobs}"
-      append_and_cut("#{output_path}/#{$timemachine_master_output_dir}", "#{output_path}/#{$timemachine_output_dir}")
+      if $append_inplace
+        append_and_cut_inplace("#{output_path}/#{$timemachine_master_output_dir}", "#{output_path}/#{$timemachine_output_dir}", !$create_videoset_segment_directory)
+      else
+        append_and_cut("#{output_path}/#{$timemachine_master_output_dir}", "#{output_path}/#{$timemachine_output_dir}")
+      end
     end
   end
 
+  def append_and_cut_inplace(path_to_master_videoset, path_to_new_videoset, suffix_only)
+    FileUtils.touch(File.join($working_dir, "WIP2"))
+
+    path_to_trailer = File.join(File.expand_path(File.dirname(__FILE__)), "suffix_10_600p.mp4")
+    master_videos = Dir.glob("#{path_to_master_videoset}/crf*/*/*/*.mp4").sort
+
+    if suffix_only
+      puts "[#{Time.now}] Appending black frames to initial master set."
+      Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
+        # Take master and append the black frame chunk to it. Also prepare the file for future frames.
+        system("concatenate-mp4-videos.py #{master_video} #{path_to_trailer} --future_frames=#{$future_appending_frames}")
+      end
+    else
+      puts "[#{Time.now}] Appending current set to master video files."
+
+      path_to_master_r_json = Dir.glob("#{path_to_master_videoset}/crf*/r.json").first
+      path_to_new_r_json = Dir.glob("#{path_to_new_videoset}/crf*/r.json").first
+      path_to_master_tm_json = "#{path_to_master_videoset}/tm.json"
+      path_to_new_tm_json = "#{path_to_new_videoset}/tm.json"
+      path_to_ajax_includes = "#{path_to_master_videoset}/ajax_includes.js"
+      path_to_ajax_includes_updater = "#{path_to_master_videoset}/update_ajax_includes.rb"
+
+      master_r_json = open(path_to_master_r_json) {|fh| JSON.load(fh)}
+      num_frames = master_r_json["frames"].to_f
+
+      new_r_json = open(path_to_new_r_json) {|fh| JSON.load(fh)}
+      additional_frame_count = new_r_json["frames"].to_i
+
+      next_segment_videos = Dir.glob("#{path_to_new_videoset}/crf*/*/*/*.mp4").sort
+
+      Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
+        next_segment_video = next_segment_videos[index]
+        # Take master without the black frame chunk at the end, append the new segment, and then append the black frame chunk
+        system("concatenate-mp4-videos.py '#{master_video}[0:-1]' #{next_segment_video} #{path_to_trailer}")
+      end
+
+      tmp_time = Time.now
+
+      # Update r.json with the new number of frames being added.
+      master_r_json["frames"] = num_frames.to_i + additional_frame_count
+      tmp_path_to_master_r_json = path_to_master_r_json + "_#{tmp_time}"
+      open(tmp_path_to_master_r_json, "w") {|fh| fh.puts(JSON.pretty_generate(master_r_json))}
+      FileUtils.mv(tmp_path_to_master_r_json, path_to_master_r_json, :force => true)
+
+      # Update tm.json with capture times for the new frames being added.
+      master_tm_json = open(path_to_master_tm_json) {|fh| JSON.load(fh)}
+      new_tm_json = open(path_to_new_tm_json) {|fh| JSON.load(fh)}
+      master_tm_json["capture-times"] += new_tm_json["capture-times"]
+      tmp_path_to_master_tm_json = path_to_master_tm_json + "_#{tmp_time}"
+      open(tmp_path_to_master_tm_json, "w") {|fh| fh.puts(JSON.generate(master_tm_json))}
+      FileUtils.mv(tmp_path_to_master_tm_json, path_to_master_tm_json, :force => true)
+
+      # Update ajax_includes.js based on the new changes made to the json above.
+      system("ruby #{path_to_ajax_includes_updater}")
+
+      # Remove the new set since we just finished appending it to the master.
+      FileUtils.rm_rf("#{path_to_new_videoset}")
+    end
+
+    # No qt-faststart required, since concatenate-mp4-videos.py already does the work and in fact, running qt-faststart
+    # at this point removes the free buffer just added, which was there to speed up future appends.
+
+    puts "[#{Time.now}] Finished inplace appending new files."
+
+    FileUtils.rm(File.join($working_dir, "WIP2"))
+  end
+
   def append_and_cut(path_to_master_videoset, path_to_new_videoset)
-    FileUtils.touch(File.join($working_dir,"WIP2"))
+    FileUtils.touch(File.join($working_dir, "WIP2"))
     puts "[#{Time.now}] Cutting garbage frames from the beginning/end and then appending current set to master video files."
     path_to_master_r_json = Dir.glob("#{path_to_master_videoset}/crf*/r.json").first
     path_to_new_r_json = Dir.glob("#{path_to_new_videoset}/crf*/r.json").first
@@ -601,7 +701,7 @@ class Compiler
         # and create these frames on the fly, rather than use a pre-computed file.
         # It is faster this way, but we cannot always assume this fixed size, which is true
         # for a day of breathecam.
-        leader_path = File.join(File.expand_path(File.dirname(__FILE__)), "leader_70.mp4")
+        leader_path = File.join(File.expand_path(File.dirname(__FILE__)), "leader_70_600p.mp4")
         leader_bytes_per_pixel={
           30 => 2701656.0 / (vid_width * vid_height * 90),
           28 => 2738868.0 / (vid_width * vid_height * 80),
@@ -691,19 +791,16 @@ class Compiler
       # Update ajax_includes.js based on the new changes made to the json above.
       system("ruby #{path_to_ajax_includes_updater}")
 
-      FileUtils.rm(File.join($working_dir,"WIP2"))
+      FileUtils.rm(File.join($working_dir, "WIP2"))
 
-      # Run qt-faststart. ffmpeg should be able to do this with '-movflags faststart' but apparently it does not actually do it. Perhaps because we are concatenating or copying streams?
+      # Run qt-faststart. ffmpeg should be able to do this with '-movflags faststart' but apparently it does not actually do it.
       # TODO: We assume qtfaststart is in the PATH
-      # Once we go past 9pm, this process takes too long to fit in our 10 minute window. So, we skip it and will do it again once we rsync over the next day.
+      # Once we go past 5pm or so, our appends may take too long to also run qt-faststart in our 10 min window.
+      # So, we skip the following for the time being and do it again once we rsync over the next day.
       unless $skip_qtfaststart_append
         curr_hour = Time.now.hour
         if curr_hour < 17 and (curr_hour != 0 or $current_day == Date.today.to_s)
-          puts "[#{Time.now}] Running qt-faststart"
-          system("find #{path_to_master_videoset}/crf*/0 -type f -name '*.mp4' -exec qtfaststart {} \\;")
-          system("find #{path_to_master_videoset}/crf*/1 -type f -name '*.mp4' -exec qtfaststart {} \\;")
-          system("find #{path_to_master_videoset}/crf*/2 -type f -name '*.mp4' -exec qtfaststart {} \\;")
-          system("find #{path_to_master_videoset}/crf*/3 -type f -name '*.mp4' -exec qtfaststart {} \\;")
+          run_qtfaststart(path_to_master_videoset)
         end
       end
 
@@ -728,6 +825,11 @@ class Compiler
     end
   end
 
+  def run_qtfaststart(path_to_master_videoset)
+    puts "[#{Time.now}] Running qt-faststart"
+    system("find #{path_to_master_videoset}/crf*/ -type f -name '*.mp4' -exec qtfaststart {} \\;")
+  end
+
   def rsync_output_files(dir_to_rsync)
     dir_to_rsync ||= "#{$timemachine_output_dir}"
     puts "[#{Time.now}] Rsyncing #{$timemachine_output_path}/#{dir_to_rsync} to #{$output_path}"
@@ -737,10 +839,12 @@ class Compiler
   def rsync_location_json
     unless $create_videoset_segment_directory
       puts "[#{Time.now}] Rsyncing #{$camera_location}.js{on} to #{$output_path}"
-      args = $input_path.split(":")
+      args = $output_path.split(":")
       host = args[0]
+      src_path = args[1] || args[0]
       extra_ssh_command = ". $HOME/.profile;"
-      system("ssh #{host} \"#{extra_ssh_command} ruby modify_breathecam_json.rb #{$output_path} #{$camera_type} #{$camera_location} #{$current_day}\"")
+      puts "ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$camera_type} #{$camera_location} #{$current_day}\""
+      system("ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$camera_type} #{$camera_location} #{$current_day}\"")
       #system("rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{$output_path}")
     end
   end
