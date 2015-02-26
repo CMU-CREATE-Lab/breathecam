@@ -1,13 +1,16 @@
 #!/bin/sh
 
+ADMIN="pdille@cmucreatelab.org"
 file="/workspace/*tmc/WIP2"
 file2="/workspace/*tmc/WIP"
 
+echo "Subject: Reboot detected [eom]" | /usr/sbin/sendmail $ADMIN
+
 if ls $file >/dev/null 2>&1;
 then
-        echo "Breathecam script was stopped in a spot that requires non-trivial work to recover."
+  echo "Breathecam script was stopped in a spot that requires non-trivial work to recover."
 else
-        rm $file2
+  rm $file2
 fi
 
 exit 0
