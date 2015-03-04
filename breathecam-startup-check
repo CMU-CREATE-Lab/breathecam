@@ -4,7 +4,7 @@ ADMIN="pdille@cmucreatelab.org"
 file="/workspace/*tmc/WIP2"
 file2="/workspace/*tmc/WIP"
 
-echo "Subject: Reboot detected [eom]" | /usr/sbin/sendmail $ADMIN
+echo "Subject: Reboot detected on $(hostname) [eom]" | /usr/sbin/sendmail $ADMIN
 
 if ls $file >/dev/null 2>&1;
 then
