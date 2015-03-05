@@ -121,21 +121,22 @@ if (!window['$']) {
   // instead of "new RegExp()" for better performance (see https://developer.mozilla.org/en/JavaScript/Guide/Regular_Expressions)
   var SPLIT_VIDEO_FRAGMENT_URL_PATTERN = /_(\d+).(mp4|webm)(?:\?time=[0-9]+)?$/i;
 
-  org.gigapan.timelapse.Videoset = function(viewerDivId, videoDivId, timelapse, canvasId, canvasTmpId) {
+  org.gigapan.timelapse.Videoset = function(viewerDivId, videoDivId, timelapse, canvasId, blackFrameDetectionCanvasId) {
     var mediaType = UTIL.getMediaType();
     var viewerType = UTIL.getViewerType();
     var videoDiv = document.getElementById(videoDivId);
-    if (viewerType == "canvas") {
+    if (viewerType != "video") {
       var canvas = document.getElementById(canvasId);
       var canvasContext = canvas.getContext('2d');
-      var canvasTmp = document.getElementById(canvasTmpId);
-      if (canvasTmp) {
-        var canvasTmpContext = canvasTmp.getContext('2d');
+      var blackFrameDetectionCanvas = document.getElementById(blackFrameDetectionCanvasId);
+      if (blackFrameDetectionCanvas) {
+        var blackFrameDetectionCanvasContext = blackFrameDetectionCanvas.getContext('2d');
       }
     }
     var isStatusLoggingEnabled = false;
     var activeVideos = {};
     var inactiveVideos = {};
+    var currentlyShownVideo = null;
     var playbackRate = 1;
     var id = 0;
     var fps = 25;
@@ -238,10 +239,11 @@ if (!window['$']) {
     };
 
     this.setLeader = function(newLeader) {
+      timeOffset = 0;
       var currentTime = _getCurrentTime();
       // Subtract 0 to force this to be a number
       leader = newLeader - 0;
-      _seek(currentTime);
+      //_seek(currentTime);
     };
 
     this.getLeader = function() {
@@ -320,9 +322,6 @@ if (!window['$']) {
       video.id = currentVideoId;
       video.active = true;
       video.ready = false;
-      if ( typeof videoBeingReplaced !== 'undefined' && videoBeingReplaced != null) {
-        video.idOfVideoBeingReplaced = videoBeingReplaced.id;
-      }
 
       // Add methods getCurrentTime() and setCurrentTime() to the video.  We MUST use these methods instead of accessing
       // the currentTime property directly so that we can abstract away the time offset calculations required for split
@@ -357,7 +356,11 @@ if (!window['$']) {
           return this.currentTime;
         };
         video.setCurrentTime = function(newTime) {
-          this.currentTime = newTime;
+          // If we rapidly zoom, then we may have old lingering videos that we attempt to seek on.
+          // Make sure we only seek the current video.
+          if (this.id == currentVideoId) {
+            this.currentTime = newTime;
+          }
         };
       }
 
@@ -365,6 +368,11 @@ if (!window['$']) {
       // https://code.google.com/p/chromium/issues/detail?id=31014
       if (isChrome && doChromeCacheBreaker) {
         var creationTime = (new Date()).getTime();
+        // The src may be a relative path. When we later call video.src we always get an absolute path,
+        // so we need to ensure that we always store absolute paths.
+        if (src.substring(0, 2) == "./" || src.substring(0, 3) == "../") {
+          src = UTIL.relativeToAbsolutePath(src);
+        }
         if (activeVideoSrcList[src]) {
           UTIL.log("Video found in local storage, adding cache breaker: " + src);
           src = src + "?time=" + creationTime
@@ -381,7 +389,7 @@ if (!window['$']) {
         video.setAttribute('controls', true);
       }
       video.setAttribute('preload', 'auto');
-      if (viewerType == "canvas") {
+      if (viewerType != "video") {
         video.geometry = {};
       }
       _repositionVideo(video, geometry);
@@ -401,19 +409,10 @@ if (!window['$']) {
           target: video
         });
       }
+
+      _deleteUnneededVideos();
+
       if (isOperaLegacy) {
-        // Opera <= 12 seems to queue too many videos and then gets stuck in the stalling state.
-        // This ensures that we remove old videos that are no longer necessary, specifically
-        // *really* old ones that never got removed for some reason.
-        if (viewerType == "canvas") {
-          for (var videoId in activeVideos) {
-            var videoIdArray = videoId.split("_");
-            var videoIdNum = videoIdArray[videoIdArray.length - 1];
-            if (id - 2 > videoIdNum) {
-              _deleteVideo(activeVideos[videoDiv.id + "_" + videoIdNum]);
-            }
-          }
-        }
         // Videos in Opera <= 12 often seem to get stuck in a state of always seeking.
         // This will ensure that if we are stuck, we reload the video.
         video.addEventListener('seeking', videoSeeking, false);
@@ -428,28 +427,28 @@ if (!window['$']) {
       // just in case the issue still exists in Chrome. From some testing,
       // it is not clear whether the bug still exists in situations of
       // low bandwidth or high tile server load.
-      if (isChrome && (doChromeSeekableHack /*|| doChromeBufferedHack*/)) {
-        var check;
-        var timeout = 2000;
-        check = function() {
-          UTIL.log("check load for video(" + video.id + ")");
-          UTIL.log("readyState: " + video.readyState);
-          if ((video.seekable.length == 0 /*|| video.buffered.length == 0*/) && activeVideos[video.id] == video) {
-            // Ouch.  A brand new bug in Chrome 15 (apparently) causes videos to never load
-            // if they've been loaded recently and are being loaded again now.
-            // It's pretty weird, but this disgusting code seems to work around the problem.
-            //
-            // 20130509: Added seekable case as well, which seems to occur when Chrome tries
-            // to receive a video from a server under heavy load. Very strange.
-            UTIL.log("Chrome bug detected, adding cache buster");
-            video.setAttribute('src', src + "?time=" + (new Date().getTime()));
-            video.load();
-            if (advancing)
-              video.play();
-          }
-        };
-        setTimeout(check, timeout);
-      }
+      //if (isChrome && (doChromeSeekableHack /*|| doChromeBufferedHack*/)) {
+      //  var check;
+      //  var timeout = 2000;
+      //  check = function() {
+      //    UTIL.log("check load for video(" + video.id + ")");
+      //    UTIL.log("readyState: " + video.readyState);
+      //    if ((video.seekable.length == 0 /*|| video.buffered.length == 0*/) && activeVideos[video.id] == video) {
+      //      // Ouch.  A brand new bug in Chrome 15 (apparently) causes videos to never load
+      //      // if they've been loaded recently and are being loaded again now.
+      //      // It's pretty weird, but this disgusting code seems to work around the problem.
+      //      //
+      //      // 20130509: Added seekable case as well, which seems to occur when Chrome tries
+      //      // to receive a video from a server under heavy load. Very strange.
+      //      UTIL.log("Chrome seek bug detected, adding cache buster");
+      //      video.setAttribute('src', src + "?time=" + (new Date().getTime()));
+      //      video.load();
+      //      if (advancing)
+      //        video.play();
+      //    }
+      //  };
+      //  setTimeout(check, timeout);
+      //}
 
       publishVideoEvent(video.id, 'video-added', currentTime);
 
@@ -457,7 +456,7 @@ if (!window['$']) {
 
       mostRecentlyAddedVideo = video;
 
-      if (viewerType == "canvas") {
+      if (viewerType != "video") {
         video.addEventListener('playing', function() {
           if (video.drawIntervalId == null)
             video.drawIntervalId = setInterval(function() {
@@ -479,6 +478,33 @@ if (!window['$']) {
     };
     this.addVideo = _addVideo;
 
+    var _idNumFromVideo = function(video) {
+      var videoIdArray = video.id.split("_");
+      return videoIdArray[videoIdArray.length - 1] - 0;
+    };
+
+    var _videoName = function(video) {
+      return 'video(' + _idNumFromVideo(video) + ')';
+    }
+    this.videoName = _videoName;
+
+    var _deleteUnneededVideos = function() {
+      var lastValidId = id - 1; // Delete any videos earlier than the one most recently requested
+
+      if (currentlyShownVideo) {
+        // Delete any videos earlier than currently shown video
+        lastValidId = Math.max(lastValidId, _idNumFromVideo(currentlyShownVideo));
+      }
+
+      for (var videoId in activeVideos) {
+        var video = activeVideos[videoId];
+        if (video != currentlyShownVideo && _idNumFromVideo(video) < lastValidId) {
+          _deleteVideo(video);
+        }
+      }
+    }
+    this.deleteUnneededVideos = _deleteUnneededVideos;
+
     var _repositionVideo = function(video, geometry) {
       //UTIL.log("video(" + video.id + ") reposition to left=" + geometry.left + ",top=" + geometry.top + ", w=" + geometry.width + ",h=" + geometry.height + "; ready="+video.ready);
       if (viewerType == "video") {
@@ -489,7 +515,7 @@ if (!window['$']) {
         video.style.width = geometry.width + "px";
         video.style.height = geometry.height + "px";
         video.geometry = geometry;
-      } else if (viewerType == "canvas") {
+      } else {
         video.geometry = geometry;
         drawToCanvas(video);
       }
@@ -509,7 +535,7 @@ if (!window['$']) {
       var currentTimeInMs = (new Date()).getTime();
       for (var videoSrc in activeVideoSrcList) {
         // Check if >= 1 day or if we just need to delete the item
-        if ((checkTimestamps && (currentTimeInMs - activeVideoSrcList[videoSrc] >= 86400000)) || typeof(checkTimestamps) !== 'boolean') {
+        if ((checkTimestamps && (currentTimeInMs - activeVideoSrcList[videoSrc] >= 86400000)) || typeof (checkTimestamps) !== 'boolean') {
           delete activeVideoSrcList[videoSrc];
         }
       }
@@ -558,7 +584,7 @@ if (!window['$']) {
       video.removeEventListener('seeking', videoSeeking, false);
       video.removeEventListener('seeked', videoSeeked, false);
 
-      if (viewerType == "canvas") {
+      if (viewerType != "video") {
         clearInterval(video.drawIntervalId);
         video.drawIntervalId = null;
       }
@@ -739,7 +765,8 @@ if (!window['$']) {
     };
 
     this.setPlaybackRate = function(rate) {
-      if (isSafari && rate > 0 && rate <= 0.25) rate = 0.5;
+      if (isSafari && rate > 0 && rate <= 0.25)
+        rate = 0.5;
 
       if (rate != playbackRate) {
         var t = _getCurrentTime();
@@ -785,7 +812,6 @@ if (!window['$']) {
         if (!eventListeners[eventName]) {
           eventListeners[eventName] = [];
         }
-
         eventListeners[eventName].push(listener);
       }
     };
@@ -988,6 +1014,8 @@ if (!window['$']) {
       }
 
       video.ready = true;
+      currentlyShownVideo = video;
+
       if (viewerType == "video") {
         video.style.left = parseFloat(video.style.left) + 100000 + "px";
       }
@@ -996,29 +1024,17 @@ if (!window['$']) {
       publishVideoEvent(video.id, 'video-made-visible', new Date(), id);
       UTIL.log("video(" + video.id + ") _makeVideoVisible(" + callingFunction + "): ready=[" + video.ready + "] error=[" + error + "] " + videoStats(video));
 
-      if (viewerType == "canvas") {
+      if (viewerType != "video") {
         drawToCanvas(video);
       }
+
+      // Delete all videos earlier than new visible video
 
       // Delete video which is being replaced, following the chain until we get to a null.  We do this in a timeout
       // to give the browser a chance to update the GUI so that it can render the new video positioned above.  This
       // (mostly) fixes the blanking problem we saw in Safari.
       var timeoutLength = (viewerType == "video") ? 5 : 0;
-      window.setTimeout(function() {
-        var videoToDelete = activeVideos[video.idOfVideoBeingReplaced];
-        var chainOfDeletes = "";
-        //var deletedVideoUrls = [];
-        while (videoToDelete) {
-          //deletedVideoUrls.push(videoToDelete.src);
-          var nextVideoToDelete = activeVideos[videoToDelete.idOfVideoBeingReplaced];
-          delete videoToDelete.idOfVideoBeingReplaced;
-          // Delete this to prevent multiple deletes
-          chainOfDeletes += videoToDelete.id + ",";
-          _deleteVideo(videoToDelete, video);
-          videoToDelete = nextVideoToDelete;
-        }
-        UTIL.log("video(" + video.id + ") _makeVideoVisible(" + callingFunction + "): chain of deletes: " + chainOfDeletes);
-      }, timeoutLength);
+      window.setTimeout(_deleteUnneededVideos, timeoutLength);
     };
 
     var videoSeeking = function(event) {
@@ -1035,7 +1051,7 @@ if (!window['$']) {
       if (video.active == false)
         return;
 
-      if (viewerType == "canvas") {
+      if (viewerType != "video") {
         if (isIE9) {
           // IE 9 is lying, it has not fully seeked yet
           setTimeout(function() {
@@ -1148,21 +1164,6 @@ if (!window['$']) {
         spinnerTimeoutId = window.setTimeout(function() {
           timelapse.showSpinner(viewerDivId);
         }, 250);
-        // TODO: stop streaming old videos
-        if (viewerType == "canvas") {
-          for (var videoId in activeVideos) {
-            if (videoId != currentVideoId && !activeVideos[videoId].ready) {
-              if (isIE9)
-                activeVideos[videoId].canDraw = false;
-              try {
-                activeVideos[videoId].pause();
-              } catch(e) {
-                UTIL.error(e.name + " while pausing " + activeVideos[videoId] + " in stall(). Most likely you are running IE 9.");
-              }
-              stopStreaming(activeVideos[videoId]);
-            }
-          }
-        }
         notifyStallEventListeners();
         _updateVideoAdvance();
       }
@@ -1363,11 +1364,11 @@ if (!window['$']) {
       if (video.active && video.ready && !video.seeking && video.readyState >= 2 && video.canDraw == true) {
         // Black frame detection
         var videoGeometry = video.geometry;
-        if (canvasTmp) {
-          canvasTmpContext.clearRect(0, 0, canvasTmp.width, canvasTmp.height);
-          canvasTmpContext.drawImage(video, videoGeometry.left, videoGeometry.top, videoGeometry.width, videoGeometry.height);
+        if (blackFrameDetectionCanvas) {
+          blackFrameDetectionCanvasContext.clearRect(0, 0, blackFrameDetectionCanvas.width, blackFrameDetectionCanvas.height);
+          blackFrameDetectionCanvasContext.drawImage(video, videoGeometry.left, videoGeometry.top, videoGeometry.width, videoGeometry.height);
 
-          var image = canvasTmpContext.getImageData(0, 0, canvasTmp.width, canvasTmp.height);
+          var image = blackFrameDetectionCanvasContext.getImageData(0, 0, blackFrameDetectionCanvas.width, blackFrameDetectionCanvas.height);
           var imgData = image.data;
           var len = imgData.length;
 

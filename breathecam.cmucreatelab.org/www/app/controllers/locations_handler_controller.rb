@@ -1,8 +1,35 @@
 class LocationsHandlerController < ApplicationController
+  require 'date'
+  require 'fileutils'
 
   # We would need to pass a token back with each request,
   # but the arduino does not know this value, so we just skip this.
-  protect_from_forgery :except => [:receive_data]
+  protect_from_forgery :except => [:receive_data, :upload]
+
+  def upload
+    if params[:id]
+      current_date = Date.today.to_s
+      directory = File.join(Rails.public_path, "upload", params[:id], "050-original-images", current_date)
+      FileUtils.mkdir_p(directory)
+      num_images = params[:images].length
+      params[:images].each_with_index do |image, index|
+        name = image.original_filename
+        path = File.join(directory, name)
+        File.open(path, "wb") { |f| f.write(image.read) }
+        if index == num_images - 1
+          latest_stitch_directory = File.join(directory, "latest_stitch")
+          FileUtils.mkdir_p(latest_stitch_directory)
+          FileUtils.rm_rf(Dir.glob("#{latest_stitch_directory}/*"))
+          latest_stitch_path = File.join(latest_stitch_directory, File.basename(name , File.extname(name)).chomp("_image") + "_full" + File.extname(name))
+          FileUtils.cp(path, latest_stitch_path)
+        end
+      end
+    end
+    respond_to do |format|
+      format.json { render json: { "success" => true } }
+      format.all { head :ok, :content_type => 'application/json' }
+    end
+  end
 
   def receive_data
     isValidRequest = false

@@ -3,7 +3,7 @@
     /* Handle old share links when the index page was poiting to the Heinz breathecam */
     var locationArray = window.location.href.split("#");
     if (locationArray.length > 1)
-      window.location.href = locationArray[0] + "locations/heinz#" + locationArray[1];
+      window.location.href = locationArray[0] + "/embeds/heinz#" + locationArray[1];
   </script>
 <% end %>
 
@@ -11,7 +11,7 @@
   <table>
     <tr>
       <td class="thumbnail">
-        <a href="<%= url_for :controller => 'locations', :location => 'heinz'%>">
+        <a href="/embeds/heinz">
           <div>
             <%= image_tag("heinz.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Heinz</div>
@@ -22,7 +22,7 @@
     </tr>
     <tr>
       <td class="thumbnail">
-        <a href="<%= url_for :controller => 'locations', :location => 'trimont1'%>">
+        <a href="/embeds/trimont1">
           <div>
             <%= image_tag("trimont1.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Trimont</div>
@@ -33,7 +33,7 @@
     </tr>
     <tr>
       <td class="thumbnail">
-        <a href="<%= url_for :controller => 'locations', :location => 'walnuttowers1'%>">
+        <a href="/embeds/walnuttowers1">
           <div>
             <%= image_tag("walnuttowers1.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Walnut Towers</div>
@@ -44,7 +44,7 @@
     </tr>
     <tr>
       <td class="thumbnail">
-        <a href="<%= url_for :controller => 'locations', :location => 'pitt1'%>">
+        <a href="/embeds/pitt1">
           <div>
             <%= image_tag("pitt1.png", :class=>"thumbnail-image") %>
             <div class="thumbnail-title">Benedum Hall</div>

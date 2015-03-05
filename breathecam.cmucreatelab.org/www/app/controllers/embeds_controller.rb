@@ -5,7 +5,7 @@ class EmbedsController < ApplicationController
   layout 'embed'
 
   def index
-    subdomain = request.subdomains(0).first
+    subdomain = request.subdomains(0).first || "breathecam"
     @location_id = params['location']
     @root_url = "http://tiles.#{subdomain}.cmucreatelab.org"
     date_today = Date.today

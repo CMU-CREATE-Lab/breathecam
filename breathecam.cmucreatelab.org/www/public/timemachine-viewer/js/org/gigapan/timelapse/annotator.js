@@ -37,9 +37,7 @@
 
  Authors:
  Paul Dille (pdille@andrew.cmu.edu)
-*/
-
-"use strict";
+ */"use strict";
 
 //
 // VERIFY NAMESPACE
@@ -98,11 +96,13 @@ if (!window['$']) {
 //
 (function() {
   var UTIL = org.gigapan.Util;
-  org.gigapan.timelapse.Annotator = function(annotatorDivId, timelapse) {
+  org.gigapan.timelapse.Annotator = function(timelapse) {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Class variables
     //
+    var timeMachineDivId = timelapse.getTimeMachineDivId();
+    var annotatorDivId = timeMachineDivId + " .annotator";
     var $annotatorDivObj = $("#" + annotatorDivId);
     var videoDivId = timelapse.getVideoDivId();
     var videoDiv = document.getElementById(videoDivId);
@@ -112,6 +112,8 @@ if (!window['$']) {
     var annotationStage;
     var annotationLayer;
     var annotationList = [];
+    var $addAnnotationCheckbox;
+    var $moveAnnotationCheckbox;
 
     var canAddAnnotation = false;
     var canMoveAnnotation = false;
@@ -123,6 +125,32 @@ if (!window['$']) {
     //
     // Public methods
     //
+    var resetToolbar = function() {
+      if ($addAnnotationCheckbox.is(":checked"))
+        $addAnnotationCheckbox.click();
+      if ($moveAnnotationCheckbox.is(":checked"))
+        $moveAnnotationCheckbox.click();
+    };
+    this.resetToolbar = resetToolbar;
+
+    var resizeUI = function() {
+      var viewportHeight = timelapse.getViewportHeight();
+      var viewportWidth = timelapse.getViewportWidth();
+      annotationStage.setSize(viewportWidth, viewportHeight);
+      annotationLayer.draw();
+      var newTop = viewportHeight - 2;
+      $("#" + annotatorDivId).css({
+        "position": "absolute",
+        "top": newTop + "px",
+        "left": "0px",
+        "right": "0px",
+        "bottom": "",
+        "width": "auto",
+        "height": ""
+      });
+    };
+    this.resizeUI = resizeUI;
+
     var setCanAddAnnotation = function(status) {
       canAddAnnotation = status;
     };
@@ -242,7 +270,7 @@ if (!window['$']) {
       }
     };
 
-    function createAnnotation(id, xPos, yPos, minZoom, startTime, endTime, kineticObj, type) {
+    function createAnnotation(id, xPos, yPos, minZoom, startTime, endTime, kineticObj, type, time, zoom) {
       return {
         id: id,
         xPos: xPos,
@@ -251,7 +279,9 @@ if (!window['$']) {
         startTime: startTime,
         endTime: endTime,
         kineticObj: kineticObj,
-        type: type
+        type: type,
+        time: time,
+        zoom: zoom
       };
     }
 
@@ -284,15 +314,15 @@ if (!window['$']) {
               x: annotation.xPos,
               y: annotation.yPos
             },
-            zoom: annotation.minZoom
+            zoom: annotation.zoom
           }, true);
-          timelapse.seek(annotation.startTime);
+          timelapse.seek(annotation.time);
         }
       }
     }
 
-    function addAnnotation(id, xPos, yPos, minZoom, startTime, endTime, kineticObj, type) {
-      var newAnnot = createAnnotation(id, xPos, yPos, minZoom, startTime, endTime, kineticObj, type);
+    function addAnnotation(id, xPos, yPos, minZoom, startTime, endTime, kineticObj, type, time, zoom) {
+      var newAnnot = createAnnotation(id, xPos, yPos, minZoom, startTime, endTime, kineticObj, type, time, zoom);
       annotationList.push(newAnnot);
       var annotListItem = document.createElement("div");
       annotListItem.id = kineticObj.attrs.id + "_item";
@@ -303,8 +333,16 @@ if (!window['$']) {
       content += '<table style="vertical-align:middle;">';
       content += '	<tr><td>Marker Src: </td><td><input type="text" id="' + annotListItem.id + "_marker_src" + '" size="23" value="' + $(kineticObj.getImage()).attr("src") + '"></td></tr>';
       content += '	<tr><td>Min Zoom: </td><td><input type="text" id="' + annotListItem.id + "_minZoom" + '" size="2" value="' + minZoom + '"></td></tr>';
-      content += '	<tr><td>Start Time: </td><td><input type="text" id="' + annotListItem.id + "_startTime" + '" size="2" value="' + startTime + '"> ' + 'End Time: <input type="text" id="' + annotListItem.id + "_endTime" + '" size="2" value="' + endTime + '"></td></tr>';
-      content += '	<tr><td>Type:</td><td><input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="audio"> Audio ' + '<input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="image"> Image ' + '<input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="video"> Video ' + '<input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="javascript"> JavaScript</td></tr>';
+      content += '  <tr><td>Start Time: </td><td><input type="text" id="' + annotListItem.id + "_startTime" + '" size="2" value="' + startTime + '"> ' + 'End Time: <input type="text" id="' + annotListItem.id + "_endTime" + '" size="2" value="' + endTime + '"></td></tr>';
+      content += '	<tr>'
+      content += '    <td>Type:</td>'
+      content += '    <td>'
+      content += '      <input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="image"> Image';
+      content += '      <input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="audio"> Audio';
+      content += '      <input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="video"> Video';
+      //content += '      <input type="radio" name="' + annotListItem.id + "_" + 'annotationType" value="javascript"> JavaScript';
+      content += '    </td>';
+      content += '  </tr>';
       content += '	<tr><td>Src: </td><td><input type="text" id="' + annotListItem.id + "_type_src" + '" size="37"></td></tr>';
       content += '	<tr style="display:none"><td valign="top">Code: </td><td><textarea id="' + annotListItem.id + "_javascript_code" + '" rows="8" cols="29"></textarea></td></tr>';
       content += '</table>';
@@ -411,7 +449,7 @@ if (!window['$']) {
 
       // Delect the item
       $annotListItem.get(0).triggerWarpAndSeek = false;
-      UTIL.selectSelectableElements($("#" + annotatorDivId + " .annotation_list"), $annotListItem);
+      UTIL.selectSelectableElements($("#" + annotatorDivId + " .annotation_list"), $annotListItem, true);
       // Hide the last annotation item's right border
       hideLastAnnotationItemBorder();
       handleAnnotatorModeToolbarChange();
@@ -482,6 +520,8 @@ if (!window['$']) {
         annotation["min-zoom"] = annotationList[i].minZoom;
         annotation["start-time"] = annotationList[i].startTime;
         annotation["end-time"] = annotationList[i].endTime;
+        annotation["time"] = annotationList[i].time;
+        annotation["zoom"] = annotationList[i].zoom;
         annotatorJSON['annotator']['annotations'].push(annotation);
       }
       return JSON.stringify(annotatorJSON, null, 3);
@@ -516,13 +556,13 @@ if (!window['$']) {
           UTIL.log("Found [" + obj['annotator']['annotations'].length + "] annotations in the json:\n\n" + json);
           for (var i = 0; i < obj['annotator']['annotations'].length; i++) {
             var annotation = obj['annotator']['annotations'][i];
-            if ( typeof annotation['id'] != 'undefined' && typeof annotation['marker-src'] != 'undefined' && typeof annotation['type'] != 'undefined' && typeof annotation['type-src'] != 'undefined' && typeof annotation['x-pos'] != 'undefined' && typeof annotation['y-pos'] != 'undefined' && typeof annotation['min-zoom'] != 'undefined' && typeof annotation['start-time'] != 'undefined' && typeof annotation['end-time'] != 'undefined') {
-
-              addAnnotationFromLoad(annotation['id'], annotation['x-pos'], annotation['y-pos'], annotation['marker-src'], annotation['type'], annotation['type-src'], annotation['min-zoom'], annotation['start-time'], annotation['end-time']);
-
+            if ( typeof annotation['id'] != 'undefined' && typeof annotation['marker-src'] != 'undefined' && typeof annotation['type'] != 'undefined' && typeof annotation['type-src'] != 'undefined' && typeof annotation['x-pos'] != 'undefined' && typeof annotation['y-pos'] != 'undefined' && typeof annotation['min-zoom'] != 'undefined' && typeof annotation['start-time'] != 'undefined' && typeof annotation['end-time'] != 'undefined' && typeof annotation['time'] != 'undefined' && typeof annotation['zoom'] != 'undefined') {
+              addAnnotationFromLoad(annotation['id'], annotation['x-pos'], annotation['y-pos'], annotation['marker-src'], annotation['type'], annotation['type-src'], annotation['min-zoom'], annotation['start-time'], annotation['end-time'], annotation['time'], annotation['zoom']);
             } else {
               UTIL.error("Ignoring invalid annotation during annotator load.");
             }
+            if (i == obj['annotator']['annotations'].length - 1)
+              UTIL.selectSelectableElements($("#" + annotatorDivId + " .annotation_list"), $("#" + annotation['id']), true);
           }
         } else {
           UTIL.error("ERROR: Invalid annotation file.");
@@ -536,9 +576,9 @@ if (!window['$']) {
       return true;
     }
 
-    function addAnnotationFromLoad(id, xPos, yPos, markerSrc, type, typeSrc, minZoom, startTime, endTime) {
+    function addAnnotationFromLoad(id, xPos, yPos, markerSrc, type, typeSrc, minZoom, startTime, endTime, time, zoom) {
       var kineticImage = addKineticObj(xPos, yPos, markerSrc, true);
-      addAnnotation(kineticImage.attrs.id + "_item", xPos, yPos, minZoom, startTime, endTime, kineticImage, type);
+      addAnnotation(kineticImage.attrs.id + "_item", xPos, yPos, minZoom, startTime, endTime, kineticImage, type, time, zoom);
       annotationList[annotationList.length - 1].type_src = typeSrc;
 
       var $mediaSrcElem = $("#" + kineticImage.attrs.id + "_item_type_src");
@@ -609,6 +649,11 @@ if (!window['$']) {
         });
 
         kineticImage.on('click', function(e) {
+          console.log(timelapse.convertViewportToTimeMachine({
+            x: this.attrs.x,
+            y: this.attrs.y
+          }));
+
           if (e.metaKey || e.ctrlKey)
             return;
 
@@ -624,7 +669,7 @@ if (!window['$']) {
           // refresh event is actually fired.
           $annotationListItem.removeClass("ui-selected");
           $annotationListItem.get(0).willWarpAndSeek = false;
-          UTIL.selectSelectableElements($("#" + annotatorDivId + " .annotation_list"), $annotationListItem);
+          UTIL.selectSelectableElements($("#" + annotatorDivId + " .annotation_list"), $annotationListItem, true);
 
           var annotation = getAnnotationByListId($annotationListItem.get(0).id);
 
@@ -713,7 +758,7 @@ if (!window['$']) {
             videoTag.style.left = this.attrs.x + "px";
           } else if (annotation.type == "javascript") {
             // TODO: Possible security hole
-            eval(annotation.type_src);
+            //eval(annotation.type_src);
           } else {
             UTIL.log("Annotation click event: No type selected");
           }
@@ -734,25 +779,27 @@ if (!window['$']) {
             y: yPos
           });
           var currentTime = timelapse.getCurrentTime();
-          addAnnotation(kineticImage.attrs.id + "_item", timeMachinePosition.x, timeMachinePosition.y, timelapse.getCurrentZoom(), Math.max(currentTime - 1, 0).toFixed(2), Math.min(currentTime + 1, timelapse.getDuration()).toFixed(2), kineticImage, null);
+          //addAnnotation(kineticImage.attrs.id + "_item", timeMachinePosition.x, timeMachinePosition.y, timelapse.getCurrentZoom(), Math.max(currentTime - 1, 0).toFixed(2), Math.min(currentTime + 1, timelapse.getDuration()).toFixed(2), kineticImage, null);
+          addAnnotation(kineticImage.attrs.id + "_item", timeMachinePosition.x, timeMachinePosition.y, -1, 0, timelapse.getDuration().toFixed(2), kineticImage, null, currentTime, timelapse.getCurrentZoom());
         }
         annotationLayer.draw();
       };
 
-      annotationImg.src = (markerSrc) ? markerSrc : "images/map-pointer.png";
+      annotationImg.src = (markerSrc) ? markerSrc : "../images/map-pointer.png";
+      resetToolbar();
       return kineticImage;
     }
 
     function setupAnnotationLayer() {
-      var viewportWidth = timelapse.getViewportWidth();
       var viewportHeight = timelapse.getViewportHeight();
+      var viewportWidth = timelapse.getViewportWidth();
 
       // Load window
       $("#" + annotatorDivId + " .loadAnnotatorWindow").dialog({
         resizable: false,
         autoOpen: false,
         width: 400,
-        height: 700,
+        height: 400,
         create: function() {
           $(this).parents(".ui-dialog").css({
             'border': '1px solid #000'
@@ -770,7 +817,7 @@ if (!window['$']) {
         resizable: false,
         autoOpen: false,
         width: 400,
-        height: 700,
+        height: 400,
         create: function() {
           $(this).parents(".ui-dialog").css({
             'border': '1px solid #000'
@@ -846,49 +893,43 @@ if (!window['$']) {
       });
 
       $("#" + annotatorDivId).hide();
-
-      var newTop = $("#" + viewerDivId + " .timelineSliderFiller").outerHeight() + $("#" + viewerDivId + " .controls").outerHeight() + $tiledContentHolder.outerHeight() + $playerOffset.top - 1;
-      var newLeft = $playerOffset.left;
-      var newWidth = $tiledContentHolder.outerWidth() - 2;
-      $("#" + annotatorDivId + " .annotation_container").css("position", "absolute").css("top", newTop + "px").css("left", newLeft + "px").css("width", newWidth + "px");
     }
 
     // Create the annotator toolbar
-    // TODO: this is broken, we moved it out from timelapse.js
     var createAnnotatorModeToolbar = function() {
-      var $annotatorModeToolbar = $("#" + viewerDivId + " .annotatorModeToolbar");
+      var $annotatorModeToolbar = $("#" + annotatorDivId + " .annotatorModeToolbar");
       // Create add button
       $annotatorModeToolbar.append('<input type="checkbox" class="addAnnotationCheckbox"/>');
       $annotatorModeToolbar.append('<label class="addAnnotationLabel" title="Enable/Disable adding annotations (CTRL key or COMMAND key)">Add</label>');
-      var $addAnnotationCheckbox = $("#" + viewerDivId + " .addAnnotationCheckbox");
-      $addAnnotationCheckbox.attr("id", viewerDivId + "_addAnnotationCheckbox");
-      $("#" + viewerDivId + " .addAnnotationLabel").attr("for", viewerDivId + "_addAnnotationCheckbox");
+      $addAnnotationCheckbox = $("#" + annotatorDivId + " .addAnnotationCheckbox");
+      $addAnnotationCheckbox.attr("id", timeMachineDivId + "_addAnnotationCheckbox");
+      $("#" + annotatorDivId + " .addAnnotationLabel").attr("for", timeMachineDivId + "_addAnnotationCheckbox");
       $addAnnotationCheckbox.button({
         icons: {
           primary: "ui-icon-plus"
         },
         text: true
       }).change(function() {
-        var $hideAnnotationCheckbox = $("#" + viewerDivId + " .hideAnnotationCheckbox");
+        var $hideAnnotationCheckbox = $("#" + annotatorDivId + " .hideAnnotationCheckbox");
         if ($hideAnnotationCheckbox.is(":checked")) {
           $hideAnnotationCheckbox.prop("checked", false).button("refresh").change();
         }
         if ($addAnnotationCheckbox.is(":checked")) {
-          annotator.setCanAddAnnotation(true);
-          if (!$("#" + viewerDivId + " .moveAnnotationCheckbox").is(":checked"))
+          setCanAddAnnotation(true);
+          if (!$("#" + annotatorDivId + " .moveAnnotationCheckbox").is(":checked"))
             $hideAnnotationCheckbox.button("option", "disabled", true);
         } else {
-          annotator.setCanAddAnnotation(false);
-          if (!$("#" + viewerDivId + " .moveAnnotationCheckbox").is(":checked"))
+          setCanAddAnnotation(false);
+          if (!$("#" + annotatorDivId + " .moveAnnotationCheckbox").is(":checked"))
             $hideAnnotationCheckbox.button("option", "disabled", false);
         }
       });
       // Create move button
       $annotatorModeToolbar.append('<input type="checkbox" class="moveAnnotationCheckbox"/>');
       $annotatorModeToolbar.append('<label class="moveAnnotationLabel" title="Enable/Disable moving annotations (ALT key)">Move</label>');
-      var $moveAnnotationCheckbox = $("#" + viewerDivId + " .moveAnnotationCheckbox");
-      $moveAnnotationCheckbox.attr("id", viewerDivId + "_moveAnnotationCheckbox");
-      $("#" + viewerDivId + " .moveAnnotationLabel").attr("for", viewerDivId + "_moveAnnotationCheckbox");
+      $moveAnnotationCheckbox = $("#" + annotatorDivId + " .moveAnnotationCheckbox");
+      $moveAnnotationCheckbox.attr("id", timeMachineDivId + "_moveAnnotationCheckbox");
+      $("#" + annotatorDivId + " .moveAnnotationLabel").attr("for", timeMachineDivId + "_moveAnnotationCheckbox");
       $moveAnnotationCheckbox.button({
         icons: {
           primary: "ui-icon-arrow-4"
@@ -896,57 +937,56 @@ if (!window['$']) {
         text: true,
         disabled: true
       }).change(function() {
-        var $hideAnnotationCheckbox = $("#" + viewerDivId + " .hideAnnotationCheckbox");
-        var $addAnnotationCheckbox = $("#" + viewerDivId + " .addAnnotationCheckbox");
+        var $hideAnnotationCheckbox = $("#" + annotatorDivId + " .hideAnnotationCheckbox");
         if ($hideAnnotationCheckbox.is(":checked")) {
           $hideAnnotationCheckbox.prop("checked", false).button("refresh").change();
         }
         if ($moveAnnotationCheckbox.is(":checked")) {
-          annotator.setCanMoveAnnotation(true);
+          setCanMoveAnnotation(true);
           if (!$addAnnotationCheckbox.is(":checked"))
             $hideAnnotationCheckbox.button("option", "disabled", true);
         } else {
-          annotator.setCanMoveAnnotation(false);
+          setCanMoveAnnotation(false);
           if (!$addAnnotationCheckbox.is(":checked"))
             $hideAnnotationCheckbox.button("option", "disabled", false);
         }
       });
       // Create delete button
       $annotatorModeToolbar.append('<button class="deleteAnnotation" title="Delete an annotation">Del</button>');
-      $("#" + viewerDivId + " .deleteAnnotation").button({
+      $("#" + annotatorDivId + " .deleteAnnotation").button({
         icons: {
           primary: "ui-icon-minus"
         },
         text: true,
         disabled: true
       }).click(function() {
-        annotator.deleteSelectedAnnotations();
+        deleteSelectedAnnotations();
         handleAnnotatorModeToolbarChange();
       });
       // Create save button
       $annotatorModeToolbar.append('<button class="saveAnnotation" title="Save annotations">Save</button>');
-      $("#" + viewerDivId + " .saveAnnotation").button({
+      $("#" + annotatorDivId + " .saveAnnotation").button({
         icons: {
           primary: "ui-icon-folder-collapsed"
         },
         text: true,
         disabled: true
       }).click(function() {
-        annotator.showSaveAnnotatorWindow();
+        showSaveAnnotatorWindow();
       });
       // Create load button
       $annotatorModeToolbar.append('<button class="loadAnnotation" title="Load annotations">Load</button>');
-      $("#" + viewerDivId + " .loadAnnotation").button({
+      $("#" + annotatorDivId + " .loadAnnotation").button({
         icons: {
           primary: "ui-icon-folder-open"
         },
         text: true
       }).click(function() {
-        annotator.showLoadAnnotatorWindow();
+        showLoadAnnotatorWindow();
       });
       // Create clear button
       $annotatorModeToolbar.append('<button class="clearAnnotation" title="Clear all annotations">Clear</button>');
-      $("#" + viewerDivId + " .clearAnnotation").button({
+      $("#" + annotatorDivId + " .clearAnnotation").button({
         icons: {
           primary: "ui-icon-trash"
         },
@@ -956,27 +996,26 @@ if (!window['$']) {
         var confirmClearAlert = confirm("Are you sure you want to clear all annotations?");
         if (!confirmClearAlert)
           return;
-        annotator.clearAnnotations();
+        clearAnnotations();
       });
       // Create buttonset
       $annotatorModeToolbar.buttonset();
     };
 
     // Change the status of the annotator toolbar
-    // TODO: this is broken, we moved it out from timelapse.js
     var handleAnnotatorModeToolbarChange = function() {
-      var $Annotationtems = $("#" + settings["annotatorDiv"] + " .annotation_list > .ui-selectee");
+      var $Annotationtems = $("#" + annotatorDivId + " .annotation_list > .ui-selectee");
       var numItems = $Annotationtems.size();
       if (numItems > 0) {
-        $("#" + viewerDivId + " .deleteAnnotation").button("option", "disabled", false);
-        $("#" + viewerDivId + " .saveAnnotation").button("option", "disabled", false);
-        $("#" + viewerDivId + " .clearAnnotation").button("option", "disabled", false);
-        $("#" + viewerDivId + " .moveAnnotationCheckbox").button("option", "disabled", false);
+        $("#" + annotatorDivId + " .deleteAnnotation").button("option", "disabled", false);
+        $("#" + annotatorDivId + " .saveAnnotation").button("option", "disabled", false);
+        $("#" + annotatorDivId + " .clearAnnotation").button("option", "disabled", false);
+        $("#" + annotatorDivId + " .moveAnnotationCheckbox").button("option", "disabled", false);
       } else {
-        $("#" + viewerDivId + " .deleteAnnotation").button("option", "disabled", true);
-        $("#" + viewerDivId + " .saveAnnotation").button("option", "disabled", true);
-        $("#" + viewerDivId + " .clearAnnotation").button("option", "disabled", true);
-        $("#" + viewerDivId + " .moveAnnotationCheckbox").button("option", "disabled", true);
+        $("#" + annotatorDivId + " .deleteAnnotation").button("option", "disabled", true);
+        $("#" + annotatorDivId + " .saveAnnotation").button("option", "disabled", true);
+        $("#" + annotatorDivId + " .clearAnnotation").button("option", "disabled", true);
+        $("#" + annotatorDivId + " .moveAnnotationCheckbox").button("option", "disabled", true);
       }
     };
 
@@ -984,10 +1023,11 @@ if (!window['$']) {
     //
     // Constructor code
     //
-    org.gigapan.Util.ajax("html", rootAppURL, "annotation_editor.html", function(html) {
-      $annotatorDivObj.html(html);
+    org.gigapan.Util.ajax("html", rootAppURL, "templates/annotation_editor.html", function(html) {
+      $("#" + timeMachineDivId).append(html);
       createAnnotatorModeToolbar();
       setupAnnotationLayer();
+      resizeUI();
     });
 
   };

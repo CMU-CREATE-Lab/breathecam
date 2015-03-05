@@ -69,7 +69,7 @@ function getDescription() {
 }
 
 function getCaption() {
-  var location = '<%= @location_id %>';
+  var location = currentLocation;
   var caption = 'Timelapse captured from ';
   if (location == 'heinz') {
     caption += 'downtown Pittsburgh';
@@ -94,6 +94,6 @@ function fbShare() {
     link: getLink(fbShareUrl),
     picture: getPicture(),
     caption: getCaption(),
-    description: getDescription(),
+    description: getDescription()
   }, function(response){});
 }

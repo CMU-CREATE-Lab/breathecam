@@ -1,0 +1,1 @@
+Corresponds to commit 2a2c196 from the "stripchart" branch.

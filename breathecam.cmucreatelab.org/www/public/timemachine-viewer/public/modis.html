@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <link href="../css/snaplapse.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/jquery-ui/smoothness/jquery-ui.custom.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/defaultUI.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/smallGoogleMap.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/scaleBar.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/visualizer.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/annotator.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/customUI.css" rel="stylesheet" type="text/css"/>
+
+    <script src="../js/jquery/jquery.min.js" type="text/javascript"></script>
+    <script src="../js/jquery/jquery-ui.custom.min.js" type="text/javascript"></script>
+    <script src="../js/jquery/plugins/mouse/jquery.mousewheel.min.js" type="text/javascript"></script>
+    <script src="../js/jquery/plugins/knob/jquery.knob.js" type="text/javascript"></script>
+    <script src="../js/kinetic/kinetic.min.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/util.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/videoset.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/parabolicMotion.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/timelapse.js" type="text/javascript"></script>
+    <script src="../js/Math.uuid.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/snaplapse.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/snaplapseViewer.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/mercator.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/scaleBar.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/smallGoogleMap.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/visualizer.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/annotator.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/customUI.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/defaultUI.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/urlEncoder.js" type="text/javascript"></script>
+
+    <script src="../js/org/gigapan/postmessage.js" type="text/javascript"></script>
+    <script src="../js/org/gigapan/timelapse/crossdomain_api.js" type="text/javascript"></script>
+
+    <script src="../template_includes.js" type="text/javascript"></script>
+    <script src="" type="text/javascript"></script>
+    <script src="https://maps.google.com/maps/api/js?sensor=false&libraries=places" type="text/javascript" ></script>
+
+    <style>
+      #share {
+        position: absolute;
+        left: 10px;
+        top: 660px;
+        height: 30px;
+        width: 85px;
+        font-size: 14px;
+        background: #71AF71;
+        color: white;
+        border-radius: 2px;
+        outline: none;
+      }
+      #share:hover {
+        background-color: #529952;
+      }
+      #share.ui-state-active {
+        background-color: #656565;
+      }
+      #shareURL {
+        width: 600px;
+        height: 32px;
+        resize: none;
+      }
+      #timeMachine {
+        position: relative;
+        margin-top: 10px;
+        margin-left: 10px;
+        width: 985px;
+        height: 640px;
+      }
+    </style>
+
+    <script type="text/javascript">
+      jQuery.support.cors = true;
+
+      // Modis
+      var url = "";
+
+      function init() {
+        myHomeView = {
+          x: 42215.53981585008,
+          y: 32543.785001045024,
+          scale: 0.012558674125514415
+        };
+        var settings = {
+          url: url,
+          enablePresentationSlider: true,
+          datasetType: "modis",
+          playOnLoad: true,
+          onTimeMachinePlayerReady: function(viewerDivId) {
+            setupPostMessageHandlers();
+            timelapse.loadSharedDataFromUnsafeURL("#presentation=ERBAA6FXpl1mkjR_Drying%20of%20Aral%20Sea_BAA9ndHxmNSjRThe%2012000-year-old%20Larsen%20B%20Ice%20Shelf%20disintegrated%20in%20February%2C%202002_Larsen%20B%20Ice%20Shelf_BkDiOI7hYfYhT_TDeforestation%20in%20the%20Amazon%20Rainforest%20south%20of%20Parque%20Estadual%20do%20Xingu_N%20Mato%20Grosso_BkDAX6VTPhJxgTSeasonal%20flooding%20fills%20the%20Cooper%20Creek%20Flood%20Plain%20and%20Lake%20Yamma%20Yamma%20in%20Queensland%2C%20Australia%2E_Lake%20Yamma%20Yamma_BkDuCoSvQN24w_TFires%20in%20Wyperfield%2C%20Murray%20Sunset%2C%20and%20Big%20Desert%20Parks%20in%20New%20South%20Wales%2C%20and%20Ngarkat%20Park%20in%20South%20Australia_Australian%20Fires_BkDgGrO-mQNYi_T_Drying%20of%20Lake%20Urmia_BkD1Gd0xQ1tySjR_Mouth%20of%20Rio%20Uruguay_BkD4PcOCnMD_I_T_CA%20Bay%20to%20Sierras_BkDiGC1Pn03OLhT_Rocky%20Mountains_BkDxFY5DoHQTK_T_Great%20Salt%20Lake_BkDrCJOBnWm6NqN_Midwest_BkDVvToeX0ne-K_African%20Savannah_BkDAuikfp4nd_T_Seasonal%20Lake%20Chad_BkDlOFWoVJV5e_T_Okavango_BkD6LOKXoLUEPxS_Lake%20Erie_BkDpJGP6rfz0r7M_Lake%20Baikal%20Russia_BA-Hy4gkrZXorM_Himalayas_Untitled_B");
+          },
+          scaleBarOptions: {
+            scaleBarDiv: "scaleBar1"
+          },
+          smallGoogleMapOptions: {
+            smallGoogleMapDiv: "smallGoogleMap1"
+          },
+          showAddressLookup: true,
+          disableTourLooping: true,
+          newHomeView: myHomeView
+        };
+        timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
+        $("#shareDialog").dialog({
+          resizable: false,
+          autoOpen: false,
+          width: 632,
+          height: 95
+        });
+        $("#share").button().click(function() {
+          var $shareDialog = $("#shareDialog");
+          if ($shareDialog.dialog("isOpen"))
+            $shareDialog.dialog("close");
+          else {
+            var parentUrl = "";
+            if (window.top === window.self) {
+              // no iframe
+              parentUrl = window.location.href.split("#")[0];
+            } else {
+              // inside iframe
+              parentUrl = document.referrer.split("#")[0];
+            }
+            var shareUrl = timelapse.getShareView();
+            $("#shareURL").val(parentUrl + shareUrl).focus(function() {
+              $(this).select();
+            }).click(function() {
+              $(this).select();
+            }).mouseup(function(e) {
+              e.preventDefault();
+            });
+            $shareDialog.dialog("open");
+          }
+        });
+      }
+
+      $(init);
+    </script>
+  </head>
+  <body>
+    <div id="timeMachine"></div>
+    <button type="button" id="share">Share</button>
+    <div id="shareDialog" title="Share Current View">
+      <textarea id="shareURL"></textarea>
+    </div>
+  </body>
+</html>

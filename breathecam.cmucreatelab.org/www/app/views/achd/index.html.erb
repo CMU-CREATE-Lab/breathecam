@@ -1,0 +1,2879 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
+                             "/timemachine-viewer/css/defaultUI.css"
+  %>
+
+  <%= javascript_include_tag "/timemachine-viewer/js/jquery/jquery.min.js",
+                             "/timemachine-viewer/js/jquery/jquery-ui.custom.min.js",
+                             "/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
+                             "/timemachine-viewer/js/org/gigapan/util.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/videoset.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/parabolicMotion.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/timelapse.js",
+                             "/timemachine-viewer/js/Math.uuid.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/snaplapse.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/snaplapseViewer.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/defaultUI.js",
+                             "/timemachine-viewer/js/org/gigapan/postmessage.js",
+                             "/timemachine-viewer/template_includes.js",
+                             "#{@root_url}/timemachines/#{@location_id}/#{@location_id}.js",
+                             "/grapher/grapher2.nocache.js",
+                             "/openseadragon/openseadragon.min.js",
+                             "https://www.google.com/jsapi",
+                             "/change-detect/ThumbnailServiceAPI.js",
+                             "/change-detect/TimeMachineCanvasLayer.js",
+                             "/change-detect/ThumbnailTool.js",
+                             "/extras/base64.js",
+                             "/extras/jquery.xdomainrequest.min.js",
+                             "fbshare-bundle.js",
+                             "/extras/jquery.ui.touch-punch.min.js"
+%>
+
+  <style type="text/css">
+    .selectTopRight {
+      cursor: ne-resize !important;
+    }
+    .selectBottomRight {
+      cursor: se-resize !important;
+    }
+    .selectBottomLeft {
+      cursor: sw-resize !important;
+    }
+    .selectTopLeft {
+      cursor: nw-resize !important;
+    }
+    .selectDown {
+      cursor: s-resize !important;
+    }
+    .selectUp {
+      cursor: n-resize !important;
+    }
+    .selectLeft {
+      cursor: w-resize !important;
+    }
+    .selectRight {
+      cursor: e-resize !important;
+    }
+    .selectMove {
+      cursor: move !important;
+    }
+    #timeMachine {
+      position: fixed;
+      left: -2px;
+      right: 220px;
+      top: -2px;
+      width: auto;
+      /*height: 683px;*/
+      height: 545px;
+      z-index: 5;
+    }
+    #changeDetect {
+      position: absolute;
+      /*top: 680px;*/
+      top: 542px;
+      width: 100%;
+      display: none;
+    }
+    #chart {
+      height: 150px;
+    }
+    #achd {
+      position: relative;
+      left: 0px;
+      right: 217px;
+      /*top: 648px;*/
+      top: 505px;
+      height: auto;
+      display: block;
+    }
+    #achdSensorDataTable {
+      width: 100%;
+    }
+    #datepicker {
+      right: 0px !important;
+      position: fixed;
+    }
+    #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
+      cursor: pointer;
+    }
+    #datepicker .ui-datepicker-header {
+      color: white;
+      background: rgb(150, 150, 150);
+      border: 0px solid rgb(204, 204, 204);
+      border-radius: 3px !important;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-datepicker {
+      font-size: 12px;
+      height: 190px;
+      border-radius: 0;
+      color: #555555;
+      background: rgb(248, 248, 248);
+      border: 1px solid rgb(150, 150, 150);
+    }
+    #datepicker .ui-state-default {
+      background: rgb(150, 150, 150);
+      border-radius: 3px !important;
+      color: white;
+      box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-state-hover {
+      background: rgb(100, 100, 100) !important;
+    }
+    #datepicker .date-highlight a {
+      color: white;
+      background: rgb(150, 150, 150);
+      border: 1px solid rgb(204, 204, 204);
+    }
+    #datepicker .ui-state-active {
+      border: 1px solid rgb(204, 204, 204) !important;
+      background: #2794DD !important;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-datepicker-header .ui-icon {
+      background-image: url(<%= asset_path('ui-icons_custom_256x240.png') %>);
+    }
+
+    #datepicker table td, select {
+      font-size: 11px !important;
+    }
+
+    #grapher {
+      font-size: 10pt !important;
+      position: relative;
+      left: 0px;
+      right: 241px;
+      width: auto;
+      top: 36px;
+    }
+
+    #dateAxisContainer {
+      width: 100%;
+      height: 40px;
+      position: relative;
+    }
+
+    #dateAxis {
+      position: absolute;
+      right: 250px;
+      left: 159px;
+      top: 0px;
+      height: 40px;
+      border: 1px solid black;
+      z-index: 20;
+      width: 1430px;
+      background: white;
+    }
+
+    .chart {
+      height: 53px;
+      margin-top: 1px;
+      background: #4f5457 !important;
+    }
+
+    .chartTitle {
+      position: absolute;
+      left: 0px;
+      width: 136px;
+      height: 31px;
+      border: 1px solid black;
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      color: white;
+      padding: 11px
+    }
+
+    .chartContent {
+      position: absolute;
+      left: 159px;
+      right: 35px;
+      height: 53px;
+      border: 1px solid black;
+      background: white;
+    }
+
+    .chartAxis {
+      position: absolute;
+      right: 0px;
+      width: 34px;
+      height: 53px;
+      border: 1px solid black;
+      background: white;
+    }
+
+    #achdSensorData {
+      position: relative;
+      top: 38px;
+      padding-bottom: 35px;
+    }
+
+    .locationTitleHover {
+      box-shadow: 0 0 0 2px #dcdcdc;
+      -moz-box-shadow: 0 0 0 2px #dcdcdc;
+      -webkit-box-shadow: 0 0 0 2px #dcdcdc;
+      border-color: transparent;
+    }
+
+  #overlayCanvas {
+    position: fixed;
+    display: none;
+    z-index: 8;
+    left: 0px;
+    pointer-events: none;
+  }
+
+  .fitChartAxis .ui-button-text {
+    margin-left: 5px;
+    font-size: 11px;
+    margin-top: 10px;
+    line-height: 15px;
+    text-align: left;
+    padding: 0px;
+  }
+
+  .fitChartAxis .ui-icon.ui-icon-custom-fitChartAxis {
+    background-image: none;
+    width: 34px;
+    height: 34px;
+    opacity: 0.55;
+    background-size: contain !important;
+    margin-left: -17px;
+    margin-top: -17px;
+  }
+
+  .fitChartAxis {
+    position: absolute;
+    height: 50px;
+    width: 40px;
+    right: -48px;
+    background: white;
+    border: 1px solid #656565;
+    border-radius: 3px !important;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    z-index: 30;
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+  }
+
+  .btnToggleState {
+    background: #B2B2B2 !important;
+  }
+
+  .changeDetectToggle .ui-button-text {
+    margin-left: -16px;
+    font-size: 11px;
+    margin-top: 6px;
+    line-height: 15px;
+    text-align: left;
+  }
+
+  .changeDetectToggle .ui-icon.ui-icon-custom-changeDetectToggle {
+    background-image: none;
+    width: 34px;
+    height: 34px;
+    opacity: 0.55;
+    background-size: contain !important;
+    margin-left: -17px;
+    margin-top: -17px;
+  }
+
+  .changeDetectToggle {
+    position: absolute;
+    height: 50px;
+    bottom: 86px;
+    width: 58px;
+    right: 20px;
+    background: white;
+    border: 1px solid #656565;
+    border-radius: 3px !important;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    z-index: 30;
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+  }
+
+  #changeDetectRecenter .ui-icon.ui-icon-custom-changeDetectRecenter {
+    background-image: none;
+    width: 34px;
+    height: 34px;
+    opacity: 0.55;
+    background-size: contain !important;
+    margin-left: -17px;
+    margin-top: -17px;
+  }
+
+  #changeDetectRecenter {
+    position: absolute;
+    height: 35px;
+    bottom: 94px;
+    width: 201px;
+    right: 7px;
+    background: white;
+    border: 1px solid #656565;
+    border-radius: 3px !important;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+  }
+
+  #changeDetectRecenter .ui-button-text {
+    padding: 12px 0px 0px 0px;
+    font-size: 11px;
+  }
+
+    #changeDetectMakeThumbnail .ui-icon.ui-icon-custom-changeDetectMakeThumbnail {
+      background-image: none;
+      width: 34px;
+      height: 34px;
+      opacity: 0.55;
+      background-size: contain !important;
+      margin-left: -17px;
+      margin-top: -17px;
+    }
+
+    #changeDetectMakeThumbnail {
+      position: absolute;
+      height: 35px;
+      bottom: 49px;
+      width: 95px;
+      right: 113px;
+      background: white;
+      border: 1px solid #656565;
+      border-radius: 3px !important;
+      box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+      outline: none;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
+  }
+
+  #changeDetectMakeThumbnail .ui-button-text {
+    padding: 6px 2px 0px 1px;
+    font-size: 11px;
+  }
+
+    #changeDetectMakeGif .ui-icon.ui-icon-custom-changeDetectMakeGif {
+      background-image: none;
+      width: 34px;
+      height: 34px;
+      opacity: 0.55;
+      background-size: contain !important;
+      margin-left: -17px;
+      margin-top: -17px;
+    }
+
+
+  #changeDetectMakeGif .ui-button-text {
+    padding: 6px 2px 0px 1px;
+    font-size: 11px;
+  }
+
+    #changeDetectMakeGif {
+      position: absolute;
+      height: 35px;
+      bottom: 49px;
+      width: 95px;
+      right: 7px;
+      background: white;
+      border: 1px solid #656565;
+      border-radius: 3px !important;
+      box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+      outline: none;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
+  }
+
+#changeDetectBtns {
+  position: absolute;
+  right: 0px;
+  bottom: -19px;
+}
+
+#toggleStaticVideo .ui-icon.ui-icon-custom-toggleStaticVideo {
+  background-image: none;
+  width: 34px;
+  height: 34px;
+  opacity: 0.55;
+  background-size: contain !important;
+  margin-left: -17px;
+  margin-top: -17px;
+}
+
+#toggleStaticVideo .ui-button-text {
+  padding: 14px 8px 0px 7px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.mobileBtn .ui-button-text{
+  padding: 5px 8px 0px 7px !important;
+  font-size: 15px !important;
+  font-weight: bold;
+}
+
+#toggleStaticVideo {
+  position: absolute;
+  height: 42px;
+  bottom: 0px;
+  width: 209px;
+  right: -221px;
+  background: white;
+  border: 1px solid #656565;
+  border-radius: 3px !important;
+  box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+  outline: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 17px;
+}
+
+div.line{
+  transform-origin: 0 100%;
+  height: 2px; /* Line width*/
+  background: #DCDCDC;
+  z-index: 100;
+  box-shadow: 0px 0px 0px 1px #383838;
+}
+
+#achd_note {
+  font-size: 10px;
+  color: white;
+  position: absolute;
+  left: 2px;
+  text-align: left;
+  width: 100%;
+}
+
+#stitched_image_note {
+  font-size: 17px;
+  color: white;
+  position: absolute;
+  left: 2px;
+  text-align: left;
+  width: auto;
+  top: 392px;
+}
+
+#achdSensorDataBrowserError {
+  display: none;
+  color: white;
+  position: absolute;
+  top: 45px;
+  left: 2px;
+  font-size: 15px;
+}
+
+.shareView {
+  height: 175px !important;
+  padding-top: 18px !important;
+}
+.shareurl {
+  width: 236px;
+  height: 80px;
+}
+.shareViewSpacer {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#fb_share {
+  cursor: pointer;
+}
+
+#stitched_image {
+  background: black;
+  width: 100%;
+  height: 100%;
+}
+
+#latest_video {
+  background: black;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+}
+
+#stitched_image_wrapper {
+  position: fixed;
+  left: -2px;
+  right: 220px;
+  top: -2px;
+  width: auto;
+  height: 392px;
+  z-index: 5;
+}
+
+#stitched_image_wrapper_child {
+  left: -2px;
+  right: 220px;
+  top: -2px;
+  width: auto;
+  height: 393px;
+  z-index: 5;
+}
+
+#image_feed_timestamp {
+  top: 46px;
+  right: 20px;
+  font-size: 17px;
+  text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000, 2px 2px 3px rgba(0,0,0,0.3);
+  color: white;
+  font-weight: normal;
+  z-index: 50;
+}
+.closedHand {cursor: url("openseadragon/cursors/closedhand.cur"), move !important;}
+.openHand {cursor: url("openseadragon/cursors/openhand.cur"), move !important;}
+.pointerHand {cursor: pointer}
+
+#location_title {
+  color: white;
+}
+img a {text-decoration: none; border: 0px}
+a.location_thumbnail_container { color: white }
+
+.unselectable {
+  -moz-user-select: -moz-none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#latest_video_controls {
+  width: 100%;
+  height: 41px;
+  min-height: 41px;
+  max-height: 41px;
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  opacity: 0.6;
+  -webkit-transition: opacity .3s;
+  -moz-transition: opacity .3s;
+  -o-transition: opacity .3s;
+  -ms-transition: opacity .3s;
+  transition: opacity .3s;
+  background-image: linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+  background-image: -o-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+  background-image: -moz-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+  background-image: -ms-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+  background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0.13, rgb(30, 30, 31)),
+    color-stop(1, rgb(47, 49, 50))
+  );
+}
+
+#latest_video_controls #seek-bar {
+  position: absolute;
+  bottom: 15px;
+  left: 70px;
+  right: 100px;
+  width: auto;
+  cursor: pointer;
+}
+
+#latest_video_controls .ui-slider-range {
+  background: rgb(92, 43, 43);
+}
+
+#latest_video_container {
+  background: black;
+  display:none;
+}
+
+#latest_video_controls #play-pause {
+  height: 30px;
+    position: absolute;
+    left: 7px;
+    top: 5px;
+    width: 51px;
+}
+
+#latest_video_controls #full-screen {
+    right: 7px;
+    position: absolute;
+    height: 30px;
+    top: 5px;
+}
+
+#video-container:hover #video-controls {
+  opacity: .9;
+}
+
+#latest_video_controls button {
+  background: rgba(0,0,0,.5);
+  border: 0;
+  color: #EEE;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+
+#latest_video_controls button:hover {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.image_feed_embed {
+  width: 100%;
+}
+
+.tutorialButton .ui-button-text {
+  margin-left: -15px;
+  font-size: 15px;
+  margin-top: 8px;
+  line-height: 15px;
+  text-align: left;
+}
+
+.tutorialButton .ui-icon.ui-icon-custom-tutorialButton {
+  background-image: none;
+  width: 34px;
+  height: 34px;
+  opacity: 0.55;
+  background-size: contain !important;
+  margin-left: -17px;
+  margin-top: -17px;
+}
+
+.tutorialButton {
+  position: absolute;
+  height: 41px;
+  top: 25px;
+  width: 109px;
+  left: 92px;
+  color: white;
+  background: #2794DD !important;
+  border: 1px solid #656565;
+  border-radius: 3px !important;
+  box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+  z-index: 1;
+  outline: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+}
+
+#tutorialDialog {
+  width: 100%;
+  height: 100%;
+  display: none;
+  overflow: hidden;
+}
+
+#pageTitle {
+  color: #fff;
+  font-size: 28px;
+  text-transform: uppercase;
+  text-shadow: -1px 0 #000,0 1px #000,1px 0 #000,0 -1px #000,2px 2px 3px rgba(0,0,0,0.3);
+  position: fixed;
+  right: 240px;
+  top: 18px;
+  z-index: 50;
+
+}
+
+#locationTitle {
+ top: 50px;
+}
+
+.timelineSlider .ui-slider-range {
+  background: #2794DD !important;
+  opacity: 0.6;
+}
+
+.location_thumbnail {
+  height: 84px;
+}
+
+.location_thumbnail_overlay {
+  height: 84px;
+}
+
+.location_thumbnail_container {
+  margin-bottom: 0px;
+}
+
+#location_toggle_container {
+  height: 340px;
+}
+
+#achdSensorDataTable td, #achdSensorDataTable th {
+  text-align: left;
+}
+
+  </style>
+
+  <script>
+    // Handles the sending of cross-domain iframe requests.
+    function post(type, data) {
+      pm({
+        target: window.parent,
+        type: type,
+        data: data,
+        origin: document.referrer // TODO: Change this (and above) to explicity set a domain we'll be receiving requests from
+      });
+    }
+  </script>
+
+  <script>
+      var timelapse;
+      var openSeadragonViewer;
+      var openSeadragonisFillScreen = false;
+      var videoLeaderSeekInterval;
+      var previousBounds;
+      var thumbnailTool;
+      var supportsPointerEventsNone = true;
+      var justAddedChannel = false;
+
+
+      function update() {
+        thumbnailTool.update();
+      }
+
+      function resize() {
+        var width = parseInt($('#timeMachine_timelapse').css('width'), 10) - 1;
+        $("#chart").width(width);
+        filter();
+      }
+
+      function filter() {
+        if (!thumbnailTool) return;
+        thumbnailTool.filter(function(r) {
+          var o = JSON.parse(r);
+          drawResults(o.values);
+        });
+      }
+      function resetFilter() {
+        var view = thumbnailTool.timelapse_.getView();
+        var scaleOffsetX = 40/view.scale;
+        var scaleOffsetY = 40/view.scale;
+        var bounds = {
+          xmin: view.x - scaleOffsetX,
+          xmax: view.x + scaleOffsetX,
+          ymin: view.y - scaleOffsetY,
+          ymax: view.y + scaleOffsetY
+        };
+        thumbnailTool.setBounds(bounds);
+        thumbnailTool.draw();
+        filter();
+      }
+
+      var currentThumbnail = new ThumbnailServiceAPI({
+        host: "http://timemachine-api.bodytrack.org/thumbnail"}, {
+          format: "png"
+      });
+
+      function getCurrentThumbnail() {
+        var bb = timelapse.getBoundingBoxForCurrentView();
+        currentThumbnail.root = timelapse.getSettings().url;
+        currentThumbnail.tileFormat = timelapase.getSettings().mediaType.slice(1);
+        currentThumbnail.boundsLTRB =  bb.xmin + "," + bb.ymin + "," + bb.xmax + "," + bb.ymax;
+        currentThumbnail.width = bb.xmax - bb.xmin;
+        currentThumbnail.height = bb.ymax - bb.ymin;
+        currentThumbnail.frameTime = timelapse.getCurrentFrame() / timelapse.getFps();
+      }
+
+      google.load("visualization", "1", {packages:["corechart"]});
+
+      function thumbnailInit() {
+        $(document).on('keydown', function(event) {
+          var currentFrame = timelapse.getCurrentFrameNumber();
+          if (event.keyCode == 37) {
+            event.stopImmediatePropagation();
+            --currentFrame;
+            if (currentFrame <= 0) {
+              currentFrame = timelapse.getNumFrames() - 1;
+            }
+            timelapse.seekToFrame(currentFrame);
+          }
+          if (event.keyCode == 39) {
+            event.stopImmediatePropagation();
+            ++currentFrame;
+            if (currentFrame >= timelapse.getNumFrames()) {
+              currentFrame = 0;
+            }
+            timelapse.seekToFrame(currentFrame);
+          }
+        });
+      }
+  </script>
+
+  <script>
+    jQuery.support.cors = true;
+    var locationDivId, timelapse, timelapseFeedUnavailable, hashVars, checkPlotLoadedInterval;
+    var currentLocation = "<%= @location_id %>";
+    var currentDate;
+    var overlayCanvas, overlayCanvasContext;
+    var intervalCount = 0;
+    var lastCaptureTime;
+    var firstCaptureTime;
+
+    var series = [];
+    var dateAxis;
+    var axisChangeListenerExist = false;
+    var originalIsPaused;
+
+    var lastCursorPosition;
+    var seekTimeMachineTimer = null;
+    var lastSeekTimeMachineTime = 0;
+    var fastestSeekTimeMachineTime = 200;
+
+    var color1 = "10,104,177";
+    var color2 = "10,177,88";
+    var color3 = "177,124,10";
+    var color4 = "10,177,186";
+    var color5 = "160,116,214";
+    var color6 = "140, 86, 171";
+
+    var lineDrawn = false;
+
+    var UTIL = org.gigapan.Util;
+
+
+    var achdData = {
+      "walnuttowers1" : {
+        "coordinates" : {
+          "x" : "",
+          "y" : ""
+        },
+        "sensors" : {
+          "Liberty" : {
+            "coordinates" : {
+              "x" : "5044",
+              "y" : "805"
+            },
+            "channels" : {
+              "ACHD_Liberty_2.PM10_UG_M3": {
+                "graphMetaData" : {
+                  label: 'Liberty PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
+                  min: -20,
+                  max: 120,
+                  color: color5
+                },
+                "summary": {}
+              },
+              "ACHD_Liberty_2.PM25_UG_M3": {
+                "graphMetaData" : {
+                  label: 'Liberty PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>',
+                  min: -20,
+                  max: 120,
+                  color: color1
+                },
+                "summary": {}
+              },
+              "ACHD_Liberty.OUT_T_DEGC": {
+                "graphMetaData" : {
+                  label: 'Liberty Temp, deg F',
+                  min: -10,
+                  max: 45,
+                  color: color3
+                },
+                "summary": {}
+              },
+              "ACHD_Liberty.SO2_PPM": {
+                "graphMetaData" : {
+                  label: "Liberty SO<sub>2</sub>, PPB",
+                  min: -0.01,
+                  max: 0.07,
+                  color: color2
+                },
+                "summary": {}
+              },
+              "ACHD_Liberty.SONICWD_DEG": {
+                "graphMetaData" : {
+                  label: 'Liberty Wind Direction, deg',
+                  min: 0,
+                  max: 360,
+                  color: color6
+                },
+                "summary": {}
+              },
+              "ACHD_Liberty.SONICWS_MPH": {
+                "graphMetaData" : {
+                  label: 'Liberty Wind Speed, MPH',
+                  min: 0,
+                  max: 30,
+                  color: color6
+                },
+                "summary": {}
+              }
+            }
+          },
+          "Lincoln" : {
+            "coordinates" : {
+              "x" : "4814",
+              "y" : "826"
+            },
+            "channels" : {
+              "ACHD_Lincoln.PM10_UG_M3": {
+                "graphMetaData" : {
+                  label: 'Lincoln PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
+                  min: -20,
+                  max: 120,
+                  color: color5
+                },
+                "summary": {}
+              },
+              "ACHD_Lincoln.PM25_UG_M3": {
+                "graphMetaData" : {
+                  label: 'Lincoln PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>',
+                  min: -20,
+                  max: 120,
+                  color: color1
+                },
+                "summary": {}
+              }
+            }
+          },
+          "North Braddock" : {
+            "coordinates" : {
+              "x" : "3093",
+              "y" : "848"
+            },
+            "channels" : {
+              "ACHD_North_Braddock.PM10B_UG_M3": {
+                "graphMetaData" : {
+                  label: 'North Braddock PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
+                  min: -20,
+                  max: 120,
+                  color: color5
+                },
+                "summary": {}
+              },
+              "ACHD_North_Braddock.OUT_T_DEGC": {
+                "graphMetaData" : {
+                  label: 'North Braddock Temp, deg F',
+                  min: -10,
+                  max: 45,
+                  color: color3
+                },
+                "summary": {}
+              },
+              "ACHD_North_Braddock.SO2_PPM": {
+                "graphMetaData" : {
+                  label: "North Braddock SO<sub>2</sub>, PPB",
+                  min: -0.01,
+                  max: 0.07,
+                  color: color2
+                },
+                "summary": {}
+              },
+              "ACHD_North_Braddock.SONICWD_DEG": {
+                "graphMetaData" : {
+                  label: 'North Braddock Wind Direction, deg',
+                  min: 0,
+                  max: 360,
+                  color: color6
+                },
+                "summary": {}
+              },
+              "ACHD_North_Braddock.SONICWS_MPH": {
+                "graphMetaData" : {
+                  label: 'North Braddock Wind Speed, MPH',
+                  min: 0,
+                  max: 30,
+                  color: color6
+                },
+                "summary": {}
+              }
+            }
+          }
+        }
+      },
+      "trimont1" : {
+        "coordinates" : {
+          "x" : "",
+          "y" : ""
+        },
+        "sensors" : {
+          "Flag Plaza" : {
+            "coordinates" : {
+              "x" : "4036",
+              "y" : "945"
+            },
+            "channels" : {
+              "ACHD_Flag_Plaza.PM10_UG_M3": {
+                "graphMetaData" : {
+                  label: 'Flag Plaza PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
+                  min: -20,
+                  max: 120,
+                  color: color1
+                },
+                "summary": {}
+              },
+              "ACHD_Flag_Plaza.OUT_T_DEGC": {
+                "graphMetaData" : {
+                  label: 'Flag Plaza Temp, deg F',
+                  min: -10,
+                  max: 45,
+                  color: color3
+                },
+                "summary": {}
+              }
+            }
+          },
+          "Lawrenceville" : {
+            "coordinates" : {
+              "x" : "2594",
+              "y" : "949"
+            },
+            "channels" : {
+              "ACHD_Lawrenceville_2.PM25B_UG_M3": {
+                "graphMetaData" : {
+                  label: 'Lawrenceville PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>',
+                  min: -20,
+                  max: 120,
+                  color: color1
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville_2.SO2_PPB": {
+                "graphMetaData" : {
+                  label: 'Lawrenceville SO<sub>2</sub>, PPB',
+                  min: -0.01,
+                  max: 0.07,
+                  color: color2
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.OUT_T_DEGC": {
+                "graphMetaData" : {
+                  label: 'Lawrenceville Temp, deg F',
+                  min: -10,
+                  max: 45,
+                  color: color3
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.OUT_RH_PERCENT": {
+                "graphMetaData" : {
+                  label: 'Lawrenceville Relative Humidity, %',
+                  min: 0,
+                  max: 100,
+                  color: color4
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.SONICWD_DEG": {
+                "graphMetaData" : {
+                  label: 'Lawrenceville Wind Direction, deg',
+                  min: 0,
+                  max: 360,
+                  color: color6
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.SONICWS_MPH": {
+                "graphMetaData" : {
+                  label: 'Lawrenceville Wind Speed, MPH',
+                  min: 0,
+                  max: 30,
+                  color: color6
+                },
+                "summary": {}
+              }
+            }
+          }
+        }
+      },
+      "heinz" : {
+        "coordinates" : {
+          "x" : "",
+          "y" : ""
+        },
+        "sensors" : {
+          "Avalon" : {
+            "coordinates" : {
+              "x" : 3186,
+              "y" : 876
+            },
+            "channels" : {
+              "ACHD_Avalon.PM25B_UG_M3": {
+                "graphMetaData" : {
+                  label: "Avalon PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>",
+                  min: -20,
+                  max: 120,
+                  color: color1
+                },
+                "summary": {}
+              },
+              "ACHD_Avalon.SO2_PPM": {
+                "graphMetaData" : {
+                  label: "Avalon SO<sub>2</sub>, PPB",
+                  min: -0.01,
+                  max: 0.07,
+                  color: color2
+                },
+                "summary": {}
+              },
+              "ACHD_Avalon.OUT_T_DEGC": {
+                "graphMetaData" : {
+                  label: "Avalon Temp, deg F",
+                  min: -10,
+                  max: 45,
+                  color: color3
+                },
+                "summary": {}
+              },
+              "ACHD_Avalon.SONICWD_DEG": {
+                "graphMetaData" : {
+                  label: "Avalon Wind Direction, deg",
+                  min: 0,
+                  max: 360,
+                  color: color6
+                },
+                "summary": {}
+              },
+              "ACHD_Avalon.SONICWS_MPH": {
+                "graphMetaData" : {
+                  label: "Avalon Wind Speed, MPH",
+                  min: 0,
+                  max: 30,
+                  color: color6
+                },
+                "summary": {}
+              }
+            }
+          },
+          "Lawrenceville" : {
+            "coordinates" : {
+              "x" : 8037,
+              "y" : 801
+            },
+            "channels" : {
+              "ACHD_Lawrenceville_2.PM25B_UG_M3": {
+                "graphMetaData" : {
+                  label: "Lawrenceville PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>",
+                  min: -20,
+                  max: 120,
+                  color: color1
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville_2.SO2_PPB": {
+                "graphMetaData" : {
+                  label: "Lawrenceville SO<sub>2</sub>, PPB",
+                  min: -0.01,
+                  max: 0.07,
+                  color: color2
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.OUT_T_DEGC": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Temp, deg F",
+                  min: -10,
+                  max: 45,
+                  color: color3
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.OUT_RH_PERCENT": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Relative Humidity, %",
+                  min: 0,
+                  max: 100,
+                  color: color4
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.SONICWD_DEG": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Wind Direction, deg",
+                  min: 0,
+                  max: 360,
+                  color: color6
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.SONICWS_MPH": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Wind Speed, MPH",
+                  min: 0,
+                  max: 30,
+                  color: color6
+                },
+                "summary": {}
+              }
+            }
+          }
+        }
+      },
+      "pitt1" : {
+        "coordinates" : {
+          "x" : "",
+          "y" : ""
+        },
+        "sensors" : {
+          "Lawrenceville" : {
+            "coordinates": {
+              "x": 125,
+              "y": 672
+            },
+            "channels" : {
+              "ACHD_Lawrenceville_2.PM25B_UG_M3": {
+                "graphMetaData" : {
+                  label: "Lawrenceville PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>",
+                  min: -20,
+                  max: 120,
+                  color: color1
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville_2.SO2_PPB": {
+                "graphMetaData" : {
+                  label: "Lawrenceville SO<sub>2</sub>, PPB",
+                  min: -0.01,
+                  max: 0.07,
+                  color: color2
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.OUT_T_DEGC": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Temp, deg F",
+                  min: -10,
+                  max: 45,
+                  color: color3
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.OUT_RH_PERCENT": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Relative Humidity, %",
+                  min: 0,
+                  max: 100,
+                  color: color4
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.SONICWD_DEG": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Wind Direction, deg",
+                  min: 0,
+                  max: 360,
+                  color: color6
+                },
+                "summary": {}
+              },
+              "ACHD_Lawrenceville.SONICWS_MPH": {
+                "graphMetaData" : {
+                  label: "Lawrenceville Wind Speed, MPH",
+                  min: 0,
+                  max: 30,
+                  color: color6
+                },
+                "summary": {}
+              }
+            }
+          }
+        }
+      }
+    };
+
+    function tm_init() {
+      post("set_share_links");
+      if (!window.btoa) window.btoa = base64.encode;
+      selectTimelapseFeed();
+      resizeOverlayCanvas();
+      //thumbnailInit();
+      var width = $('#timeMachine').width() - 2;
+      $("#achdSensorData").width(width);
+      supportsPointerEventsNone = supportsPointerEventsNone();
+      if (supportsPointerEventsNone) $(overlayCanvas).show();
+
+      var initialDataset = cached_breathecam.latest.path;
+      var startingDate = cached_breathecam.latest.date;
+
+      var hash = window.location.hash.slice(1);
+      hashVars = UTIL.unpackVars(hash);
+      var loadedTimelapse = false;
+      if (hashVars) {
+        hashVars.s = cameraToNameRemap(hashVars.s);
+        if (hashVars.d) {
+          startingDate = String(hashVars.d);
+          initialDataset = cached_breathecam.datasets[startingDate];
+          if (!initialDataset) {
+            initialDataset = cached_breathecam.latest.path;
+          }
+        }
+        if (hashVars.s) {
+          loadedTimelapse = true;
+          currentLocation = String(hashVars.s);
+          changeLocation(currentLocation, startingDate, null, null, false, function() {
+            initialDataset = cached_breathecam.datasets[startingDate];
+            if (!initialDataset) {
+              initialDataset = cached_breathecam.latest.path;
+            }
+            setupTimelapse(initialDataset, startingDate);
+          });
+        }
+      }
+
+      // If we did not load the timelapse with the hash vars above, do so now.
+      if (!loadedTimelapse)
+        setupTimelapse(initialDataset, startingDate);
+      locationDivId = currentLocation + "_overlay";
+      setLocationThumbnailToggle();
+      setLocationTitle();
+      showContent();
+    }
+
+    function img_init() {
+      if (UTIL.isMobile()) {
+        $("#location_toggle_container").css("height", "385px");
+        $("#stitched_image_wrapper_child").css("height", "439px");
+        $("#stitched_image_wrapper").css({"height" : "438px", "right" : "108px"});
+        $("#location_toggle_container").css("width", "auto");
+        $(".location_thumbnail_overlay").css({"width" : "101px", "height" : "96px"});
+        $(".location_thumbnail").css({"width" : "101px", "height" : "96px"});
+        $(".location_title").css("width", "101px");
+        $("#toggleStaticVideo").css({"width" : "100px", "right" : "-111px"});
+        $("#toggleStaticVideo").addClass("mobileBtn");
+        $("#locationTitle").css("right", "129px");
+        $("#pageTitle").css("right", "129px");
+        $("#stitched_image_note").css("top", "438px");
+        $(".location_thumbnail_overlay").hide();
+      }
+      var IEVersionObj = navigator.userAgent.match(/MSIE\s([\d]+)/);
+      var IEDoubleClickWorkaround = (UTIL.isIE() && IEVersionObj && IEVersionObj[1] < 9) ? true : false
+      $.ajax({
+        url: "<%= @dzi %>",
+        contentType: 'text/plain',
+        type: "GET",
+        dataType: "json"
+      }).done(function(tileJson) {
+        openSeadragonViewer = OpenSeadragon({
+          id: "stitched_image",
+          prefixUrl: "openseadragon/images/",
+          tileSources: tileJson,
+          showNavigator: true,
+          navigatorPosition: "BOTTOM_RIGHT",
+          visibilityRatio: 0.05,
+          gestureSettingsMouse: {
+            clickToZoom: IEDoubleClickWorkaround,
+            dblClickToZoom: !IEDoubleClickWorkaround
+          },
+          autoHideControls: false,
+          maxZoomLevel: 20
+        });
+
+        openSeadragonViewer.addHandler('canvas-release', function() {
+          $("#stitched_image").removeClass("closedHand").addClass("openHand");
+        });
+
+        openSeadragonViewer.addHandler('canvas-drag', function() {
+          $("#stitched_image").removeClass("openHand").addClass("closedHand");
+        });
+
+        // IE < 11 does not fire full-screen, so we must use full-page
+        // Both full-page and full-screen are fired in other browsers.
+        openSeadragonViewer.addHandler('pre-full-page', function() {
+          previousBounds = openSeadragonViewer.viewport.getBounds();
+        });
+
+        openSeadragonViewer.addHandler('full-page', function() {
+          openSeadragonisFillScreen = openSeadragonViewer.isFullPage();
+
+          // Hack since going into full screen causes the view to go completely zoomed out.
+          // What should be happening is it repositions where you last were. OpenSeadragon bug?
+          window.setTimeout(function () {
+            openSeadragonViewer.viewport.fitBounds(previousBounds, true);
+          }, 150);
+
+          if (UTIL.fullScreenAPISupported()) return;
+
+          var viewerElement = document.getElementById("stitched_image");
+          var screenWidth = $(window).width();
+          var screenHeight = $(window).height();
+
+          if (openSeadragonisFillScreen) {
+            viewerElement.style.width = screenWidth + "px";
+            viewerElement.style.height = screenHeight + "px";
+            //iframeElement.style.width = screenWidth + "px";
+            //iframeElement.style.height = screenHeight + "px";
+          } else {
+            viewerElement.style.width = "auto";
+            viewerElement.style.height = "476px";
+            //iframeElement.style.width = "atuo";
+            //iframeElement.style.height = "476";
+          }
+
+          var IEVersionObj = navigator.userAgent.match(/MSIE\s([\d]+)/);
+          var oldIE = (UTIL.isIE() && IEVersionObj && IEVersionObj[1] < 9)
+
+          if (window.self !== window.top && !oldIE) {
+            post("resize_iframe", {fillScreen: true});
+          }
+        });
+
+        openSeadragonViewer.addHandler("open", function(){
+          createTutorialButton(500, 320, "#stitched_image");
+          $("#stitched_image .tutorialButton").css({"top" : "39px", "left" : "6px"});
+          setLocationThumbnailToggle();
+          selectImageFeed();
+          showContent();
+        });
+
+        $("#stitched_image img").on("mouseenter", function() {
+          $(this).removeClass("openHand closedHand").addClass("pointerHand");
+        });
+
+        $("#stitched_image").attr('unselectable','on').addClass("unselectable").bind('selectstart', function(){
+          return false;
+        });
+
+        // IE < 9 HACK
+        $(document).on('dragstart', 'img', function(event) { event.preventDefault(); });
+
+        $(document).keydown(function(e) {
+          if ($("#latest_video_container").is(":visible")) return;
+          switch(e.which) {
+            case 70: // f
+              if (!openSeadragonisFillScreen) openSeadragonViewer.viewport.viewer.setFullScreen(true);
+              break;
+            case 27: // escape
+              if (openSeadragonisFillScreen) openSeadragonViewer.viewport.viewer.setFullScreen();
+              break;
+            case 37: // left
+              openSeadragonViewer.viewport.panBy(new OpenSeadragon.Point(-0.01, 0));
+              break;
+            case 38: // up
+              openSeadragonViewer.viewport.panBy(new OpenSeadragon.Point(0, 0.01));
+              break;
+            case 39: // right
+              openSeadragonViewer.viewport.panBy(new OpenSeadragon.Point(0.01, 0));
+              break;
+            case 40: // down
+              openSeadragonViewer.viewport.panBy(new OpenSeadragon.Point(0, -0.01));
+              break;
+            case 173:
+            case 109:
+            case 189: // minus
+              openSeadragonViewer.viewport.zoomBy(0.9);
+              break;
+            case 61:
+            case 107:
+            case 187: // plus
+              openSeadragonViewer.viewport.zoomBy(1.1);
+              break;
+            default: return;
+          }
+          e.preventDefault();
+        });
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log("There was an error encountered: " + textStatus + " -- " + errorThrown);
+      });
+
+    }
+
+    function cameraToNameRemap(cameraName) {
+      if (cameraName == "north_shore")
+        return "heinz";
+      else if (cameraName == "downtown")
+        return "trimont1";
+      else if (cameraName == "mon_valley")
+        return "walnuttowers1";
+      else if (cameraName == "oakland")
+        return "pitt1";
+      else
+        return cameraName;
+    }
+
+    function nameToCameraRemap(cameraName) {
+      if (cameraName == "heinz")
+        return "north_shore";
+      else if (cameraName == "trimont1")
+        return "downtown";
+      else if (cameraName == "walnuttowers1")
+        return "mon_valley";
+      else if (cameraName == "pitt1")
+        return "oakland";
+      else
+        return cameraName;
+    }
+
+    function toggleImageToVideo() {
+      var $latestVideoContainer = $("#latest_video_container");
+      var $stitchedImageWrapper = $("#stitched_image_wrapper");
+      var $latestVideo = $("#latest_video");
+      var $stitchedImage = $("#stitched_image");
+      if ($latestVideoContainer.is(":visible")) {
+        $latestVideo[0].pause();
+        $("#toggleStaticVideo").button('option', 'label', 'Timelapse Video');
+        $stitchedImage.show();
+        $latestVideoContainer.hide();
+        $("#stitched_image_wrapper_child").css("overflow", "");
+        $("#image_feed_timestamp").show();
+      } else {
+        var latestVideoWidth = $latestVideo.width();
+        var stitchedImageWrapperWidth = $stitchedImageWrapper.width();
+
+        $latestVideo.height($stitchedImageWrapper.height() * 1.72);
+        $latestVideo.width(stitchedImageWrapperWidth * 1.71);
+        $latestVideo.css("top", $latestVideo.width() * 0.038);
+        $latestVideo.css("right", $latestVideo.width() * ((currentLocation == "pitt1") ? 0.035 : 0.107));
+        $("#seek-bar").width(stitchedImageWrapperWidth - 175);
+
+        var video = document.getElementById("latest_video");
+        var dateObj = new Date();
+        var dateStr = dateObj.getFullYear() + "-" + ('0' + (dateObj.getMonth() + 1)).slice(-2) + "-" + ('0' + dateObj.getDate()).slice(-2);
+
+        video.setAttribute("src", "http://tiles.bodytrack.org/breathecam/timemachines/" + currentLocation + "/" + dateStr + ".timemachine/crf26-12fps-1424x800/0/0/0.mp4");
+        video.load();
+        $("#toggleStaticVideo").button('option', 'label', 'Zoomable Image');
+        $stitchedImage.hide();
+        $latestVideoContainer.show();
+        $("#stitched_image_wrapper_child").css("overflow", "hidden");
+        $("#image_feed_timestamp").hide();
+      }
+    }
+
+    function createTutorialButton(buttonWidth, buttonHeight, appendingDiv) {
+      var $tutorialButton = $("<div class='tutorialButton'>Quick Tour</div>");
+      $tutorialButton.attr({"id" : "timeMachine_tutorialButton", "title" : "Click to see an instructional video on how to use Breathe Cam"});
+      $tutorialButton.button({
+        icons: {
+          primary: "ui-icon-custom-tutorialButton"
+        },
+        text: true
+      }).on("click", function() {
+        var $tourDialog = $("#tutorialDialog");
+        if ($tourDialog.dialog("isOpen")) {
+          $tourDialog.dialog("close");
+          $("#tutorialIframe").remove();
+        } else {
+          $("#tutorialDialog").append('<iframe id="tutorialIframe" src="//player.vimeo.com/video/113645930?autoplay=1" width="100%" height="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>');
+          $tourDialog.dialog("open");
+        }
+      });
+      $tutorialButton.appendTo($(appendingDiv));
+
+      $("#tutorialDialog").dialog({
+        resizable: false,
+        autoOpen: false,
+        width: buttonWidth,
+        height: buttonHeight,
+        modal: true,
+        open: function( event, ui ) {
+          $(this).parent().css("top", "0px");
+          $(".ui-widget-overlay").on('click', function(){
+            $("#tutorialDialog").dialog('close');
+          });
+        },
+        close: function( event, ui ) {
+          $("#tutorialIframe").remove();
+        }
+      });
+    }
+
+    function setupTimelapse(initialDataset, startingDate) {
+      var settings = {
+        url: initialDataset,
+        disableTourLooping: true,
+        mediaType: ".mp4",
+        showFullScreenBtn: true,
+        showLogoOnDefaultUI: false,
+        datasetType: "breathecam",
+        onTimeMachinePlayerReady: function(viewerDivId) {
+          createTutorialButton(720, 540, "#timeMachine");
+
+          fbShareUrl = "http://breatheproject.org/learn/breathe-cam/";
+          $(".shareView").html("<div><img id='fb_share' src='assets/facebook_share.png'></div><div class='shareViewSpacer'>OR</div><div><textarea class='shareurl'></textarea></div>");
+          $(".shareView").dialog({ width: 275 });
+          $("#fb_share").on("click", function() {
+            fbShare();
+          });
+          $("#" + viewerDivId + " .fullScreen").css({
+            "right": "20px",
+            "bottom": "150px"
+          });
+          timelapse.addFullScreenChangeListener(function(browserSupportsFullScreen) {
+            var $changeDetectToggle = $(".changeDetectToggle");
+            if ($changeDetectToggle.hasClass("ui-state-disabled"))
+              $changeDetectToggle.button("enable");
+            else
+              $changeDetectToggle.button("disable");
+            if (!browserSupportsFullScreen)
+              post("resize_iframe", {fillScreen: true});
+          });
+
+          var $changeDetectRecenter = $("#changeDetectRecenter");
+          $changeDetectRecenter.button({
+            icons: {
+              primary: "ui-icon-custom-changeDetectRecenter"
+            },
+            text: true
+          }).on("click", function() {
+            resetFilter();
+          });
+
+          var $changeDetectMakeThumbnail = $("#changeDetectMakeThumbnail");
+          $changeDetectMakeThumbnail.button({
+            icons: {
+              primary: "ui-icon-custom-changeDetectMakeThumbnail"
+            },
+            text: true
+          }).on("click", function() {
+            window.open(thumbnailTool.getCurrentThumbnail());
+          });
+
+          var $changeDetectMakeGif = $("#changeDetectMakeGif");
+          $changeDetectMakeGif.button({
+            icons: {
+              primary: "ui-icon-custom-changeDetectMakeGif"
+            },
+            text: true
+          }).on("click", function() {
+            window.open(thumbnailTool.getCurrentGif());
+          });
+
+          var $changeDetectToggle = $("<div class='changeDetectToggle'>Change Detection</div>");
+          $changeDetectToggle.attr({"id" : "timeMachine_changeDetect", "title" : "Toggle the change detection tool"});
+          $changeDetectToggle.button({
+            icons: {
+              primary: "ui-icon-custom-changeDetectToggle"
+            },
+            text: true
+          }).on("click", function() {
+            var grapherHeight;
+            if ($("#achd").is(":visible")) {
+              grapherHeight = $("#grapher").height();
+              $("#achd").hide();
+              $(this).addClass("btnToggleState");
+            } else {
+              $("#achd").show();
+              grapherHeight = $("#grapher").height();
+              $(this).removeClass("btnToggleState");
+            }
+            if ($("#changeDetect").is(":visible")) {
+              post("resize_iframe", {height: (grapherHeight - 3)});
+              $("#changeDetect").hide();
+            } else {
+              post("resize_iframe", {height: ((-1 * grapherHeight) + 3)});
+              $("#changeDetect").show();
+            }
+            if (!thumbnailTool) {
+              var view = timelapse.getView();
+              var scaleOffsetX = 40/view.scale;
+              var scaleOffsetY = 40/view.scale;
+              var bounds = (view.x - scaleOffsetX) + "," + (view.y - scaleOffsetY) + "," + (view.x + scaleOffsetX) + "," + (view.y + scaleOffsetY);
+              thumbnailTool = new ThumbnailTool(timelapse, bounds);
+            } else {
+              thumbnailTool.toggleLayer();
+              if ($("#changeDetect").is(":visible"))
+                filter();
+            }
+          });
+          $changeDetectToggle.appendTo($("#timeMachine .controls"));
+
+          var captureTimes = timelapse.getCaptureTimes();
+          lastCaptureTime = captureTimes[captureTimes.length - 1];
+          firstCaptureTime = captureTimes[0];
+
+          timelapse.addTimeChangeListener(changeSensorValues);
+          addTimeLineSliderListeners();
+          addPlayButtonListeners();
+          //onCalendarDateChange();
+
+          // Override the hashchange event
+          window.onhashchange = null;
+          $(window).on("hashchange", function() {
+            var newHash = window.location.hash.slice(1);
+            var newHashVars = UTIL.unpackVars(newHash);
+            var currentHash = timelapse.getShareView();
+            var currentHashVars = UTIL.unpackVars(currentHash);
+            if (!newHashVars) return;
+            newHashVars.s = cameraToNameRemap(newHashVars.s);
+            if ((newHashVars.d && currentHashVars.d != newHashVars.d) || (newHashVars.s && currentHashVars.s != newHashVars.s)) {
+              var newDate, newDataset;
+              if (newHashVars.d) {
+                newDate = String(newHashVars.d);
+                newDataset = cached_breathecam.datasets[newDate];
+                if (!newDataset && currentHashVars.s == newHashVars.s) return;
+              }
+              var newTime = parseFloat(newHashVars.t);
+              var newView = timelapse.normalizeView(timelapse.unsafeViewToView(newHashVars.v));
+              if (newHashVars.s && currentHashVars.s != newHashVars.s) {
+                currentLocation = String(newHashVars.s);
+                changeLocation(currentLocation, newDate, newView, newTime, true);
+              } else {
+                updateCalendarAndToggleUI(newDate);
+                timelapse.loadTimelapse(newDataset, newView, newTime, false, null, function() {
+                  changeSensorValues()
+                  addTimeLineSliderListeners();
+                });
+              }
+            } else {
+              // Share views
+              timelapse.loadSharedViewFromUnsafeURL(UTIL.getUnsafeHashString());
+            }
+            window.location.hash = "";
+          });
+          if (!hashVars) {
+            var numFrames = timelapse.getNumFrames();
+            // 12 fps * 5 seconds = 60 frames
+            var fiveSecondsFromEnd = numFrames - 60;
+            timelapse.seekToFrame(fiveSecondsFromEnd);
+          }
+          //showContent();
+          changeSensorValues();
+        }
+      };
+      timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
+
+      currentDate = startingDate;
+
+      loadCalendar(startingDate);
+      // IE 9 cannot load the cvs from fluxtream. No idea why...
+      if (UTIL.isIE9()) {
+        $("#achdSensorData").remove();
+        $("#achdSensorDataBrowserError").show();
+      } else {
+        getACHDData(startingDate);
+      }
+    }
+
+    function selectTimelapseFeed() {
+      $("#image_feed").css("visibility", "hidden");
+      $("#stitched_image_wrapper").css("visibility", "hidden");
+      $("#stitched_image").css("visibility", "hidden");
+      $("#timelapse_feed").show();
+      setLocationTitle();
+    }
+
+    function selectImageFeed() {
+      $("#timelapse_feed").hide();
+      $("#image_feed").css("visibility", "visible");
+      $("#stitched_image_wrapper").css("visibility", "visible");
+      $("#stitched_image").css("visibility", "visible");
+      $("#location_toggle_container").css("top", "0px");
+      setLocationTitle();
+    }
+
+    function setLocationTitle() {
+      var locationTitle = $("#location_toggle .location_thumbnail_selected").siblings(".location_title").text();
+      $("#locationTitle").text(locationTitle);
+    }
+
+    function showContent() {
+      $("#loading").hide();
+      $("#content").css("visibility", "visible");
+      $("#location_toggle_container").scrollTop($("#" + locationDivId).offset().top - $("#location_toggle_container").offset().top);
+    }
+
+    function getCurrentTimeMachineDateInSecs() {
+      return (new Date(timelapse.getCurrentCaptureTime()).getTime()) / 1000;
+    }
+
+    function changeLocation(locationName, newDate, newView, newTime, doLoad, callBack) {
+      currentLocation = locationName;
+      if (timelapseFeedUnavailable) {
+        var dateObj = new Date();
+        var dateStr = dateObj.getFullYear() + "-" + ('0' + (dateObj.getMonth() + 1)).slice(-2) + "-" + ('0' + dateObj.getDate()).slice(-2);
+
+        $.ajax({
+          url: "<%= @root_url %>/images/" + locationName + "/050-original-images/" + dateStr + "/latest_stitch/" + locationName + ".json",
+          dataType: "json"
+        }).done(function(data) {
+          openSeadragonViewer.open(data);
+          locationDivId = currentLocation + "_overlay";
+          setLocationThumbnailToggle();
+          setLocationTitle();
+          if ($("#latest_video_container").is(":visible")) {
+            var video = document.getElementById("latest_video");
+            var $latestVideoContainer = $("#latest_video_container");
+            var $stitchedImageWrapper = $("#stitched_image_wrapper");
+            var $latestVideo = $(video);
+            var $stitchedImage = $("#stitched_image");
+
+            var latestVideoWidth = $latestVideo.width();
+            var stitchedImageWrapperWidth = $stitchedImageWrapper.width();
+
+            $latestVideo.height($stitchedImageWrapper.height() * 1.72);
+            $latestVideo.width(stitchedImageWrapperWidth * 1.71);
+            $latestVideo.css("top", $latestVideo.width() * 0.038);
+            $latestVideo.css("right", $latestVideo.width() * ((currentLocation == "pitt1") ? 0.045 : 0.107));
+            $("#seek-bar").width(stitchedImageWrapperWidth - 175);
+
+            video.setAttribute("src", "http://tiles.bodytrack.org/breathecam/timemachines/" + locationName + "/" + dateStr + ".timemachine/crf26-12fps-1424x800/0/0/0.mp4");
+            video.load();
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          console.log("There was an error encountered: " + textStatus + " -- " + errorThrown);
+        });
+    } else {
+        $.ajax({
+          url: "<%= @root_url %>/timemachines/" + locationName + "/" + locationName + ".json",
+          dataType: "json"
+        }).done(function(data) {
+          cached_breathecam = data;
+          var startingDate = cached_breathecam.latest.date;
+          var startingDataset = cached_breathecam.latest.path;
+
+          if (newDate) {
+            var tmpStartingDataset = cached_breathecam.datasets[newDate];
+            if (tmpStartingDataset) {
+              startingDate = newDate;
+              startingDataset = tmpStartingDataset;
+            }
+          }
+          // If there is no timelapse object at this point, then that means that we have just arrived at the page
+          // with a share link that has an invalid location name.
+          // Load the timelapse with the default location specified in the .fail() callback below.
+          if (!timelapse) {
+            setupTimelapse(startingDataset, startingDate);
+            return;
+          }
+          updateCalendarAndToggleUI(startingDate);
+          if (doLoad) {
+            if (timelapse && startingDataset) {
+              newTime = parseFloat(newTime);
+              timelapse.loadTimelapse(startingDataset, newView, newTime, false, null, function() {
+                filter();
+                addTimeLineSliderListeners();
+                if (isNaN(newTime)) {
+                  var numFrames = timelapse.getNumFrames();
+                  // 12 fps * 5 seconds = 60 frames
+                  var fiveSecondsFromEnd = numFrames - 60;
+                  timelapse.seekToFrame(fiveSecondsFromEnd);
+                }
+              });
+            }
+          } else if (typeof(callBack) === "function") {
+            callBack();
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR, textStatus, errorThrown);
+          changeLocation("heinz", null, null, null, true);
+        });
+      }
+    }
+
+    function updateCalendarAndToggleUI(startingDate) {
+      // TODO
+      for (var i = 0; i < series.length; i++) {
+        delete series[i].pc;
+        delete series[i].axis;
+      }
+      series.length = 0;
+      delete dateAxis;
+      $("#grapher").empty();
+      locationDivId = currentLocation + "_overlay";
+      setLocationThumbnailToggle();
+      setLocationTitle();
+      $("#datepicker").datepicker("destroy");
+      currentDate = startingDate;
+      loadCalendar(startingDate);
+      getACHDData(startingDate);
+      $(".sensorLocation").remove();
+    }
+
+    function loadCalendar(startingDate) {
+      var dateArray = startingDate.split("-");
+      $("#datepicker").datepicker({
+        defaultDate : new Date(dateArray[0], dateArray[1] - 1, dateArray[2]),
+        minDate : new Date(2014, 0),
+        onSelect : selectDay,
+        beforeShowDay : highlightDays
+      });
+    }
+
+    function highlightDays(date) {
+      date = $.datepicker.formatDate('yy-mm-dd', date);
+      if (cached_breathecam.datasets[date])
+        return [true, 'date-highlight'];
+      else
+        return [false, ''];
+    }
+
+    function selectDay(dateText, dateElem) {
+      var dateObj = new Date(dateText);
+      var date = $.datepicker.formatDate('yy-mm-dd', dateObj);
+      var path = cached_breathecam.datasets[date];
+      if (timelapse && path) {
+        currentDate = date;
+        timelapse.loadTimelapse(path, null, null, true, null, function() {
+          filter();
+          getACHDData(date);
+          addTimeLineSliderListeners();
+          if (typeof(dateAxis) !== "undefined") {
+            onCalendarDateChange();
+            var captureTimes = timelapse.getCaptureTimes();
+            lastCaptureTime = captureTimes[captureTimes.length - 1];
+            firstCaptureTime = captureTimes[0];
+            var startTime = (new Date((firstCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
+            var endTime = (new Date((lastCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
+            var currentTimeInSec = getCurrentTimeMachineDateInSecs();
+            dateAxis.setMaxRange(startTime, endTime);
+            dateAxis.setCursorPosition(currentTimeInSec);
+            for (var i = 0; i < series.length; i++) {
+              (function(idx) {
+                setTimeout(function() {
+                  clampNumberAxisToDataRange(idx);
+                }, 100);
+              })(i);
+            }
+          }
+        });
+      }
+    }
+
+    // Calling this function during playback will cause massive lag
+    function repositionChartCursor(time) {
+      var max = dateAxis.getMax();
+      var min = dateAxis.getMin();
+      var span = max - min;
+      var offset = span / 2;
+      if (time > max) {
+        dateAxis.setRange(time + offset - span, time + offset);
+      } else if (time < min) {
+        dateAxis.setRange(time - offset, time - offset + span);
+      }
+    }
+
+    function setLocationThumbnailToggle() {
+      $(".location_thumbnail_selected").removeClass("location_thumbnail_selected");
+      $("#" + locationDivId).addClass("location_thumbnail_selected");
+    }
+
+    function changeSensorValues() {
+      var currentCaptureTimeDateObj = new Date(timelapse.getCurrentCaptureTime());
+      currentCaptureTimeDateObj.setMinutes(0);
+      currentCaptureTimeDateObj /= 1000;
+
+      var sensorNamesArray = achdData[currentLocation] ? Object.keys(achdData[currentLocation].sensors) : [];
+      for (var i = 0; i < sensorNamesArray.length; i++) {
+        var sensor = achdData[currentLocation].sensors[sensorNamesArray[i]];
+        var channelNamesArray = Object.keys(sensor.channels);
+        for (var j = 0; j < channelNamesArray.length; j++) {
+          if (channelNamesArray[j].indexOf(".SONICWS_MPH") >= 0) continue;
+          var sensorData = sensor.channels[channelNamesArray[j]].summary;
+          var data = sensorData[currentCaptureTimeDateObj];
+          if (!data) {
+            // Check that we are near the end of the day, which means ACHD data is behind and we need to show the value
+            // of the last hour.
+            var sensorDataTimes = Object.keys(sensorData);
+            var lastSensorTime = sensorDataTimes[sensorDataTimes.length - 1];
+            if (currentCaptureTimeDateObj > parseInt(lastSensorTime)) {
+              data = sensorData[lastSensorTime];
+              currentCaptureTimeDateObj = lastSensorTime;
+            }
+          }
+          var $channelElm = $('div.sensor[data-channel="' + channelNamesArray[j] + '"]');
+          if (channelNamesArray[j].indexOf(".SONICWD_DEG") >= 0) {
+            var windSpeedChannelName = "ACHD_" + sensorNamesArray[i].replace(/\s+/g, '_') + ".SONICWS_MPH";
+            $channelElm = $('div.sensor[data-channel="' + windSpeedChannelName + '"]');
+            var wd = windDegreeToCompassDirection(data);
+            data = undefined;
+            if (wd != "N/A") {
+              data = sensor.channels[windSpeedChannelName].summary[(currentCaptureTimeDateObj)] + " MPH, " + wd;
+            }
+          }
+          data = (data !== undefined) ? data : "N/A";
+          $channelElm.text(data);
+        }
+      }
+    }
+
+    function getACHDData(newDateString) {
+      var captureTimes = [];
+      lastCaptureTime = newDateString + " 23:59:59";
+      firstCaptureTime = newDateString + " 00:00:00";
+      var startTime = (new Date((firstCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
+      var endTime = (new Date((lastCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
+
+      var sensors = achdData[currentLocation] ? Object.keys(achdData[currentLocation].sensors) : 0;
+      var channels = [];
+      for (var i = 0; i < sensors.length; i++) {
+        channels = channels.concat(Object.keys(achdData[currentLocation].sensors[sensors[i]].channels));
+      }
+      $.ajax({
+          url: "http://fluxtream-api-proxy.bodytrack.org/api/bodytrack/exportCSV/1968/fluxtream-export-from-" + startTime + "-to-" + endTime + ".csv",
+          data: {"channels" : JSON.stringify(channels)},
+          success: function(cvsData) {
+            var cvsArray = cvsData.split("\n");
+            var headingsArray = cvsArray[0].split(",");
+            // First row is the CVS headers, which we took care of above, so start at 1.
+            for (var i = 1; i < cvsArray.length; i++) {
+              var cvsLineAsArray = cvsArray[i].split(",");
+              // First entry is the EPOC time, so start at 1.
+              for (var j = 1; j < cvsLineAsArray.length; j++) {
+                var sensorName = headingsArray[j].split("ACHD_")[1].split(".")[0].replace(/_[0-9]|_/g, ' ').trim();
+                achdData[currentLocation].sensors[sensorName].channels[headingsArray[j]].summary[cvsLineAsArray[0]] = unitConversion(headingsArray[j], parseFloat(cvsLineAsArray[j]));
+              }
+            }
+            if ($(".sensor").length == 0)
+              createACHDTable();
+            changeSensorValues();
+          },
+          failure: function(data) {
+            console.log('Failed to load sensor channels.');
+          },
+          headers: {
+            Authorization: 'Basic ' + window.btoa('achd:achdmirror')
+          }
+      });
+    }
+
+    function clampNumberAxisToDataRange(seriesIndex) {
+      if (!series[seriesIndex]) return;
+      var plot = series[seriesIndex].p;
+      if (!plot) return;
+      var stats = plot.getStatistics(dateAxis.getMin(), dateAxis.getMax());
+      if (checkPlotLoadedInterval && stats.has_data || intervalCount >= 20) {
+        clearInterval(checkPlotLoadedInterval);
+        intervalCount = 0;
+      }
+      if (typeof stats.y_min !== 'undefined' && typeof stats.y_max !== 'undefined') {
+        var paddedRange = paddedYAxisRange(stats.y_min, stats.y_max);
+        series[seriesIndex].axis.setRange(paddedRange.min, paddedRange.max);
+        intervalCount = 0;
+      }
+    }
+
+    function paddedYAxisRange(min, max) {
+      var yDiff = max - min;
+      var padding = 0.5;
+      if (yDiff < 1e-10) {
+        padding = 0.5;
+      } else {
+        padding = 0.05 * yDiff;
+      }
+      return {min : min - padding, max : max + padding};
+    }
+
+    function windDegreeToCompassDirection(wd) {
+      var cd = "N/A";
+      if (typeof(wd) === "undefined") return cd;
+      if (wd >= 0 && wd < 11.25 || wd >= 348.75 && wd <= 360) {
+        cd = "N";
+      } else if (wd >= 11.25 && wd < 33.75) {
+        cd = "NNE";
+      } else if (wd >= 33.75 && wd < 56.25) {
+        cd = "NE";
+      } else if (wd >= 56.25 && wd < 78.75) {
+        cd = "ENE";
+      } else if (wd >= 78.75 && wd < 101.25) {
+        cd = "E";
+      } else if (wd >= 101.25 && wd < 123.75) {
+        cd = "ESE";
+      } else if (wd >= 123.75 && wd < 146.25) {
+        cd = "SE";
+      } else if (wd >= 146.25 && wd < 168.75) {
+        cd = "SSE";
+      } else if (wd >= 168.75 && wd < 191.25) {
+        cd = "S";
+      } else if (wd >= 191.25 && wd < 213.75) {
+        cd = "SSW";
+      } else if (wd >= 213.75 && wd < 236.25) {
+        cd = "SW";
+      } else if (wd >= 236.25 && wd < 258.75) {
+        cd = "WSW";
+      } else if (wd >= 258.75 && wd < 281.25) {
+        cd = "W";
+      } else if (wd >= 281.25 && wd < 303.75) {
+        cd = "WNW";
+      } else if (wd >= 303.75 && wd < 326.25) {
+        cd = "NW";
+      } else if (wd >= 326.25 && wd < 348.75) {
+        cd = "NNW";
+      }
+      return cd;
+    }
+
+    function unitConversion(channelName, dataValue) {
+      var PPM = "_PPM";
+      var DEGC = "_DEGC";
+      var channelNameLength = channelName.length;
+
+      if (channelName.indexOf(PPM, channelNameLength - PPM.length) !== -1) {
+        dataValue *= 1000.0; // Convert PPM to PPB
+      } else if (channelName.indexOf(DEGC, channelNameLength - DEGC.length) !== -1) {
+        dataValue = (dataValue * 1.8 + 32).toFixed(1); // Convert C to F
+      }
+      if (isNaN(dataValue) || typeof(dataValue) === "undefined") {
+        dataValue = "N/A";
+      }
+
+      return dataValue;
+    }
+
+    var createChart = function(channelName, channel) {
+      if (!$("#dateAxisContainer").length) {
+
+        $("#grapher").append('<div id="dateAxisContainer"><div id="dateAxis"></div></div>');
+        var captureTimes = timelapse.getCaptureTimes();
+        lastCaptureTime = captureTimes[captureTimes.length - 1];
+        firstCaptureTime = captureTimes[0];
+        var startTime = (new Date((firstCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
+        var endTime = (new Date((lastCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
+        dateAxis = new DateAxis("dateAxis", "horizontal", {
+          min: startTime,
+          max: endTime
+        });
+        dateAxis.setMaxRange(startTime, endTime);
+        dateAxis.setCursorPosition(getCurrentTimeMachineDateInSecs());
+        lastCursorPosition = dateAxis.getCursorPosition();
+      }
+      $("#dateAxis").mousedown(onGrapherMouseDown);
+
+      // Add charts
+      var i = series.length;
+      series[i] = {};
+      series[i].id = i;
+
+      var color_line = "rgb(" + channel.color + ")";
+      var color_fill = "rgba(" + channel.color + ",0.4)";
+
+      var row = $('<div class="chart"' + 'data-channel=' + channelName + '></div>');
+      row.append('<div class="chartTitle" style="background:' + color_fill + '">' + channel.label + '</div>');
+      row.append('<div id="series' + i + '" class="chartContent"></div>');
+      row.append('<div id="series' + i + 'axis" class="chartAxis"></div>');
+      row.append('<div id="series' + i + 'axisFit" class="fitChartAxis" title="Fit y-axis to data">Re-Fit<br>Data</div>');
+
+      $('#grapher').append(row);
+      $("#series" + i).mousedown(onGrapherMouseDown);
+
+      var $fitChartAxis = $(".fitChartAxis");
+      $fitChartAxis.button({
+        icons: {
+          primary: "ui-icon-custom-fitChartAxis"
+        },
+        text: true
+      });
+
+      series[i].axis = new NumberAxis('series' + i + 'axis', "vertical", {
+        min: channel.min,
+        max: channel.max
+      });
+
+      var datasource;
+      (function(source) {
+        datasource = function(level, offset, successCallback, failureCallback) {
+          $.ajax({
+            url: 'http://fluxtream-api-proxy.bodytrack.org/api/bodytrack/tiles/1968/' + source + '/' + level + '.' + offset + '.json',
+            success: function(data) {
+              var dataArray = data.data;
+              for (var i = 0; i < dataArray.length; i++) {
+                dataArray[i][1] = unitConversion(channelName, dataArray[i][1]);
+              }
+              successCallback(JSON.stringify(data));
+            },
+            failure: failureCallback,
+            headers: {
+              Authorization: 'Basic ' + window.btoa('achd:achdmirror')
+            }
+          });
+        };
+      })(channelName);
+
+      var plot = new DataSeriesPlot(datasource, dateAxis, series[i].axis, {});
+
+      series[i].p = plot;
+      plot.setStyle({
+        "styles": [{
+          "type": "line",
+          "lineWidth": 1,
+          "show": true,
+          "color": color_line
+        }],
+        highlight: {
+          "lineWidth": 1,
+          "styles": [{
+            "type": "lollipop",
+            "color": "#ff0000",
+            "radius": 1,
+            "lineWidth": 1,
+            "fill": false
+          }, {
+            "show": true,
+            "type": "value",
+            "fillColor": "#ff0000",
+            "marginWidth": 10,
+            "font": "9pt Helvetica,Arial,Verdana,sans-serif",
+            "verticalOffset": 7,
+            "numberFormat": "###,##0.0##"
+          }]
+        }
+      });
+      series[i].pc = new PlotContainer("series" + i, false, [plot]);
+      setSizes();
+      checkPlotLoadedInterval = setInterval(function(){
+        clampNumberAxisToDataRange(i);
+        intervalCount++;
+      }, 100);
+
+    };
+
+    var lastDateInSecs;
+    var timeChangeListenerExist = false;
+    var setChartCursorTimer = null;
+    var lastSetChartCursorTime = 0;
+    var fastestSetChartCursorTime_slow = 700;
+    var fastestSetChartCursorTime_fast = 100;
+    var fastestSetChartCursorTime = fastestSetChartCursorTime_slow;
+
+    function seekTimeMachine(currentDateInSecs, onSeekCompleteCallBack) {
+      if (currentDateInSecs != lastDateInSecs) {
+        lastDateInSecs = currentDateInSecs;
+        var desiredDate = new Date(currentDateInSecs * 1000);
+        var desiredDateString = $.datepicker.formatDate('mm/dd/yy', desiredDate);
+        var currentCaptureDateString = timelapse.getCurrentCaptureTime().split(" ")[0];
+        if (currentCaptureDateString) {
+          if (desiredDateString == currentCaptureDateString) {
+            // Just seek to the time
+            var closestDesiredFrame = timelapse.findExactOrClosestCaptureTime(desiredDate.toTimeString().substr(0, 5));
+            timelapse.seekToFrame(closestDesiredFrame);
+          }
+        }
+      }
+      if ( typeof onSeekCompleteCallBack === "function")
+        onSeekCompleteCallBack();
+    }
+
+    function onCalendarDateChange() {
+      var time = getCurrentTimeMachineDateInSecs();
+      setChartCursor(time);
+      repositionChartCursor(time);
+    }
+
+    function addTimeLineSliderListeners() {
+      clearTimeout(setChartCursorTimer);
+      setChartCursorTimer = null;
+      $("#Tslider1").mousedown(function() {
+        fastestSetChartCursorTime = fastestSetChartCursorTime_fast;
+        setChartCursorToCurrentTime();
+        if (timelapse.isPaused())
+          addTimeMachineTimeChangeListener();
+        // Make sure we release mousedown upon exiting our viewport if we are inside an iframe
+        $("body").one("mouseleave", function(event) {
+          if (window && (window.self !== window.top)) {
+            if (timelapse.isPaused())
+              removeTimeMachineTimeChangeListener();
+            fastestSetChartCursorTime = fastestSetChartCursorTime_slow;
+          }
+        });
+        // Release mousedown upon mouseup
+        $(document).one("mouseup", function(event) {
+          if (timelapse.isPaused())
+            removeTimeMachineTimeChangeListener();
+          fastestSetChartCursorTime = fastestSetChartCursorTime_slow;
+        });
+      });
+    }
+
+    function addPlayButtonListeners() {
+      $(".playbackButton").click(function() {
+        if ($(this).hasClass("pause")) {
+          addTimeMachineTimeChangeListener();
+        } else if ($(this).hasClass("play")) {
+          removeTimeMachineTimeChangeListener();
+        }
+      });
+    }
+
+    function onGrapherMouseDown() {
+      originalIsPaused = timelapse.isPaused();
+      if (!originalIsPaused) {
+        removeTimeMachineTimeChangeListener();
+        timelapse.handlePlayPause();
+      }
+      addGrapherAxisChangeListener();
+      // Make sure we release mousedown upon exiting our viewport if we are inside an iframe
+      $("body").one("mouseleave", function(event) {
+        if (window && (window.self !== window.top)) {
+          removeGrapherAxisChangeListener();
+          seekTimeMachine(dateAxis.getCursorPosition(), function() {
+            if (!originalIsPaused) {
+              addTimeMachineTimeChangeListener();
+              timelapse.handlePlayPause();
+            }
+          });
+        }
+      });
+      // Release mousedown upon mouseup
+      $(document).one("mouseup", function(event) {
+        removeGrapherAxisChangeListener();
+        seekTimeMachine(dateAxis.getCursorPosition(), function() {
+          if (!originalIsPaused) {
+            addTimeMachineTimeChangeListener();
+            timelapse.handlePlayPause();
+          }
+        });
+      });
+    }
+
+    function seekTimeMachineToCurrentCursorPosition(event) {
+      if (seekTimeMachineTimer) {
+        // We're already scheduled to make an update at the earliest
+        // possible time.  Do nothing.
+        return;
+      }
+      // Make sure not to call more often than this interval
+      var firstAllowedUpdateTime = lastSeekTimeMachineTime + fastestSeekTimeMachineTime;
+      var currentTime = new Date().getTime();
+      if (currentTime >= firstAllowedUpdateTime) {
+        // OK to update now
+        seekTimeMachine(event.cursorPosition);
+        lastSeekTimeMachineTime = currentTime;
+      } else {
+        // Schedule update at first allowed time
+        seekTimeMachineTimer = setTimeout(function() {
+          seekTimeMachine(event.cursorPosition);
+          lastSeekTimeMachineTime = new Date().getTime();
+          seekTimeMachineTimer = null;
+        }, firstAllowedUpdateTime - currentTime);
+      }
+    }
+
+    function addGrapherAxisChangeListener() {
+      if (!axisChangeListenerExist) {
+        axisChangeListenerExist = true;
+        dateAxis.addAxisChangeListener(seekTimeMachineToCurrentCursorPosition);
+      }
+    }
+
+    function removeGrapherAxisChangeListener() {
+      if (axisChangeListenerExist) {
+        dateAxis.removeAxisChangeListener(seekTimeMachineToCurrentCursorPosition);
+        clearTimeout(seekTimeMachineTimer);
+        seekTimeMachineTimer = null;
+        axisChangeListenerExist = false;
+      }
+    }
+
+    function addTimeMachineTimeChangeListener() {
+      if (!timeChangeListenerExist) {
+        timeChangeListenerExist = true;
+        timelapse.addTimeChangeListener(setChartCursorToCurrentTime);
+      }
+    }
+
+    function removeTimeMachineTimeChangeListener() {
+      if (timeChangeListenerExist) {
+        timelapse.removeTimeChangeListener(setChartCursorToCurrentTime);
+        clearTimeout(setChartCursorTimer);
+        setChartCursorTimer = null;
+        timeChangeListenerExist = false;
+      }
+    }
+
+    function setChartCursorToCurrentTime() {
+      setChartCursor(getCurrentTimeMachineDateInSecs());
+    }
+
+    function setChartCursor(time) {
+      if (!dateAxis) return;
+      if (setChartCursorTimer) {
+        // We're already scheduled to make an update at the earliest
+        // possible time.  Do nothing.
+        return;
+      }
+      // Make sure not to call more often than this interval
+      var firstAllowedUpdateTime = lastSetChartCursorTime + fastestSetChartCursorTime;
+      var currentTime = new Date().getTime();
+      if (currentTime >= firstAllowedUpdateTime) {
+        // OK to update now
+        dateAxis.setCursorPosition(time);
+        lastSetChartCursorTime = currentTime;
+      } else {
+        // Schedule update at first allowed time
+        setChartCursorTimer = setTimeout(function() {
+          dateAxis.setCursorPosition(time);
+          lastSetChartCursorTime = new Date().getTime();
+          setChartCursorTimer = null;
+        }, firstAllowedUpdateTime - currentTime);
+      }
+    }
+
+    function setSizes() {
+      var width = $('#timeMachine').width() - 2;
+      $("#achdSensorData").width(width);
+      if (!dateAxis) return;
+      $("#grapher").css("width", width + "px");
+      $("#dateAxis").width($('.chartContent').width());
+      var dateAxisWidth = $('#dateAxis').width();
+      var dateAxisHeight = $('#dateAxis').height();
+      if (!dateAxisWidth || !dateAxisHeight) return;
+      dateAxis.setSize(dateAxisWidth, dateAxisHeight, SequenceNumber.getNext());
+      for (var i = 0; i < series.length; i++) {
+        series[i].axis.setSize($('#series' + i + 'axis').width(), $('#series' + i + 'axis').height(), SequenceNumber.getNext());
+        series[i].pc.setSize($('#series' + i).width(), $('#series' + i).height(), SequenceNumber.getNext());
+      }
+    }
+
+    function resizeOverlayCanvas() {
+      var locationToggleContainerWidth = $("#location_toggle_container").width();
+      var marginBetweenLocationToggleAndViewer = Math.abs(locationToggleContainerWidth - parseInt($("#timeMachine").css("right"))) + 1;
+      overlayCanvas.width = window.innerWidth - locationToggleContainerWidth - marginBetweenLocationToggleAndViewer;
+    }
+
+    function createACHDTable() {
+      var sensorNamesArray = achdData[currentLocation] ? Object.keys(achdData[currentLocation].sensors).sort() : [];
+      var html = "";
+      for (var i = 0; i < sensorNamesArray.length; i++) {
+        var sensor = achdData[currentLocation].sensors[sensorNamesArray[i]];
+        html += "<tr class='sensorLocation' data-name='" + sensorNamesArray[i] + "' data-tm-pos='" + sensor.coordinates.x + "," + sensor.coordinates.y + "'>";
+        html += "<td align='left' style='padding-left: 0px !important; position: relative; z-index: 9'><div class='achdSensorLocation'>" + sensorNamesArray[i].replace("North ", "") + ":</div></td>";
+        var orderedChannels = ["","","","",""];
+        var channelNamesArray = Object.keys(sensor.channels);
+        for (var j = 0; j < channelNamesArray.length; j++) {
+          if (channelNamesArray[j].indexOf(".PM25") >= 0) {
+            orderedChannels[0] = channelNamesArray[j];
+          } else if (channelNamesArray[j].indexOf(".PM10") >= 0) {
+            orderedChannels[1] = channelNamesArray[j];
+          } else if (channelNamesArray[j].indexOf(".SO2") >= 0) {
+            orderedChannels[2] = channelNamesArray[j];
+          } else if (channelNamesArray[j].indexOf(".OUT_T_DEGC") >= 0) {
+            orderedChannels[3] = channelNamesArray[j];
+          } else if (channelNamesArray[j].indexOf(".OUT_RH_PERCENT") >= 0) {
+            orderedChannels[4] = channelNamesArray[j];
+          } else if (channelNamesArray[j].indexOf(".SONICWS_MPH") >= 0) {
+            orderedChannels[5] = channelNamesArray[j];
+          }
+        }
+        html += "<td align='left' title='Click to toggle a graph of fine particles'><div class='sensor' data-channel='" + orderedChannels[0] + "'>N/A</div></td>";
+        html += "<td align='left' title='Click to toggle a graph of respirable suspended particles'><div class='sensor' data-channel='" + orderedChannels[1] + "'>N/A</div></td>";
+        html += "<td align='left' title='Click to toggle a graph of sulfur dioxide'><div class='sensor' data-channel='" + orderedChannels[2] + "'>N/A</div></td>";
+        html += "<td align='left' title='Click to toggle a graph of temperature'><div class='sensor' data-channel='" + orderedChannels[3] + "'>N/A</div></td>";
+        html += "<td align='left' title='Click to toggle a graph of humidity'><div class='sensor' data-channel='" + orderedChannels[4] + "'>N/A</div></td>";
+        html += "<td align='left' title='Click to toggle a graph of wind speed'><div class='sensor' data-channel='" + orderedChannels[5] + "'>N/A</div></td>";
+        html += "</tr>";
+      }
+      $("#achdSensorDataTable").append(html);
+      // Remove cursor pointer from entries that do not have available graphs
+      $.each($(".sensor"), function(key, element) {
+        var $elm = $(element);
+        if ($elm.data("channel") == "" || $elm.data("channel") == "undefined")
+          $(element).css({"cursor" : "default"});
+      });
+    }
+
+    $(function() {
+      var $toggleStaticVideo = $("#toggleStaticVideo");
+      $toggleStaticVideo.button({
+        icons: {
+          primary: "ui-icon-custom-toggleStaticVideo"
+        },
+        text: true
+      }).on("click", function() {
+        toggleImageToVideo()
+      });
+
+      // Video
+      var video = document.getElementById("latest_video");
+      var vTest = document.createElement('video');
+      if (!vTest.canPlayType || !vTest.canPlayType('video/mp4')) $toggleStaticVideo.hide();
+
+      // Buttons
+      var playButton = document.getElementById("play-pause");
+      var fullScreenButton = document.getElementById("full-screen");
+
+      $(video).on("loadedmetadata", function() {
+        var newMin = (video.duration > 5.7) ? 5.7 : 0;
+        var newMax = video.duration - 0.833; // 10 frames at 12 fps
+        video.currentTime = newMin;
+
+        if (!videoLeaderSeekInterval) {
+          videoLeaderSeekInterval = setInterval(function(){
+            var video = $("#latest_video")[0];
+            if (video.paused) return;
+            var newMin = (video.duration > 5.7) ? 5.7 : 0;
+            var newMax = video.duration - 0.833; // 10 frames at 12 fps
+            if (video.currentTime < newMin) {
+              video.currentTime = newMin;
+            }
+          }, 50);
+        }
+
+        $("#seek-bar").slider( "option", "min", newMin );
+        $("#seek-bar").slider( "option", "max", newMax );
+        video.play();
+      });
+
+      $("#seek-bar").slider({
+        range: "min",
+        step: 0.083,
+        slide: function(e, ui) {
+          // $(this).slider('value')  --> previous value
+          // ui.value                 --> current value
+          // If we are manually using the slider and we are pulling it back to the start
+          // we wont actually get to time 0 because of how we are snapping.
+          // Manually seek to position 0 when this happens.
+
+          if (($(this).slider('value') > ui.value) && ui.value <= 5.7)
+            video.currentTime = 5.7;
+          else
+            video.currentTime = ui.value;
+        }
+      });
+
+      $(video).on('play', function (e) {
+        playButton.innerHTML = "Pause";
+      }).on('pause', function (e) {
+        playButton.innerHTML = "Play";
+      }).on("click", function() {
+        if (video.paused == true) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      }).on("timeupdate", function() {
+        $("#seek-bar").slider("option", "value", video.currentTime);
+      });
+
+      $(playButton).on("click", function() {
+        if (video.paused == true) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+
+      // Event listener for the full-screen button
+      $(fullScreenButton).on("click", function() {
+        if (!document.fullscreenElement &&    // alternative standard method
+          !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+          if (video.requestFullscreen) {
+            video.requestFullscreen();
+          } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
+          } else if (video.mozRequestFullScreen) {
+            video.mozRequestFullScreen();
+          } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+          }
+        }
+      });
+
+      overlayCanvas = document.getElementById("overlayCanvas");
+      if (overlayCanvas.getContext)
+        overlayCanvasContext = overlayCanvas.getContext("2d");
+      var timelapseSupported = org.gigapan.Util.browserSupported(".mp4");
+      var stitchedImage = "<%= @stitched_image %>";
+      locationDivId = "<%= @location_id %>" + "_overlay";
+
+      $(".location_thumbnail_container").on("click", function() {
+        window.location.hash = "";
+        post("clear_hash", {"changeDetectHeight" : (!!$("#changeDetect").is(":visible") * 3)});
+        var newLocation = $(this).attr("data-location-id");
+        if (currentLocation != newLocation)
+          changeLocation(newLocation, null, null, null, true);
+      });
+
+      $(window).resize(function() {
+
+        $("#latest_video").height($("#stitched_image_wrapper").height() * 1.72);
+        $("#latest_video").width($("#stitched_image_wrapper").width() * 1.71);
+        $("#latest_video").css("top", $("#latest_video").width() * 0.058);
+        $("#latest_video").css("right", $("#latest_video").width() * 0.127);
+        $("#seek-bar").width($("#stitched_image_wrapper").width() - 175);
+
+        if (!timelapseFeedUnavailable) {
+          if (!justAddedChannel) {
+            resizeOverlayCanvas();
+            setSizes();
+          }
+          justAddedChannel = false;
+        } else {
+          var viewerElement = document.getElementById("stitched_image");
+          var screenWidth = $(window.parent).width();
+          var screenHeight = $(window.parent).height();
+          if (openSeadragonisFillScreen) {
+            viewerElement.style.width = screenWidth + "px";
+            viewerElement.style.height = screenHeight + "px";
+          }
+        }
+      });
+
+      $("#achdSensorDataTable").on("mouseenter", ".sensorLocation", function() {
+        if (lineDrawn) return;
+        var tmCoords = $(this).data("tm-pos").split(",");
+        var viewportCoords = timelapse.convertTimeMachineToViewport({x: tmCoords[0], y: tmCoords[1]});
+        if (supportsPointerEventsNone) {
+          overlayCanvasContext.beginPath();
+          overlayCanvasContext.moveTo($(this).position().left + 20 + ($(this).find("td").first().width() / 2), $(this).offset().top - 1 - $(window).scrollTop());
+          overlayCanvasContext.lineTo(viewportCoords.x, viewportCoords.y);
+          overlayCanvasContext.lineWidth = 2;
+          overlayCanvasContext.strokeStyle = '#DCDCDC';
+          overlayCanvasContext.shadowOffsetX = 0;
+          overlayCanvasContext.shadowOffsetY = 0;
+          overlayCanvasContext.shadowBlur    = 3;
+          overlayCanvasContext.shadowColor   = "black";
+          overlayCanvasContext.stroke();
+          overlayCanvasContext.beginPath();
+          overlayCanvasContext.fillStyle = '#DCDCDC';
+          overlayCanvasContext.arc(viewportCoords.x, viewportCoords.y, 3, 0, Math.PI * 2);
+          overlayCanvasContext.fill();
+          overlayCanvasContext.closePath();
+          lineDrawn = true;
+        } else {
+          createLine($(this).position().left + 20 + ($(this).find("td").first().width() / 2), $(this).offset().top - 2 - $(window).scrollTop(), viewportCoords.x, viewportCoords.y);
+          lineDrawn = true;
+        }
+        $(this).find("td").first().addClass("locationTitleHover");
+      });
+
+      $("#achdSensorDataTable").on("mouseleave", ".sensorLocation", function(e) {
+        var $locationRow = $(this);
+        var locationRowOffset = $(this).offset();
+        if ((e.clientX <= Math.floor((locationRowOffset.left + 1)) || e.clientX >= Math.floor($locationRow.width() - 2) || e.clientY >= Math.floor(locationRowOffset.top + $locationRow.height()) || e.clientY <= Math.floor(locationRowOffset.top))) {
+          if (supportsPointerEventsNone) {
+            overlayCanvas.width = overlayCanvas.width;
+          } else {
+            $('.line').remove();
+          }
+          $(this).find("td").first().removeClass("locationTitleHover");
+          lineDrawn = false;
+        }
+      });
+
+      $("#grapher").on("click", ".fitChartAxis", function() {
+          var seriesElemId = $(this)[0].id.match(/\d+/)[0];
+          for (var i = 0; i < series.length; i++) {
+            if (series[i].id == seriesElemId) {
+              clampNumberAxisToDataRange(i);
+              break;
+            }
+          }
+      });
+
+      $("#achdSensorDataTable").on("click", ".sensor", function() {
+        // toggle graphs
+        justAddedChannel = true;
+        var previousGrapherHeight = $("#grapher").height();
+        var sensor = $(this).closest("tr").first().data("name");
+        var channelName = $(this).data("channel");
+        var channelData = achdData[currentLocation].sensors[sensor].channels[channelName];
+        if (!channelData) return;
+        var graphMetaData = channelData.graphMetaData;
+        if (!$(this).hasClass("graphOn")) {
+          $(this).css({"background" : "rgba(" + graphMetaData.color + ",0.4)"});
+          createChart(channelName, graphMetaData);
+        } else {
+          $(this).css({"background" : "transparent"});
+          var chart = $('.chart[data-channel="' + $(this).data("channel") + '"]');
+          var chartSeriesElem = chart.find(".chartContent")[0];
+          var seriesElemId = chartSeriesElem.id.match(/\d+/)[0];
+          var seriesId = -1;
+          for (var i = 0; i < series.length; i++) {
+            if (series[i].id == seriesElemId) {
+              seriesId = i;
+              break;
+            }
+          }
+          delete series[seriesId].pc;
+          delete series[seriesId].axis;
+          $(chart).remove();
+          series.splice(seriesId, 1);
+          if (series.length == 0) {
+            delete dateAxis;
+            $("#grapher").empty();
+          }
+        }
+        $(this).toggleClass("graphOn");
+
+        var diff = ($("#grapher").height() - previousGrapherHeight);
+        var numSensors = Object.keys(achdData[currentLocation].sensors).length;
+        if (Math.abs(diff) == 94) {
+          for (var i = 2; i < numSensors; i++) {
+            if (diff < 0) {
+              diff -= 25;
+            } else {
+              diff += 25;
+            }
+          }
+        }
+        post("resize_iframe", {height: diff});
+      }).on("mouseenter", ".sensor", function() {
+        var sensor = $(this).closest("tr").first().data("name");
+        var channelName = $(this).data("channel");
+        var channelData = achdData[currentLocation].sensors[sensor].channels[channelName];
+        if (!channelData) return;
+        var graphMetaData = channelData.graphMetaData;
+        $(this).css({"background" : "rgba(" + graphMetaData.color + ",0.4)"});
+      }).on("mouseleave", ".sensor", function(e) {
+        if ($(this).hasClass("graphOn")) return;
+        $(this).css({"background" : "transparent"});
+      });
+
+      $(window).scroll(function() {
+        var $cache = $('#dateAxis');
+        var scrollTop = $(window).scrollTop();
+        if (scrollTop > 25) {
+          $(".achdSensorLocation").parents("td").css({"z-index" : "0"});
+        } else {
+          $(".achdSensorLocation").parents("td").css({"z-index" : "9"});
+        }
+        if (scrollTop > 103) {
+          $cache.css({'position': 'fixed', 'top': '548px', 'left': '160px'});
+        } else {
+          $cache.css({'position': 'relative', 'top': '0px', 'left': '158px'});
+        }
+      });
+
+      if ((!timelapseSupported || typeof (cached_breathecam) === "undefined") && stitchedImage === "") {
+        // Nothing is up. Hide containers and inform the user
+        $("#stitched_image_wrapper").hide();
+        $("#location_toggle").hide();
+        $("#loading").html("<div class='error_msg2'>Content currently unavailable. Please try again later.</div>");
+      } else if (!timelapseSupported || typeof (cached_breathecam) === "undefined") {
+        timelapseFeedUnavailable = true;
+        // Timelapse unavailable, show latest stitched pano
+        // Calendar is gone in this mode, so move thumbnail toggles to top of page
+        $("#location_toggle").css({'top':'0px'});
+        $("#image_feed_timestamp").css({"top" : "92px", "right" : "21px"});
+        post("resize_iframe", {height: -170, persist: true});
+        img_init();
+      } else {
+        // Show timelapse
+        tm_init();
+      }
+      $("#container").on("mousedown", function() { return false; });
+    });
+
+    function supportsPointerEventsNone() {
+      if (navigator.appName == 'Microsoft Internet Explorer'){
+          var agent = navigator.userAgent;
+          if (agent.match(/MSIE ([0-9]{1,}[\.0-9]{0,})/) != null){
+              var version = parseFloat( RegExp.$1 );
+              if (version < 11)
+                return false;
+          }
+      }
+      return true;
+    }
+
+    function createLine(x1,y1, x2,y2){
+      var length = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+      var angle  = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+      var transform = 'rotate('+angle+'deg)';
+
+        var line = $('<div>')
+            .appendTo("body")
+            .addClass('line')
+            .css({
+              'position': 'absolute',
+              'transform': transform
+            })
+            .width(length)
+            .offset({left: x1, top: y1});
+
+        return line;
+    }
+  </script>
+<% end %>
+
+<div id="loading">
+  <img id="loadingImg" src="<%= asset_path('loading.gif') %>" width="508" height="381" alt="loading">
+</div>
+<div id="locationTitle"></div>
+<canvas id="overlayCanvas" width="0" height="660"></canvas>
+<div id="timelapse_feed" class="timelapse_feed_embed">
+  <div id="timeMachine"></div>
+  <div id="changeDetect">
+    <div id="chart"></div>
+    <div id="thumbnail-tool"></div>
+    <div id="changeDetectBtns">
+      <div id="changeDetectRecenter" title="Recenter rectangle on viewer">Recenter rectangle on viewer</div>
+      <div id="changeDetectMakeThumbnail" title="Create a thumbnail of view">Create thumbnail of view</div>
+      <div id="changeDetectMakeGif" title="Create an animated gif of view">Create animated gif of view</div>
+    </div>
+  </div>
+  <div id="achd">
+    <div id="achdSensorDataBrowserError">ACHD monitoring station data is not viewable with the browser you are running. Please update your browser to the latest version.</div>
+    <div id="achdSensorData">
+      <table id="achdSensorDataTable">
+        <tr align="left">
+          <th style="padding-left: 0px !important; float: left">Sensor Location</th>
+          <th>Fine Particles (2.5 &mu;m)</th>
+          <th title="Respirable Suspended Particles">RS Particles (10 &mu;m)</th>
+          <th>Sulfur Dioxide (PPB)</th>
+          <th>Temperature (F)</th>
+          <th>Relative Humidity (%)</th>
+          <th>Wind Speed & Direction</th>
+        </tr>
+      </table>
+    </div>
+    <p id="achd_note">Note: ACHD monitoring stations do not uniformly track the same air quality and meteorological data. When a given station has no report on a particular parameter, the data will be displayed as "N/A".</p>
+    <div id="grapher"></div>
+  </div>
+  <div id="datepicker" class="datepicker_embed"></div>
+</div>
+<div id="image_feed" class="image_feed_embed">
+  <div id="stitched_image_note">For a much richer, interactive experience with Breathe Cam, you must run the latest version of your browser and be on a desktop/laptop.</div>
+  <div id="stitched_image_wrapper">
+    <div id="stitched_image_wrapper_child">
+      <div id="stitched_image" class="openHand"></div>
+      <div id="latest_video_container">
+        <video id="latest_video" autoplay="autoplay" preload="auto"></video>
+        <div id="latest_video_controls">
+          <button type="button" id="play-pause" class="play">Play</button>
+          <div id="seek-bar"></div>
+          <button type="button" id="full-screen">Full Screen</button>
+        </div>
+      </div>
+    </div>
+    <div id="toggleStaticVideo">Timelapse Video</div>
+    <span id="image_feed_timestamp"><%= @pretty_time %></span>
+  </div>
+</div>
+<div id="location_toggle_container">
+  <div id="location_toggle">
+    <a class="location_thumbnail_container" data-location-id="heinz" href="javascript:void(0)">
+      <div id="heinz_overlay" class="location_thumbnail_overlay"></div>
+      <img src="<%= asset_path('heinz_toggle.png') %>" class="location_thumbnail" alt="Heinz">
+      <div class="location_title">North Shore</div>
+    </a>
+    <a class="location_thumbnail_container" data-location-id="trimont1" href="javascript:void(0)">
+      <div id="trimont1_overlay" class="location_thumbnail_overlay"></div>
+      <img src="<%= asset_path('trimont1_toggle.png') %>" class="location_thumbnail" alt="Trimont">
+      <div class="location_title">Downtown</div>
+    </a>
+    <a class="location_thumbnail_container" data-location-id="walnuttowers1" href="javascript:void(0)">
+      <div id="walnuttowers1_overlay" class="location_thumbnail_overlay"></div>
+      <img src="<%= asset_path('walnuttowers1_toggle.png') %>" class="location_thumbnail" alt="Walnut Towers">
+      <div class="location_title">Mon. Valley</div>
+    </a>
+    <a class="location_thumbnail_container location_thumbnail_container_end" data-location-id="pitt1" href="javascript:void(0)">
+      <div id="pitt1_overlay" class="location_thumbnail_overlay"></div>
+      <img src="<%= asset_path('pitt1_toggle.png') %>" class="location_thumbnail" alt="Pitt">
+      <div class="location_title">Oakland</div>
+    </a>
+  </div>
+</div>
+<div id="tutorialDialog"></div>
+<div id="pageTitle">BREATHE CAM</div>
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10682694-12']);
+  _gaq.push(['_trackPageview']);
+  _gaq.push(['_trackPageLoadTime']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
