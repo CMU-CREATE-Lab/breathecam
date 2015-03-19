@@ -17,13 +17,12 @@
                              "/timemachine-viewer/js/org/gigapan/postmessage.js",
                              "/timemachine-viewer/template_includes.js",
                              "#{@root_url}/timemachines/#{@location_id}/#{@location_id}.js",
-                             "/grapher/grapher2.nocache.js",
+                             "/grapher/gwt/grapher2.nocache.js",
                              "/openseadragon/openseadragon.min.js",
                              "https://www.google.com/jsapi",
                              "/change-detect/ThumbnailServiceAPI.js",
                              "/change-detect/TimeMachineCanvasLayer.js",
                              "/change-detect/ThumbnailTool.js",
-                             "/extras/base64.js",
                              "/extras/jquery.xdomainrequest.min.js",
                              "fbshare-bundle.js",
                              "/extras/jquery.ui.touch-punch.min.js"
@@ -733,7 +732,6 @@ a.location_thumbnail_container { color: white }
       var supportsPointerEventsNone = true;
       var justAddedChannel = false;
 
-
       function update() {
         thumbnailTool.update();
       }
@@ -837,6 +835,7 @@ a.location_thumbnail_container { color: white }
 
     var UTIL = org.gigapan.Util;
 
+    var ESDR_API_ROOT_URL = 'http://esdr.cmucreatelab.org/api/v1';
 
     var achdData = {
       "walnuttowers1" : {
@@ -851,7 +850,8 @@ a.location_thumbnail_container { color: white }
               "y" : "805"
             },
             "channels" : {
-              "ACHD_Liberty_2.PM10_UG_M3": {
+              "Liberty.PM10_UG_M3": {
+                "feed_id" : 29,
                 "graphMetaData" : {
                   label: 'Liberty PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
                   min: -20,
@@ -860,7 +860,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Liberty_2.PM25_UG_M3": {
+              "Liberty.PM25_UG_M3": {
+                "feed_id" : 29,
                 "graphMetaData" : {
                   label: 'Liberty PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>',
                   min: -20,
@@ -869,7 +870,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Liberty.OUT_T_DEGC": {
+              "Liberty.OUT_T_DEGC": {
+                "feed_id" : 28,
                 "graphMetaData" : {
                   label: 'Liberty Temp, deg F',
                   min: -10,
@@ -878,7 +880,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Liberty.SO2_PPM": {
+              "Liberty.SO2_PPM": {
+                "feed_id" : 28,
                 "graphMetaData" : {
                   label: "Liberty SO<sub>2</sub>, PPB",
                   min: -0.01,
@@ -887,7 +890,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Liberty.SONICWD_DEG": {
+              "Liberty.SONICWD_DEG": {
+                "feed_id" : 28,
                 "graphMetaData" : {
                   label: 'Liberty Wind Direction, deg',
                   min: 0,
@@ -896,7 +900,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Liberty.SONICWS_MPH": {
+              "Liberty.SONICWS_MPH": {
+                "feed_id" : 28,
                 "graphMetaData" : {
                   label: 'Liberty Wind Speed, MPH',
                   min: 0,
@@ -913,7 +918,8 @@ a.location_thumbnail_container { color: white }
               "y" : "826"
             },
             "channels" : {
-              "ACHD_Lincoln.PM10_UG_M3": {
+              "Lincoln.PM10_UG_M3": {
+                "feed_id" : 30,
                 "graphMetaData" : {
                   label: 'Lincoln PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
                   min: -20,
@@ -922,7 +928,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lincoln.PM25_UG_M3": {
+              "Lincoln.PM25_UG_M3": {
+                "feed_id" : 30,
                 "graphMetaData" : {
                   label: 'Lincoln PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>',
                   min: -20,
@@ -939,7 +946,8 @@ a.location_thumbnail_container { color: white }
               "y" : "848"
             },
             "channels" : {
-              "ACHD_North_Braddock.PM10B_UG_M3": {
+              "North Braddock.PM10B_UG_M3": {
+                "feed_id" : 3,
                 "graphMetaData" : {
                   label: 'North Braddock PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
                   min: -20,
@@ -948,7 +956,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_North_Braddock.OUT_T_DEGC": {
+              "North Braddock.OUT_T_DEGC": {
+                "feed_id" : 3,
                 "graphMetaData" : {
                   label: 'North Braddock Temp, deg F',
                   min: -10,
@@ -957,7 +966,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_North_Braddock.SO2_PPM": {
+              "North Braddock.SO2_PPM": {
+                "feed_id" : 3,
                 "graphMetaData" : {
                   label: "North Braddock SO<sub>2</sub>, PPB",
                   min: -0.01,
@@ -966,7 +976,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_North_Braddock.SONICWD_DEG": {
+              "North Braddock.SONICWD_DEG": {
+                "feed_id" : 3,
                 "graphMetaData" : {
                   label: 'North Braddock Wind Direction, deg',
                   min: 0,
@@ -975,7 +986,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_North_Braddock.SONICWS_MPH": {
+              "North Braddock.SONICWS_MPH": {
+                "feed_id" : 3,
                 "graphMetaData" : {
                   label: 'North Braddock Wind Speed, MPH',
                   min: 0,
@@ -1000,7 +1012,8 @@ a.location_thumbnail_container { color: white }
               "y" : "945"
             },
             "channels" : {
-              "ACHD_Flag_Plaza.PM10_UG_M3": {
+              "Flag Plaza.PM10_UG_M3": {
+                "feed_id" : 23,
                 "graphMetaData" : {
                   label: 'Flag Plaza PM<sub>10</sub>, &mu;g/m<sup>3</sup>',
                   min: -20,
@@ -1009,7 +1022,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Flag_Plaza.OUT_T_DEGC": {
+              "Flag Plaza.OUT_T_DEGC": {
+                "feed_id" : 23,
                 "graphMetaData" : {
                   label: 'Flag Plaza Temp, deg F',
                   min: -10,
@@ -1026,7 +1040,8 @@ a.location_thumbnail_container { color: white }
               "y" : "949"
             },
             "channels" : {
-              "ACHD_Lawrenceville_2.PM25B_UG_M3": {
+              "Lawrenceville.PM25B_UG_M3": {
+                "feed_id" : 27,
                 "graphMetaData" : {
                   label: 'Lawrenceville PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>',
                   min: -20,
@@ -1035,7 +1050,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville_2.SO2_PPB": {
+              "Lawrenceville.SO2_PPB": {
+                "feed_id" : 27,
                 "graphMetaData" : {
                   label: 'Lawrenceville SO<sub>2</sub>, PPB',
                   min: -0.01,
@@ -1044,7 +1060,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.OUT_T_DEGC": {
+              "Lawrenceville.OUT_T_DEGC": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: 'Lawrenceville Temp, deg F',
                   min: -10,
@@ -1053,7 +1070,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.OUT_RH_PERCENT": {
+              "Lawrenceville.OUT_RH_PERCENT": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: 'Lawrenceville Relative Humidity, %',
                   min: 0,
@@ -1062,7 +1080,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.SONICWD_DEG": {
+              "Lawrenceville.SONICWD_DEG": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: 'Lawrenceville Wind Direction, deg',
                   min: 0,
@@ -1071,7 +1090,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.SONICWS_MPH": {
+              "Lawrenceville.SONICWS_MPH": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: 'Lawrenceville Wind Speed, MPH',
                   min: 0,
@@ -1096,7 +1116,8 @@ a.location_thumbnail_container { color: white }
               "y" : 876
             },
             "channels" : {
-              "ACHD_Avalon.PM25B_UG_M3": {
+              "Avalon.PM25B_UG_M3": {
+                "feed_id" : 1,
                 "graphMetaData" : {
                   label: "Avalon PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>",
                   min: -20,
@@ -1105,7 +1126,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Avalon.SO2_PPM": {
+              "Avalon.SO2_PPM": {
+                "feed_id" : 1,
                 "graphMetaData" : {
                   label: "Avalon SO<sub>2</sub>, PPB",
                   min: -0.01,
@@ -1114,7 +1136,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Avalon.OUT_T_DEGC": {
+              "Avalon.OUT_T_DEGC": {
+                "feed_id" : 1,
                 "graphMetaData" : {
                   label: "Avalon Temp, deg F",
                   min: -10,
@@ -1123,7 +1146,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Avalon.SONICWD_DEG": {
+              "Avalon.SONICWD_DEG": {
+                "feed_id" : 1,
                 "graphMetaData" : {
                   label: "Avalon Wind Direction, deg",
                   min: 0,
@@ -1132,7 +1156,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Avalon.SONICWS_MPH": {
+              "Avalon.SONICWS_MPH": {
+                "feed_id" : 1,
                 "graphMetaData" : {
                   label: "Avalon Wind Speed, MPH",
                   min: 0,
@@ -1149,7 +1174,8 @@ a.location_thumbnail_container { color: white }
               "y" : 801
             },
             "channels" : {
-              "ACHD_Lawrenceville_2.PM25B_UG_M3": {
+              "Lawrenceville.PM25B_UG_M3": {
+                "feed_id" : 27,
                 "graphMetaData" : {
                   label: "Lawrenceville PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>",
                   min: -20,
@@ -1158,7 +1184,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville_2.SO2_PPB": {
+              "Lawrenceville.SO2_PPB": {
+                "feed_id" : 27,
                 "graphMetaData" : {
                   label: "Lawrenceville SO<sub>2</sub>, PPB",
                   min: -0.01,
@@ -1167,7 +1194,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.OUT_T_DEGC": {
+              "Lawrenceville.OUT_T_DEGC": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Temp, deg F",
                   min: -10,
@@ -1176,7 +1204,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.OUT_RH_PERCENT": {
+              "Lawrenceville.OUT_RH_PERCENT": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Relative Humidity, %",
                   min: 0,
@@ -1185,7 +1214,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.SONICWD_DEG": {
+              "Lawrenceville.SONICWD_DEG": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Wind Direction, deg",
                   min: 0,
@@ -1194,7 +1224,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.SONICWS_MPH": {
+              "Lawrenceville.SONICWS_MPH": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Wind Speed, MPH",
                   min: 0,
@@ -1219,7 +1250,8 @@ a.location_thumbnail_container { color: white }
               "y": 672
             },
             "channels" : {
-              "ACHD_Lawrenceville_2.PM25B_UG_M3": {
+              "Lawrenceville.PM25B_UG_M3": {
+                "feed_id" : 27,
                 "graphMetaData" : {
                   label: "Lawrenceville PM<sub>2.5</sub>, &mu;g/m<sup>3</sup>",
                   min: -20,
@@ -1228,7 +1260,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville_2.SO2_PPB": {
+              "Lawrenceville.SO2_PPB": {
+                "feed_id" : 27,
                 "graphMetaData" : {
                   label: "Lawrenceville SO<sub>2</sub>, PPB",
                   min: -0.01,
@@ -1237,7 +1270,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.OUT_T_DEGC": {
+              "Lawrenceville.OUT_T_DEGC": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Temp, deg F",
                   min: -10,
@@ -1246,7 +1280,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.OUT_RH_PERCENT": {
+              "Lawrenceville.OUT_RH_PERCENT": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Relative Humidity, %",
                   min: 0,
@@ -1255,7 +1290,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.SONICWD_DEG": {
+              "Lawrenceville.SONICWD_DEG": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Wind Direction, deg",
                   min: 0,
@@ -1264,7 +1300,8 @@ a.location_thumbnail_container { color: white }
                 },
                 "summary": {}
               },
-              "ACHD_Lawrenceville.SONICWS_MPH": {
+              "Lawrenceville.SONICWS_MPH": {
+                "feed_id" : 26,
                 "graphMetaData" : {
                   label: "Lawrenceville Wind Speed, MPH",
                   min: 0,
@@ -1281,7 +1318,6 @@ a.location_thumbnail_container { color: white }
 
     function tm_init() {
       post("set_share_links");
-      if (!window.btoa) window.btoa = base64.encode;
       selectTimelapseFeed();
       resizeOverlayCanvas();
       //thumbnailInit();
@@ -1344,7 +1380,7 @@ a.location_thumbnail_container { color: white }
         $(".location_thumbnail_overlay").hide();
       }
       var IEVersionObj = navigator.userAgent.match(/MSIE\s([\d]+)/);
-      var IEDoubleClickWorkaround = (UTIL.isIE() && IEVersionObj && IEVersionObj[1] < 9) ? true : false
+      var IEDoubleClickWorkaround = (UTIL.isIE() && IEVersionObj && IEVersionObj[1] < 9) ? true : false;
       $.ajax({
         url: "<%= @dzi %>",
         contentType: 'text/plain',
@@ -1408,7 +1444,7 @@ a.location_thumbnail_container { color: white }
           }
 
           var IEVersionObj = navigator.userAgent.match(/MSIE\s([\d]+)/);
-          var oldIE = (UTIL.isIE() && IEVersionObj && IEVersionObj[1] < 9)
+          var oldIE = (UTIL.isIE() && IEVersionObj && IEVersionObj[1] < 9);
 
           if (window.self !== window.top && !oldIE) {
             post("resize_iframe", {fillScreen: true});
@@ -1472,7 +1508,6 @@ a.location_thumbnail_container { color: white }
       }).fail(function(jqXHR, textStatus, errorThrown) {
         console.log("There was an error encountered: " + textStatus + " -- " + errorThrown);
       });
-
     }
 
     function cameraToNameRemap(cameraName) {
@@ -1708,7 +1743,7 @@ a.location_thumbnail_container { color: white }
               } else {
                 updateCalendarAndToggleUI(newDate);
                 timelapse.loadTimelapse(newDataset, newView, newTime, false, null, function() {
-                  changeSensorValues()
+                  changeSensorValues();
                   addTimeLineSliderListeners();
                 });
               }
@@ -1733,13 +1768,7 @@ a.location_thumbnail_container { color: white }
       currentDate = startingDate;
 
       loadCalendar(startingDate);
-      // IE 9 cannot load the cvs from fluxtream. No idea why...
-      if (UTIL.isIE9()) {
-        $("#achdSensorData").remove();
-        $("#achdSensorDataBrowserError").show();
-      } else {
-        getACHDData(startingDate);
-      }
+      getACHDData(startingDate);
     }
 
     function selectTimelapseFeed() {
@@ -1947,35 +1976,42 @@ a.location_thumbnail_container { color: white }
 
     function changeSensorValues() {
       var currentCaptureTimeDateObj = new Date(timelapse.getCurrentCaptureTime());
-      currentCaptureTimeDateObj.setMinutes(0);
+      var currentCaptureTimeDateObjMins = currentCaptureTimeDateObj.getMinutes();
+      var currentCaptureTimeDateObjHours = currentCaptureTimeDateObj.getHours();
+      currentCaptureTimeDateObj.setMinutes(30);
+      if (currentCaptureTimeDateObjMins < 30 && currentCaptureTimeDateObjHours > 0) {
+        currentCaptureTimeDateObj.setHours(currentCaptureTimeDateObjHours - 1);
+      }
       currentCaptureTimeDateObj /= 1000;
 
       var sensorNamesArray = achdData[currentLocation] ? Object.keys(achdData[currentLocation].sensors) : [];
+
       for (var i = 0; i < sensorNamesArray.length; i++) {
         var sensor = achdData[currentLocation].sensors[sensorNamesArray[i]];
         var channelNamesArray = Object.keys(sensor.channels);
         for (var j = 0; j < channelNamesArray.length; j++) {
-          if (channelNamesArray[j].indexOf(".SONICWS_MPH") >= 0) continue;
+          if (channelNamesArray[j].indexOf("SONICWS_MPH") >= 0) continue;
           var sensorData = sensor.channels[channelNamesArray[j]].summary;
           var data = sensorData[currentCaptureTimeDateObj];
-          if (!data) {
-            // Check that we are near the end of the day, which means ACHD data is behind and we need to show the value
-            // of the last hour.
+          if (typeof(data) !== "number") {
+            // ACHD data lags behind, so pull the last available data in this case
             var sensorDataTimes = Object.keys(sensorData);
-            var lastSensorTime = sensorDataTimes[sensorDataTimes.length - 1];
-            if (currentCaptureTimeDateObj > parseInt(lastSensorTime)) {
-              data = sensorData[lastSensorTime];
-              currentCaptureTimeDateObj = lastSensorTime;
+            var startTimeIdx = sensorDataTimes.indexOf((currentCaptureTimeDateObj).toString());
+            if (startTimeIdx === -1) startTimeIdx = sensorDataTimes.length - 1;
+            for (var k = startTimeIdx; k >= 0; k--) {
+              data = sensorData[sensorDataTimes[k]];
+              currentCaptureTimeDateObj = sensorDataTimes[k];
+              if (typeof(data) === "number") break;
             }
           }
           var $channelElm = $('div.sensor[data-channel="' + channelNamesArray[j] + '"]');
-          if (channelNamesArray[j].indexOf(".SONICWD_DEG") >= 0) {
-            var windSpeedChannelName = "ACHD_" + sensorNamesArray[i].replace(/\s+/g, '_') + ".SONICWS_MPH";
+          if (channelNamesArray[j].indexOf("SONICWD_DEG") >= 0) {
+            var windSpeedChannelName = sensorNamesArray[i] + "." + "SONICWS_MPH";
             $channelElm = $('div.sensor[data-channel="' + windSpeedChannelName + '"]');
             var wd = windDegreeToCompassDirection(data);
             data = undefined;
             if (wd != "N/A") {
-              data = sensor.channels[windSpeedChannelName].summary[(currentCaptureTimeDateObj)] + " MPH, " + wd;
+              data = sensor.channels[windSpeedChannelName].summary[currentCaptureTimeDateObj] + " MPH, " + wd;
             }
           }
           data = (data !== undefined) ? data : "N/A";
@@ -1991,37 +2027,52 @@ a.location_thumbnail_container { color: white }
       var startTime = (new Date((firstCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
       var endTime = (new Date((lastCaptureTime).replace(/-/g,"/")).getTime()) / 1000;
 
-      var sensors = achdData[currentLocation] ? Object.keys(achdData[currentLocation].sensors) : 0;
+      var sensors = achdData[currentLocation] ? Object.keys(achdData[currentLocation].sensors) : [];
       var channels = [];
-      for (var i = 0; i < sensors.length; i++) {
-        channels = channels.concat(Object.keys(achdData[currentLocation].sensors[sensors[i]].channels));
-      }
-      $.ajax({
-          url: "http://fluxtream-api-proxy.bodytrack.org/api/bodytrack/exportCSV/1968/fluxtream-export-from-" + startTime + "-to-" + endTime + ".csv",
-          data: {"channels" : JSON.stringify(channels)},
-          success: function(cvsData) {
-            var cvsArray = cvsData.split("\n");
-            var headingsArray = cvsArray[0].split(",");
-            // First row is the CVS headers, which we took care of above, so start at 1.
-            for (var i = 1; i < cvsArray.length; i++) {
-              var cvsLineAsArray = cvsArray[i].split(",");
-              // First entry is the EPOC time, so start at 1.
-              for (var j = 1; j < cvsLineAsArray.length; j++) {
-                var sensorName = headingsArray[j].split("ACHD_")[1].split(".")[0].replace(/_[0-9]|_/g, ' ').trim();
-                achdData[currentLocation].sensors[sensorName].channels[headingsArray[j]].summary[cvsLineAsArray[0]] = unitConversion(headingsArray[j], parseFloat(cvsLineAsArray[j]));
+      var feedId;
+
+      for (var sensorIdx = 0; sensorIdx < sensors.length; sensorIdx++) {
+        channels = Object.keys(achdData[currentLocation].sensors[sensors[sensorIdx]].channels);
+        channelsByFeed = {};
+        for (var channelIdx = 0; channelIdx < channels.length; channelIdx++) {
+          feedId = achdData[currentLocation].sensors[sensors[sensorIdx]].channels[channels[channelIdx]].feed_id;
+          channelsByFeed[feedId] = (channelsByFeed[feedId] || []).concat([channels[channelIdx].split(".")[1]]);
+        }
+        var feedIds = Object.keys(channelsByFeed);
+        for (var feedIdx = 0; feedIdx < feedIds.length; feedIdx++) {
+          feedId = feedIds[feedIdx];
+          (function(sensorIdx, feedIdx, channelsByFeed){
+            $.ajax({
+              crossDomain: true,
+              type: "GET",
+              dataType: "text",
+              url: ESDR_API_ROOT_URL + "/feeds/" + feedId + "/channels/" + channelsByFeed[feedId].join(",") + "/export",
+              data: { from: startTime, to: endTime},
+              success: function(csvData) {
+                var csvArray = csvData.split("\n");
+                var headingsArray = csvArray[0].split(",");
+                // First row is the CSV headers, which we took care of above, so start at 1.
+                for (var i = 1; i < csvArray.length; i++) {
+                  var csvLineAsArray = csvArray[i].split(",");
+                  // First entry is the EPOC time, so start at 1.
+                  for (var j = 1; j < csvLineAsArray.length; j++) {
+                    var tmpChannelHeading = headingsArray[j].split(".");
+                    var channelHeading = sensors[sensorIdx] + "." + tmpChannelHeading[tmpChannelHeading.length - 1];
+                    achdData[currentLocation].sensors[sensors[sensorIdx]].channels[channelHeading].summary[csvLineAsArray[0]] = unitConversion(headingsArray[j], parseFloat(csvLineAsArray[j]));
+                  }
+                }
+                if ($(".sensor").length === 0)
+                  createACHDTable();
+                changeSensorValues();
+
+              },
+              failure: function(data) {
+                console.log('Failed to load sensor data.');
               }
-            }
-            if ($(".sensor").length == 0)
-              createACHDTable();
-            changeSensorValues();
-          },
-          failure: function(data) {
-            console.log('Failed to load sensor channels.');
-          },
-          headers: {
-            Authorization: 'Basic ' + window.btoa('achd:achdmirror')
-          }
-      });
+            });
+          })(sensorIdx, feedIdx, channelsByFeed);
+        }
+      }
     }
 
     function clampNumberAxisToDataRange(seriesIndex) {
@@ -2098,7 +2149,7 @@ a.location_thumbnail_container { color: white }
       if (channelName.indexOf(PPM, channelNameLength - PPM.length) !== -1) {
         dataValue *= 1000.0; // Convert PPM to PPB
       } else if (channelName.indexOf(DEGC, channelNameLength - DEGC.length) !== -1) {
-        dataValue = (dataValue * 1.8 + 32).toFixed(1); // Convert C to F
+        dataValue = parseFloat((dataValue * 1.8 + 32).toFixed(1)); // Convert C to F
       }
       if (isNaN(dataValue) || typeof(dataValue) === "undefined") {
         dataValue = "N/A";
@@ -2157,24 +2208,25 @@ a.location_thumbnail_container { color: white }
       });
 
       var datasource;
-      (function(source) {
+      var feedId = achdData[currentLocation].sensors[channelName.split(".")[0]].channels[channelName].feed_id;
+      (function(source, sourceId) {
         datasource = function(level, offset, successCallback, failureCallback) {
           $.ajax({
-            url: 'http://fluxtream-api-proxy.bodytrack.org/api/bodytrack/tiles/1968/' + source + '/' + level + '.' + offset + '.json',
-            success: function(data) {
-              var dataArray = data.data;
+           crossDomain: true,
+            type: "GET",
+            dataType: "json",
+            url: ESDR_API_ROOT_URL + "/feeds/" + sourceId + "/channels/" + source + "/tiles/" + level + "." + offset,
+            success: function(json) {
+              var dataArray = json.data;
               for (var i = 0; i < dataArray.length; i++) {
                 dataArray[i][1] = unitConversion(channelName, dataArray[i][1]);
               }
-              successCallback(JSON.stringify(data));
+              successCallback(JSON.stringify(dataArray));
             },
-            failure: failureCallback,
-            headers: {
-              Authorization: 'Basic ' + window.btoa('achd:achdmirror')
-            }
+            failure: failureCallback
           });
         };
-      })(channelName);
+      })(channelName.split(".")[1], feedId);
 
       var plot = new DataSeriesPlot(datasource, dateAxis, series[i].axis, {});
 
@@ -2427,17 +2479,17 @@ a.location_thumbnail_container { color: white }
         var orderedChannels = ["","","","",""];
         var channelNamesArray = Object.keys(sensor.channels);
         for (var j = 0; j < channelNamesArray.length; j++) {
-          if (channelNamesArray[j].indexOf(".PM25") >= 0) {
+          if (channelNamesArray[j].indexOf("PM25") >= 0) {
             orderedChannels[0] = channelNamesArray[j];
-          } else if (channelNamesArray[j].indexOf(".PM10") >= 0) {
+          } else if (channelNamesArray[j].indexOf("PM10") >= 0) {
             orderedChannels[1] = channelNamesArray[j];
-          } else if (channelNamesArray[j].indexOf(".SO2") >= 0) {
+          } else if (channelNamesArray[j].indexOf("SO2") >= 0) {
             orderedChannels[2] = channelNamesArray[j];
-          } else if (channelNamesArray[j].indexOf(".OUT_T_DEGC") >= 0) {
+          } else if (channelNamesArray[j].indexOf("OUT_T_DEGC") >= 0) {
             orderedChannels[3] = channelNamesArray[j];
-          } else if (channelNamesArray[j].indexOf(".OUT_RH_PERCENT") >= 0) {
+          } else if (channelNamesArray[j].indexOf("OUT_RH_PERCENT") >= 0) {
             orderedChannels[4] = channelNamesArray[j];
-          } else if (channelNamesArray[j].indexOf(".SONICWS_MPH") >= 0) {
+          } else if (channelNamesArray[j].indexOf("SONICWS_MPH") >= 0) {
             orderedChannels[5] = channelNamesArray[j];
           }
         }
@@ -2453,8 +2505,9 @@ a.location_thumbnail_container { color: white }
       // Remove cursor pointer from entries that do not have available graphs
       $.each($(".sensor"), function(key, element) {
         var $elm = $(element);
-        if ($elm.data("channel") == "" || $elm.data("channel") == "undefined")
-          $(element).css({"cursor" : "default"});
+        if ($elm.data("channel") === "" || $elm.data("channel") === "undefined") {
+          $(element).css({"cursor" : "default"}).prop("title", "");
+        }
       });
     }
 
@@ -2466,7 +2519,7 @@ a.location_thumbnail_container { color: white }
         },
         text: true
       }).on("click", function() {
-        toggleImageToVideo()
+        toggleImageToVideo();
       });
 
       // Video
@@ -2522,7 +2575,7 @@ a.location_thumbnail_container { color: white }
       }).on('pause', function (e) {
         playButton.innerHTML = "Play";
       }).on("click", function() {
-        if (video.paused == true) {
+        if (video.paused === true) {
           video.play();
         } else {
           video.pause();
@@ -2532,7 +2585,7 @@ a.location_thumbnail_container { color: white }
       });
 
       $(playButton).on("click", function() {
-        if (video.paused == true) {
+        if (video.paused === true) {
           video.play();
         } else {
           video.pause();
@@ -2687,7 +2740,7 @@ a.location_thumbnail_container { color: white }
           delete series[seriesId].axis;
           $(chart).remove();
           series.splice(seriesId, 1);
-          if (series.length == 0) {
+          if (series.length === 0) {
             delete dateAxis;
             $("#grapher").empty();
           }
@@ -2756,7 +2809,7 @@ a.location_thumbnail_container { color: white }
     function supportsPointerEventsNone() {
       if (navigator.appName == 'Microsoft Internet Explorer'){
           var agent = navigator.userAgent;
-          if (agent.match(/MSIE ([0-9]{1,}[\.0-9]{0,})/) != null){
+          if (agent.match(/MSIE ([0-9]{1,}[\.0-9]{0,})/) !== null){
               var version = parseFloat( RegExp.$1 );
               if (version < 11)
                 return false;
