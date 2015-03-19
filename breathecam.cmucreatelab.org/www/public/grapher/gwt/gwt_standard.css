@@ -1,5 +1,5 @@
 /**
- * The file contains styles for GWT widgets in the standard theme, in RTL mode.
+ * The file contains styles for GWT widgets in the standard theme.
  *
  * In order to maintain cross-browser compatibility, the following syntax is
  * used to create IE6 specific style rules:
@@ -12,33 +12,13 @@
  *    }
  */
 
-body, table td, select {
-  font-family: Arial Unicode MS, Arial, sans-serif;
-  font-size: small;
-}
-pre {
-  font-family: "courier new", courier;
-  font-size: small;
-}
-body {
-  color: black;
-  margin: 0px;
-  border: 0px;
-  padding: 0px;
-  background: #fff;
-  direction: rtl;
-}
-a, a:visited, a:hover {
-  color: #0000AA;
-}
-
 /**
  * The reference theme can be used to determine when this style sheet has
  * loaded.  Create a hidden div element with absolute position, assign the style
  * name below, and attach it to the DOM.  Use a timer to detect when the
  * element's height and width are set to 5px.
  */
-.gwt-Reference-standard-rtl {
+.gwt-Reference-standard {
   height: 5px;
   width: 5px;
   zoom: 1;
@@ -119,7 +99,7 @@ a, a:visited, a:hover {
 
 .gwt-DialogBox .Caption {
   background: #e3e8f3 url(images/hborder.png) repeat-x 0px -2003px;
-  padding: 4px 8px 4px 4px;
+  padding: 4px 4px 4px 8px;
   cursor: default;
   border-bottom: 1px solid #bbbbbb;
   border-top: 5px solid #d0e4f6;
@@ -209,9 +189,9 @@ a, a:visited, a:hover {
   cursor: hand;
 }
 .gwt-DisclosurePanel .content {
-  border-right: 3px solid #e8eef7;
-  padding: 4px 8px 4px 0px;
-  margin-right: 6px;
+  border-left: 3px solid #e8eef7;
+  padding: 4px 0px 4px 8px;
+  margin-left: 6px;
 }
 
 .gwt-FileUpload {
@@ -283,7 +263,7 @@ a, a:visited, a:hover {
   padding: 0px;
   margin: 0px;
   border: 0px;
-  border-right: 1px solid #888888;
+  border-left: 1px solid #888888;
   background: white;
 }
 .gwt-MenuBar-horizontal .gwt-MenuItemSeparator .menuSeparatorInner {
@@ -293,14 +273,14 @@ a, a:visited, a:hover {
 }
 .gwt-MenuBar-vertical {
   margin-top: 0px;
-  margin-right: 0px;
+  margin-left: 0px;
   background: white;
 }
 .gwt-MenuBar-vertical table {
   border-collapse: collapse;
 }
 .gwt-MenuBar-vertical .gwt-MenuItem {
-  padding: 4px 1px 4px 14px;
+  padding: 4px 14px 4px 1px;
 }
 .gwt-MenuBar-vertical .gwt-MenuItemSeparator {
   padding: 2px 0px;
@@ -314,13 +294,13 @@ a, a:visited, a:hover {
   overflow: hidden;
 }
 .gwt-MenuBar-vertical .subMenuIcon {
-  padding-left: 4px;
+  padding-right: 4px;
 }
 .gwt-MenuBar-vertical .subMenuIcon-selected {
   background: #E0EDFE;
 }
 .gwt-MenuBarPopup {
-  margin: 0px 3px 0px 0px;
+  margin: 0px 0px 0px 3px;
 }
 .gwt-MenuBarPopup .menuPopupTopCenter {
   background: url(images/hborder.png) 0px -12px repeat-x;
@@ -565,51 +545,51 @@ a, a:visited, a:hover {
   margin: 0px;
 }
 .gwt-RichTextToolbar .gwt-PushButton-up {
-  padding: 0px 0px 0px 1px;
-  margin-left: 4px;
+  padding: 0px 1px 0px 0px;
+  margin-right: 4px;
   margin-bottom: 4px;
   border-width: 1px; 
 }
 .gwt-RichTextToolbar .gwt-PushButton-up-hovering {
-  margin-left: 4px;
+  margin-right: 4px;
   margin-bottom: 4px;
-  padding: 0px 0px 0px 1px;
+  padding: 0px 1px 0px 0px;
   border-width: 1px; 
 }
 .gwt-RichTextToolbar .gwt-PushButton-down {
-  margin-left: 4px;
+  margin-right: 4px;
   margin-bottom: 4px;
-  padding: 0px 1px 0px 0px;
+  padding: 0px 0px 0px 1px;
   border-width: 1px; 
 }
 .gwt-RichTextToolbar .gwt-PushButton-down-hovering {
-  margin-left: 4px;
+  margin-right: 4px;
   margin-bottom: 4px;
-  padding: 0px 1px 0px 0px;
+  padding: 0px 0px 0px 1px;
   border-width: 1px; 
 }
 .gwt-RichTextToolbar .gwt-ToggleButton-up {
-  margin-left: 4px;
+  margin-right: 4px;
   margin-bottom: 4px;
-  padding: 0px 0px 0px 1px;
+  padding: 0px 1px 0px 0px;
   border-width: 1px;
 }
 .gwt-RichTextToolbar .gwt-ToggleButton-up-hovering {
-  margin-left: 4px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  padding: 0px 1px 0px 0px;
+  border-width: 1px;
+}
+.gwt-RichTextToolbar .gwt-ToggleButton-down {
+  margin-right: 4px;
   margin-bottom: 4px;
   padding: 0px 0px 0px 1px;
   border-width: 1px;
 }
-.gwt-RichTextToolbar .gwt-ToggleButton-down {
-  margin-left: 4px;
-  margin-bottom: 4px;
-  padding: 0px 1px 0px 0px;
-  border-width: 1px;
-}
 .gwt-RichTextToolbar .gwt-ToggleButton-down-hovering {
-  margin-left: 4px;
+  margin-right: 4px;
   margin-bottom: 4px;
-  padding: 0px 1px 0px 0px;
+  padding: 0px 0px 0px 1px;
   border-width: 1px;
 }
 
@@ -640,7 +620,7 @@ a, a:visited, a:hover {
   border: 1px solid #bbbbbb;
   border-bottom: 0px;
   background: white;
-  padding: 2px 5px 10px 2px;
+  padding: 2px 2px 10px 5px;
 }
 .gwt-DecoratedStackPanel .gwt-StackPanelItem {
   cursor: pointer;
@@ -708,7 +688,7 @@ a, a:visited, a:hover {
   padding: 2px;
 }
 .gwt-SuggestBoxPopup {
-  margin-right: 3px;
+  margin-left: 3px;
 }
 .gwt-SuggestBoxPopup .item {
   padding: 2px 6px;
@@ -836,7 +816,7 @@ a, a:visited, a:hover {
 }
 .gwt-DecoratedTabBar .gwt-TabBarItem {
   border-collapse: collapse;
-  margin-right: 6px;
+  margin-left: 6px;
 }
 .gwt-DecoratedTabBar .tabTopCenter {
   padding: 0px;
@@ -988,18 +968,17 @@ a, a:visited, a:hover {
   white-space: nowrap;
   cursor: hand;
   cursor: pointer;
-  zoom: 1;
 }
 .gwt-Tree .gwt-TreeItem-selected {
   background: #93c2f1 url(images/hborder.png) repeat-x 0px -1463px;
 }
 .gwt-TreeItem .gwt-RadioButton input,
 .gwt-TreeItem .gwt-CheckBox input {
-  margin-right: 0px;
+  margin-left: 0px;
 }
 * html .gwt-TreeItem .gwt-RadioButton input,
 * html .gwt-TreeItem .gwt-CheckBox input {
-  margin-right: -4px;
+  margin-left: -4px;
 }
 
 .gwt-DateBox input {
@@ -1107,7 +1086,7 @@ td.datePickerMonth {
   border: 1px solid #bbbbbb;
   border-bottom: 0px;
   background: white;
-  padding: 2px 5px 10px 2px;
+  padding: 2px 2px 10px 5px;
 }
 
 .gwt-TabLayoutPanel {
