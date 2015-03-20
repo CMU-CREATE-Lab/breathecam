@@ -28,189 +28,203 @@
                              "/extras/jquery.ui.touch-punch.min.js"
 %>
 
-  <style type="text/css">
-    .selectTopRight {
-      cursor: ne-resize !important;
-    }
-    .selectBottomRight {
-      cursor: se-resize !important;
-    }
-    .selectBottomLeft {
-      cursor: sw-resize !important;
-    }
-    .selectTopLeft {
-      cursor: nw-resize !important;
-    }
-    .selectDown {
-      cursor: s-resize !important;
-    }
-    .selectUp {
-      cursor: n-resize !important;
-    }
-    .selectLeft {
-      cursor: w-resize !important;
-    }
-    .selectRight {
-      cursor: e-resize !important;
-    }
-    .selectMove {
-      cursor: move !important;
-    }
-    #timeMachine {
-      position: fixed;
-      left: -2px;
-      right: 220px;
-      top: -2px;
-      width: auto;
-      /*height: 683px;*/
-      height: 545px;
-      z-index: 5;
-    }
-    #changeDetect {
-      position: absolute;
-      /*top: 680px;*/
-      top: 542px;
-      width: 100%;
-      display: none;
-    }
-    #chart {
-      height: 150px;
-    }
-    #achd {
-      position: relative;
-      left: 0px;
-      right: 217px;
-      /*top: 648px;*/
-      top: 505px;
-      height: auto;
-      display: block;
-    }
-    #achdSensorDataTable {
-      width: 100%;
-    }
-    #datepicker {
-      right: 0px !important;
-      position: fixed;
-    }
-    #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
-      cursor: pointer;
-    }
-    #datepicker .ui-datepicker-header {
-      color: white;
-      background: rgb(150, 150, 150);
-      border: 0px solid rgb(204, 204, 204);
-      border-radius: 3px !important;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
-    }
-    #datepicker .ui-datepicker {
-      font-size: 12px;
-      height: 190px;
-      border-radius: 0;
-      color: #555555;
-      background: rgb(248, 248, 248);
-      border: 1px solid rgb(150, 150, 150);
-    }
-    #datepicker .ui-state-default {
-      background: rgb(150, 150, 150);
-      border-radius: 3px !important;
-      color: white;
-      box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
-    }
-    #datepicker .ui-state-hover {
-      background: rgb(100, 100, 100) !important;
-    }
-    #datepicker .date-highlight a {
-      color: white;
-      background: rgb(150, 150, 150);
-      border: 1px solid rgb(204, 204, 204);
-    }
-    #datepicker .ui-state-active {
-      border: 1px solid rgb(204, 204, 204) !important;
-      background: #2794DD !important;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
-    }
-    #datepicker .ui-datepicker-header .ui-icon {
-      background-image: url(<%= asset_path('ui-icons_custom_256x240.png') %>);
-    }
+<style type="text/css">
+  .selectTopRight {
+    cursor: ne-resize !important;
+  }
+  .selectBottomRight {
+    cursor: se-resize !important;
+  }
+  .selectBottomLeft {
+    cursor: sw-resize !important;
+  }
+  .selectTopLeft {
+    cursor: nw-resize !important;
+  }
+  .selectDown {
+    cursor: s-resize !important;
+  }
+  .selectUp {
+    cursor: n-resize !important;
+  }
+  .selectLeft {
+    cursor: w-resize !important;
+  }
+  .selectRight {
+    cursor: e-resize !important;
+  }
+  .selectMove {
+    cursor: move !important;
+  }
+  #timeMachine {
+    position: fixed;
+    left: -2px;
+    right: 220px;
+    top: -2px;
+    width: auto;
+    height: 545px;
+    z-index: 5;
+  }
+  #changeDetect {
+    position: absolute;
+    top: 542px;
+    width: 100%;
+    display: none;
+  }
+  #chart {
+    height: 150px;
+  }
+  #achd {
+    position: relative;
+    left: 0px;
+    right: 217px;
+    top: 505px;
+    height: auto;
+    display: block;
+  }
+  #achdSensorDataTable {
+    width: 100%;
+  }
+  #datepicker {
+    right: 0px !important;
+    position: fixed;
+  }
+  #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
+    cursor: pointer;
+  }
+  #datepicker .ui-datepicker-header {
+    color: white;
+    background: rgb(150, 150, 150);
+    border: 0px solid rgb(204, 204, 204);
+    border-radius: 3px !important;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+  }
+  #datepicker .ui-datepicker {
+    font-size: 12px;
+    height: 190px;
+    border-radius: 0;
+    color: #555555;
+    background: rgb(248, 248, 248);
+    border: 1px solid rgb(150, 150, 150);
+  }
+  #datepicker .ui-state-default {
+    background: rgb(150, 150, 150);
+    border-radius: 3px !important;
+    color: white;
+    box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+  }
+  #datepicker .ui-state-hover {
+    background: rgb(100, 100, 100) !important;
+  }
+  #datepicker .date-highlight a {
+    color: white;
+    background: rgb(150, 150, 150);
+    border: 1px solid rgb(204, 204, 204);
+  }
+  #datepicker .ui-state-active {
+    border: 1px solid rgb(204, 204, 204) !important;
+    background: #2794DD !important;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+  }
+  #datepicker .ui-datepicker-header .ui-icon {
+    background-image: url(<%= asset_path('ui-icons_custom_256x240.png') %>);
+  }
 
-    #datepicker table td, select {
-      font-size: 11px !important;
-    }
+  #datepicker table td, select {
+    font-size: 11px !important;
+  }
 
-    #grapher {
-      font-size: 10pt !important;
-      position: relative;
-      left: 0px;
-      right: 241px;
-      width: auto;
-      top: 36px;
-    }
+  #grapher {
+    font-size: 10pt !important;
+    position: relative;
+    left: 0px;
+    right: 241px;
+    width: auto;
+    top: 36px;
+  }
 
-    #dateAxisContainer {
-      width: 100%;
-      height: 40px;
-      position: relative;
-    }
+  #dateAxisContainer {
+    width: 100%;
+    height: 40px;
+    position: relative;
+  }
 
-    #dateAxis {
-      position: absolute;
-      right: 250px;
-      left: 159px;
-      top: 0px;
-      height: 40px;
-      border: 1px solid black;
-      z-index: 20;
-      width: 1430px;
-      background: white;
-    }
+  #dateAxis {
+    position: absolute;
+    right: 250px;
+    left: 159px;
+    top: 0px;
+    height: 40px;
+    border: 1px solid black;
+    z-index: 20;
+    width: 1430px;
+    background: white;
+  }
 
-    .chart {
-      height: 53px;
-      margin-top: 1px;
-      background: #4f5457 !important;
-    }
+  #yAxisAutoScaleToggle {
+    width: 23px;
+    height: 28px;
+    right: 4px;
+    position: absolute;
+    top: 6px;
+    background: white;
+  }
 
-    .chartTitle {
-      position: absolute;
-      left: 0px;
-      width: 136px;
-      height: 31px;
-      border: 1px solid black;
-      font-family: 'Helvetica Neue', Helvetica, Arial;
-      color: white;
-      padding: 11px
-    }
+  #yAxisAutoScaleToggle.active {
+    background: #e0e0e0;
+    border-color: #dbdbdb;
+    box-shadow:         inset 0 3px 5px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:    inset 0 3px 5px rgba(0, 0, 0, 0.2);
+  }
 
-    .chartContent {
-      position: absolute;
-      left: 159px;
-      right: 35px;
-      height: 53px;
-      border: 1px solid black;
-      background: white;
-    }
+  .chart {
+    height: 53px;
+    margin-top: 1px;
+    background: #4f5457 !important;
+  }
 
-    .chartAxis {
-      position: absolute;
-      right: 0px;
-      width: 34px;
-      height: 53px;
-      border: 1px solid black;
-      background: white;
-    }
+  .chartTitle {
+    position: absolute;
+    left: 0px;
+    width: 136px;
+    height: 31px;
+    border: 1px solid black;
+    font-family: 'Helvetica Neue', Helvetica, Arial;
+    color: white;
+    padding: 11px
+  }
 
-    #achdSensorData {
-      position: relative;
-      top: 38px;
-      padding-bottom: 35px;
-    }
+  .chartContent {
+    position: absolute;
+    left: 159px;
+    right: 35px;
+    height: 53px;
+    border: 1px solid black;
+    background: white;
+  }
 
-    .locationTitleHover {
-      box-shadow: 0 0 0 2px #dcdcdc;
-      -moz-box-shadow: 0 0 0 2px #dcdcdc;
-      -webkit-box-shadow: 0 0 0 2px #dcdcdc;
-      border-color: transparent;
-    }
+  .chartAxis {
+    position: absolute;
+    right: 0px;
+    width: 34px;
+    height: 53px;
+    border: 1px solid black;
+    background: white;
+  }
+
+  #achdSensorData {
+    position: relative;
+    top: 38px;
+    padding-bottom: 35px;
+  }
+
+  .locationTitleHover {
+    box-shadow: 0 0 0 2px #dcdcdc;
+    -moz-box-shadow: 0 0 0 2px #dcdcdc;
+    -webkit-box-shadow: 0 0 0 2px #dcdcdc;
+    border-color: transparent;
+  }
 
   #overlayCanvas {
     position: fixed;
@@ -218,40 +232,6 @@
     z-index: 8;
     left: 0px;
     pointer-events: none;
-  }
-
-  .fitChartAxis .ui-button-text {
-    margin-left: 5px;
-    font-size: 11px;
-    margin-top: 10px;
-    line-height: 15px;
-    text-align: left;
-    padding: 0px;
-  }
-
-  .fitChartAxis .ui-icon.ui-icon-custom-fitChartAxis {
-    background-image: none;
-    width: 34px;
-    height: 34px;
-    opacity: 0.55;
-    background-size: contain !important;
-    margin-left: -17px;
-    margin-top: -17px;
-  }
-
-  .fitChartAxis {
-    position: absolute;
-    height: 50px;
-    width: 40px;
-    right: -48px;
-    background: white;
-    border: 1px solid #656565;
-    border-radius: 3px !important;
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-    z-index: 30;
-    outline: none;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 11px;
   }
 
   .btnToggleState {
@@ -322,29 +302,29 @@
     font-size: 11px;
   }
 
-    #changeDetectMakeThumbnail .ui-icon.ui-icon-custom-changeDetectMakeThumbnail {
-      background-image: none;
-      width: 34px;
-      height: 34px;
-      opacity: 0.55;
-      background-size: contain !important;
-      margin-left: -17px;
-      margin-top: -17px;
-    }
+  #changeDetectMakeThumbnail .ui-icon.ui-icon-custom-changeDetectMakeThumbnail {
+    background-image: none;
+    width: 34px;
+    height: 34px;
+    opacity: 0.55;
+    background-size: contain !important;
+    margin-left: -17px;
+    margin-top: -17px;
+  }
 
-    #changeDetectMakeThumbnail {
-      position: absolute;
-      height: 35px;
-      bottom: 49px;
-      width: 95px;
-      right: 113px;
-      background: white;
-      border: 1px solid #656565;
-      border-radius: 3px !important;
-      box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-      outline: none;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 11px;
+  #changeDetectMakeThumbnail {
+    position: absolute;
+    height: 35px;
+    bottom: 49px;
+    width: 95px;
+    right: 113px;
+    background: white;
+    border: 1px solid #656565;
+    border-radius: 3px !important;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
   }
 
   #changeDetectMakeThumbnail .ui-button-text {
@@ -352,363 +332,362 @@
     font-size: 11px;
   }
 
-    #changeDetectMakeGif .ui-icon.ui-icon-custom-changeDetectMakeGif {
-      background-image: none;
-      width: 34px;
-      height: 34px;
-      opacity: 0.55;
-      background-size: contain !important;
-      margin-left: -17px;
-      margin-top: -17px;
-    }
-
+  #changeDetectMakeGif .ui-icon.ui-icon-custom-changeDetectMakeGif {
+    background-image: none;
+    width: 34px;
+    height: 34px;
+    opacity: 0.55;
+    background-size: contain !important;
+    margin-left: -17px;
+    margin-top: -17px;
+  }
 
   #changeDetectMakeGif .ui-button-text {
     padding: 6px 2px 0px 1px;
     font-size: 11px;
   }
 
-    #changeDetectMakeGif {
-      position: absolute;
-      height: 35px;
-      bottom: 49px;
-      width: 95px;
-      right: 7px;
-      background: white;
-      border: 1px solid #656565;
-      border-radius: 3px !important;
-      box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-      outline: none;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 11px;
+  #changeDetectMakeGif {
+    position: absolute;
+    height: 35px;
+    bottom: 49px;
+    width: 95px;
+    right: 7px;
+    background: white;
+    border: 1px solid #656565;
+    border-radius: 3px !important;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
   }
 
-#changeDetectBtns {
-  position: absolute;
-  right: 0px;
-  bottom: -19px;
-}
+  #changeDetectBtns {
+    position: absolute;
+    right: 0px;
+    bottom: -19px;
+  }
 
-#toggleStaticVideo .ui-icon.ui-icon-custom-toggleStaticVideo {
-  background-image: none;
-  width: 34px;
-  height: 34px;
-  opacity: 0.55;
-  background-size: contain !important;
-  margin-left: -17px;
-  margin-top: -17px;
-}
+  #toggleStaticVideo .ui-icon.ui-icon-custom-toggleStaticVideo {
+    background-image: none;
+    width: 34px;
+    height: 34px;
+    opacity: 0.55;
+    background-size: contain !important;
+    margin-left: -17px;
+    margin-top: -17px;
+  }
 
-#toggleStaticVideo .ui-button-text {
-  padding: 14px 8px 0px 7px;
-  font-size: 16px;
-  font-weight: bold;
-}
+  #toggleStaticVideo .ui-button-text {
+    padding: 14px 8px 0px 7px;
+    font-size: 16px;
+    font-weight: bold;
+  }
 
-.mobileBtn .ui-button-text{
-  padding: 5px 8px 0px 7px !important;
-  font-size: 15px !important;
-  font-weight: bold;
-}
+  .mobileBtn .ui-button-text{
+    padding: 5px 8px 0px 7px !important;
+    font-size: 15px !important;
+    font-weight: bold;
+  }
 
-#toggleStaticVideo {
-  position: absolute;
-  height: 42px;
-  bottom: 0px;
-  width: 209px;
-  right: -221px;
-  background: white;
-  border: 1px solid #656565;
-  border-radius: 3px !important;
-  box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-  outline: none;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 17px;
-}
+  #toggleStaticVideo {
+    position: absolute;
+    height: 42px;
+    bottom: 0px;
+    width: 209px;
+    right: -221px;
+    background: white;
+    border: 1px solid #656565;
+    border-radius: 3px !important;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 17px;
+  }
 
-div.line{
-  transform-origin: 0 100%;
-  height: 2px; /* Line width*/
-  background: #DCDCDC;
-  z-index: 100;
-  box-shadow: 0px 0px 0px 1px #383838;
-}
+  div.line{
+    transform-origin: 0 100%;
+    height: 2px; /* Line width*/
+    background: #DCDCDC;
+    z-index: 100;
+    box-shadow: 0px 0px 0px 1px #383838;
+  }
 
-#achd_note {
-  font-size: 10px;
-  color: white;
-  position: absolute;
-  left: 2px;
-  text-align: left;
-  width: 100%;
-}
+  #achd_note {
+    font-size: 10px;
+    color: white;
+    position: absolute;
+    left: 2px;
+    text-align: left;
+    width: 100%;
+  }
 
-#stitched_image_note {
-  font-size: 17px;
-  color: white;
-  position: absolute;
-  left: 2px;
-  text-align: left;
-  width: auto;
-  top: 392px;
-}
+  #stitched_image_note {
+    font-size: 17px;
+    color: white;
+    position: absolute;
+    left: 2px;
+    text-align: left;
+    width: auto;
+    top: 392px;
+  }
 
-#achdSensorDataBrowserError {
-  display: none;
-  color: white;
-  position: absolute;
-  top: 45px;
-  left: 2px;
-  font-size: 15px;
-}
+  #achdSensorDataBrowserError {
+    display: none;
+    color: white;
+    position: absolute;
+    top: 45px;
+    left: 2px;
+    font-size: 15px;
+  }
 
-.shareView {
-  height: 175px !important;
-  padding-top: 18px !important;
-}
-.shareurl {
-  width: 236px;
-  height: 80px;
-}
-.shareViewSpacer {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
+  .shareView {
+    height: 175px !important;
+    padding-top: 18px !important;
+  }
+  .shareurl {
+    width: 236px;
+    height: 80px;
+  }
+  .shareViewSpacer {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 
-#fb_share {
-  cursor: pointer;
-}
+  #fb_share {
+    cursor: pointer;
+    width: 224px;
+    height: 42px;
+  }
 
-#stitched_image {
-  background: black;
-  width: 100%;
-  height: 100%;
-}
+  #stitched_image {
+    background: black;
+    width: 100%;
+    height: 100%;
+  }
 
-#latest_video {
-  background: black;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  cursor: pointer;
-}
+  #latest_video {
+    background: black;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+  }
 
-#stitched_image_wrapper {
-  position: fixed;
-  left: -2px;
-  right: 220px;
-  top: -2px;
-  width: auto;
-  height: 392px;
-  z-index: 5;
-}
+  #stitched_image_wrapper {
+    position: fixed;
+    left: -2px;
+    right: 220px;
+    top: -2px;
+    width: auto;
+    height: 392px;
+    z-index: 5;
+  }
 
-#stitched_image_wrapper_child {
-  left: -2px;
-  right: 220px;
-  top: -2px;
-  width: auto;
-  height: 393px;
-  z-index: 5;
-}
+  #stitched_image_wrapper_child {
+    left: -2px;
+    right: 220px;
+    top: -2px;
+    width: auto;
+    height: 393px;
+    z-index: 5;
+  }
 
-#image_feed_timestamp {
-  top: 46px;
-  right: 20px;
-  font-size: 17px;
-  text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000, 2px 2px 3px rgba(0,0,0,0.3);
-  color: white;
-  font-weight: normal;
-  z-index: 50;
-}
-.closedHand {cursor: url("openseadragon/cursors/closedhand.cur"), move !important;}
-.openHand {cursor: url("openseadragon/cursors/openhand.cur"), move !important;}
-.pointerHand {cursor: pointer}
+  #image_feed_timestamp {
+    top: 46px;
+    right: 20px;
+    font-size: 17px;
+    text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000, 2px 2px 3px rgba(0,0,0,0.3);
+    color: white;
+    font-weight: normal;
+    z-index: 50;
+  }
+  .closedHand {cursor: url("openseadragon/cursors/closedhand.cur"), move !important;}
+  .openHand {cursor: url("openseadragon/cursors/openhand.cur"), move !important;}
+  .pointerHand {cursor: pointer}
 
-#location_title {
-  color: white;
-}
-img a {text-decoration: none; border: 0px}
-a.location_thumbnail_container { color: white }
+  #location_title {
+    color: white;
+  }
+  img a {text-decoration: none; border: 0px}
+  a.location_thumbnail_container { color: white }
 
-.unselectable {
-  -moz-user-select: -moz-none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
+  .unselectable {
+    -moz-user-select: -moz-none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 
-#latest_video_controls {
-  width: 100%;
-  height: 41px;
-  min-height: 41px;
-  max-height: 41px;
-  position: absolute;
-  bottom: 0px;
-  left: 0;
-  opacity: 0.6;
-  -webkit-transition: opacity .3s;
-  -moz-transition: opacity .3s;
-  -o-transition: opacity .3s;
-  -ms-transition: opacity .3s;
-  transition: opacity .3s;
-  background-image: linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
-  background-image: -o-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
-  background-image: -moz-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
-  background-image: -webkit-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
-  background-image: -ms-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
-  background-image: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-    color-stop(0.13, rgb(30, 30, 31)),
-    color-stop(1, rgb(47, 49, 50))
-  );
-}
+  #latest_video_controls {
+    width: 100%;
+    height: 41px;
+    min-height: 41px;
+    max-height: 41px;
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    opacity: 0.6;
+    -webkit-transition: opacity .3s;
+    -moz-transition: opacity .3s;
+    -o-transition: opacity .3s;
+    -ms-transition: opacity .3s;
+    transition: opacity .3s;
+    background-image: linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+    background-image: -o-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+    background-image: -moz-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+    background-image: -ms-linear-gradient(bottom, rgb(30, 30, 31) 13%, rgb(47, 49, 50) 100%);
+    background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.13, rgb(30, 30, 31)),
+      color-stop(1, rgb(47, 49, 50))
+    );
+  }
 
-#latest_video_controls #seek-bar {
-  position: absolute;
-  bottom: 15px;
-  left: 70px;
-  right: 100px;
-  width: auto;
-  cursor: pointer;
-}
+  #latest_video_controls #seek-bar {
+    position: absolute;
+    bottom: 15px;
+    left: 70px;
+    right: 100px;
+    width: auto;
+    cursor: pointer;
+  }
 
-#latest_video_controls .ui-slider-range {
-  background: rgb(92, 43, 43);
-}
+  #latest_video_controls .ui-slider-range {
+    background: rgb(92, 43, 43);
+  }
 
-#latest_video_container {
-  background: black;
-  display:none;
-}
+  #latest_video_container {
+    background: black;
+    display:none;
+  }
 
-#latest_video_controls #play-pause {
-  height: 30px;
+  #latest_video_controls #play-pause {
+    height: 30px;
     position: absolute;
     left: 7px;
     top: 5px;
     width: 51px;
-}
+  }
 
-#latest_video_controls #full-screen {
+  #latest_video_controls #full-screen {
     right: 7px;
     position: absolute;
     height: 30px;
     top: 5px;
-}
+  }
 
-#video-container:hover #video-controls {
-  opacity: .9;
-}
+  #video-container:hover #video-controls {
+    opacity: 0.9;
+  }
 
-#latest_video_controls button {
-  background: rgba(0,0,0,.5);
-  border: 0;
-  color: #EEE;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
-}
+  #latest_video_controls button {
+    background: rgba(0,0,0,.5);
+    border: 0;
+    color: #EEE;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+  }
 
-#latest_video_controls button:hover {
-  cursor: pointer;
-  opacity: 1;
-}
+  #latest_video_controls button:hover {
+    cursor: pointer;
+    opacity: 1;
+  }
 
-.image_feed_embed {
-  width: 100%;
-}
+  .image_feed_embed {
+    width: 100%;
+  }
 
-.tutorialButton .ui-button-text {
-  margin-left: -15px;
-  font-size: 15px;
-  margin-top: 8px;
-  line-height: 15px;
-  text-align: left;
-}
+  .tutorialButton .ui-button-text {
+    margin-left: -15px;
+    font-size: 15px;
+    margin-top: 8px;
+    line-height: 15px;
+    text-align: left;
+  }
 
-.tutorialButton .ui-icon.ui-icon-custom-tutorialButton {
-  background-image: none;
-  width: 34px;
-  height: 34px;
-  opacity: 0.55;
-  background-size: contain !important;
-  margin-left: -17px;
-  margin-top: -17px;
-}
+  .tutorialButton .ui-icon.ui-icon-custom-tutorialButton {
+    background-image: none;
+    width: 34px;
+    height: 34px;
+    opacity: 0.55;
+    background-size: contain !important;
+    margin-left: -17px;
+    margin-top: -17px;
+  }
 
-.tutorialButton {
-  position: absolute;
-  height: 41px;
-  top: 25px;
-  width: 109px;
-  left: 92px;
-  color: white;
-  background: #2794DD !important;
-  border: 1px solid #656565;
-  border-radius: 3px !important;
-  box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-  z-index: 1;
-  outline: none;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-}
+  .tutorialButton {
+    position: absolute;
+    height: 41px;
+    top: 25px;
+    width: 109px;
+    left: 92px;
+    color: white;
+    background: #2794DD !important;
+    border: 1px solid #656565;
+    border-radius: 3px !important;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    z-index: 1;
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+  }
 
-#tutorialDialog {
-  width: 100%;
-  height: 100%;
-  display: none;
-  overflow: hidden;
-}
+  #tutorialDialog {
+    width: 100%;
+    height: 100%;
+    display: none;
+    overflow: hidden;
+  }
 
-#pageTitle {
-  color: #fff;
-  font-size: 28px;
-  text-transform: uppercase;
-  text-shadow: -1px 0 #000,0 1px #000,1px 0 #000,0 -1px #000,2px 2px 3px rgba(0,0,0,0.3);
-  position: fixed;
-  right: 240px;
-  top: 18px;
-  z-index: 50;
+  #pageTitle {
+    color: #fff;
+    font-size: 28px;
+    text-transform: uppercase;
+    text-shadow: -1px 0 #000,0 1px #000,1px 0 #000,0 -1px #000,2px 2px 3px rgba(0,0,0,0.3);
+    position: fixed;
+    right: 240px;
+    top: 18px;
+    z-index: 50;
+  }
 
-}
+  #locationTitle {
+    top: 50px;
+  }
 
-#locationTitle {
- top: 50px;
-}
+  .timelineSlider .ui-slider-range {
+    background: #2794DD !important;
+    opacity: 0.6;
+  }
 
-.timelineSlider .ui-slider-range {
-  background: #2794DD !important;
-  opacity: 0.6;
-}
+  .location_thumbnail {
+    height: 84px;
+  }
 
-.location_thumbnail {
-  height: 84px;
-}
+  .location_thumbnail_overlay {
+    height: 84px;
+  }
 
-.location_thumbnail_overlay {
-  height: 84px;
-}
+  .location_thumbnail_container {
+    margin-bottom: 0px;
+  }
 
-.location_thumbnail_container {
-  margin-bottom: 0px;
-}
+  #location_toggle_container {
+    height: 340px;
+  }
 
-#location_toggle_container {
-  height: 340px;
-}
-
-#achdSensorDataTable td, #achdSensorDataTable th {
-  text-align: left;
-}
-
-  </style>
+  #achdSensorDataTable td, #achdSensorDataTable th {
+    text-align: left;
+  }
+</style>
 
   <script>
     // Handles the sending of cross-domain iframe requests.
@@ -832,6 +811,7 @@ a.location_thumbnail_container { color: white }
     var color6 = "140, 86, 171";
 
     var lineDrawn = false;
+    var autoScaleYAxes = true;
 
     var UTIL = org.gigapan.Util;
 
@@ -2079,7 +2059,7 @@ a.location_thumbnail_container { color: white }
       if (!series[seriesIndex]) return;
       var plot = series[seriesIndex].p;
       if (!plot) return;
-      var stats = plot.getStatistics(dateAxis.getMin(), dateAxis.getMax());
+      var stats = plot.getSimpleStatistics(dateAxis.getMin(), dateAxis.getMax());
       if (checkPlotLoadedInterval && stats.has_data || intervalCount >= 20) {
         clearInterval(checkPlotLoadedInterval);
         intervalCount = 0;
@@ -2158,10 +2138,18 @@ a.location_thumbnail_container { color: white }
       return dataValue;
     }
 
+    var doAutoScaleNumberAxis = function() {
+      // auto-scale the y-axes
+      if (autoScaleYAxes) {
+        for (var i = 0; i < series.length; i++) {
+          clampNumberAxisToDataRange(i);
+        }
+      }
+    }
+
     var createChart = function(channelName, channel) {
       if (!$("#dateAxisContainer").length) {
-
-        $("#grapher").append('<div id="dateAxisContainer"><div id="dateAxis"></div></div>');
+        $("#grapher").append('<div id="dateAxisContainer"><div id="dateAxis"></div><div id="yAxisAutoScaleToggle"></div>');
         var captureTimes = timelapse.getCaptureTimes();
         lastCaptureTime = captureTimes[captureTimes.length - 1];
         firstCaptureTime = captureTimes[0];
@@ -2174,6 +2162,28 @@ a.location_thumbnail_container { color: white }
         dateAxis.setMaxRange(startTime, endTime);
         dateAxis.setCursorPosition(getCurrentTimeMachineDateInSecs());
         lastCursorPosition = dateAxis.getCursorPosition();
+        dateAxis.addAxisChangeListener(doAutoScaleNumberAxis);
+
+        var $fitChartAxis = $("#yAxisAutoScaleToggle");
+        $fitChartAxis.button({
+          icons: {
+            primary: "ui-icon-arrowthick-2-n-s"
+          },
+          text: false
+        }).addClass("active").on("mouseenter", function(e) {
+          if ($(this).hasClass("active")) {
+            $(this).removeClass('ui-state-hover');
+          }
+        }).on("click", function() {
+          autoScaleYAxes = !autoScaleYAxes;
+          if ($(this).hasClass("active")) {
+            $(this).removeClass('active');
+          } else {
+            $(this).addClass('active');
+            doAutoScaleNumberAxis();
+          }
+          return false;
+        }).prop("title", "Toggle y-axis auto-scaling");
       }
       $("#dateAxis").mousedown(onGrapherMouseDown);
 
@@ -2189,18 +2199,9 @@ a.location_thumbnail_container { color: white }
       row.append('<div class="chartTitle" style="background:' + color_fill + '">' + channel.label + '</div>');
       row.append('<div id="series' + i + '" class="chartContent"></div>');
       row.append('<div id="series' + i + 'axis" class="chartAxis"></div>');
-      row.append('<div id="series' + i + 'axisFit" class="fitChartAxis" title="Fit y-axis to data">Re-Fit<br>Data</div>');
 
       $('#grapher').append(row);
       $("#series" + i).mousedown(onGrapherMouseDown);
-
-      var $fitChartAxis = $(".fitChartAxis");
-      $fitChartAxis.button({
-        icons: {
-          primary: "ui-icon-custom-fitChartAxis"
-        },
-        text: true
-      });
 
       series[i].axis = new NumberAxis('series' + i + 'axis', "vertical", {
         min: channel.min,
@@ -2702,16 +2703,6 @@ a.location_thumbnail_container { color: white }
         }
       });
 
-      $("#grapher").on("click", ".fitChartAxis", function() {
-          var seriesElemId = $(this)[0].id.match(/\d+/)[0];
-          for (var i = 0; i < series.length; i++) {
-            if (series[i].id == seriesElemId) {
-              clampNumberAxisToDataRange(i);
-              break;
-            }
-          }
-      });
-
       $("#achdSensorDataTable").on("click", ".sensor", function() {
         // toggle graphs
         justAddedChannel = true;
@@ -2741,6 +2732,7 @@ a.location_thumbnail_container { color: white }
           $(chart).remove();
           series.splice(seriesId, 1);
           if (series.length === 0) {
+            dateAxis.removeAxisChangeListener(doAutoScaleNumberAxis);
             delete dateAxis;
             $("#grapher").empty();
           }
