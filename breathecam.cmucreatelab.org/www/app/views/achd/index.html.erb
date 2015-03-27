@@ -2233,29 +2233,39 @@
 
       series[i].p = plot;
       plot.setStyle({
-        "styles": [{
-          "type": "line",
-          "lineWidth": 1,
-          "show": true,
-          "color": color_line
-        }],
-        highlight: {
-          "lineWidth": 1,
-          "styles": [{
-            "type": "lollipop",
-            "color": "#ff0000",
-            "radius": 1,
-            "lineWidth": 1,
-            "fill": false
-          }, {
-            "show": true,
-            "type": "value",
-            "fillColor": "#ff0000",
-            "marginWidth": 10,
-            "font": "9pt Helvetica,Arial,Verdana,sans-serif",
-            "verticalOffset": 7,
-            "numberFormat": "###,##0.0##"
-          }]
+        "styles" : [
+           { "type" : "line", "lineWidth" : 1, "show" : true, "color" : color_line },
+           { "type" : "circle", radius : 1, "lineWidth" : 1, "show" : true, "color" : color_line, fill : true }
+         ],
+        "highlight" : {
+          "lineWidth" : 1,
+          "styles" : [
+            {
+              "show" : true,
+              "type" : "lollipop",
+              "color" : "#000000",
+              "radius" : 0,
+              "lineWidth" : 1,
+              "fill" : false
+            },
+            {
+              "type" : "circle",
+              radius : 3,
+              "lineWidth" : 0.5,
+              "show" : true,
+              "color" : "#ff0000",
+              fill : false
+            },
+            {
+              "show" : true,
+              "type" : "value",
+              "fillColor" : "#ff0000",
+              "marginWidth" : 10,
+              "font" : "7pt Helvetica,Arial,Verdana,sans-serif",
+              "verticalOffset" : 7,
+              "numberFormat" : "###,##0"
+            }
+          ]
         }
       });
       series[i].pc = new PlotContainer("series" + i, false, [plot]);
