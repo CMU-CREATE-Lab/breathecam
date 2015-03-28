@@ -1,8 +1,10 @@
-<% content_for :head do %>
+<% content_for :css do %>
   <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
                              "/timemachine-viewer/css/defaultUI.css"
   %>
+<% end %>
 
+<% content_for :javascript do %>
   <%= javascript_include_tag "/timemachine-viewer/js/jquery/jquery.min.js",
                              "/timemachine-viewer/js/jquery/jquery-ui.custom.min.js",
                              "/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
@@ -26,7 +28,7 @@
                              "/extras/jquery.xdomainrequest.min.js",
                              "fbshare-bundle.js",
                              "/extras/jquery.ui.touch-punch.min.js"
-%>
+  %>
 
 <style type="text/css">
   .selectTopRight {

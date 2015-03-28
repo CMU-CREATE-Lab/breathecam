@@ -3,7 +3,7 @@
 <head>
   <title>Breathe Cam</title>
   <meta charset="utf-8"/>
-  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= stylesheet_link_tag "application", :media => "all" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
   <%= yield :head %>
@@ -12,11 +12,6 @@
   <div id="container">
     <div id="header">
       <div id="header-titles">
-        <div class="cmu-font">
-          <a href="http://www.cmu.edu/">
-            <div id="cmu-logo-detail-page_disabled"></div>
-          </a>
-        </div>
         <div class="create-lab-font">
           <a href="/">
             <div class="title-text">CREATE Lab</div>
@@ -24,8 +19,7 @@
           </a>
         </div>
       </div>
-      <p id="site-description">
-      </p>
+      <p id="site-description"></p>
     </div>
     <%= yield %>
     <div id="footer">

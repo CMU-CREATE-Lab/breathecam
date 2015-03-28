@@ -1,9 +1,11 @@
-<% content_for :head do %>
+<% content_for :css do %>
   <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
                              "/timemachine-viewer/css/defaultUI.css",
                              "zoomify-bundle.css"
   %>
+<% end %>
 
+<% content_for :javascript do %>
   <%= javascript_include_tag "/timemachine-viewer/js/jquery/jquery.min.js",
                              "/timemachine-viewer/js/jquery/jquery-ui.custom.min.js",
                              "/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
@@ -17,9 +19,10 @@
                              "/timemachine-viewer/js/org/gigapan/timelapse/defaultUI.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/crossdomain_api.js",
                              "/timemachine-viewer/template_includes.js",
-                             "http://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js",
+                             "/extras/jquery.xdomainrequest.min.js",
                              "#{@root_url}/timemachines/#{@location_id}/#{@location_id}.js",
                              "zoomify-bundle.js"  %>
+
   <style type="text/css">
     #timeMachine {
       position: fixed;

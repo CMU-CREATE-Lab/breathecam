@@ -1,11 +1,13 @@
-<% content_for :head do %>
 <% content_for :title, "E-Cam" %>
-  <%= stylesheet_link_tag    "/timemachine-viewer/css/snaplapse.css",
-                             "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
-                             "/timemachine-viewer/css/player.css",
+
+<% content_for :css do %>
+  <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
+                             "/timemachine-viewer/css/defaultUI.css",
                              "zoomify-bundle.css"
   %>
+<% end %>
 
+<% content_for :javascript do %>
   <%= javascript_include_tag "/timemachine-viewer/js/jquery/jquery.min.js",
                              "/timemachine-viewer/js/jquery/jquery-ui.custom.min.js",
                              "/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
@@ -17,20 +19,64 @@
                              "/timemachine-viewer/js/org/gigapan/timelapse/snaplapse.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/snaplapseViewer.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/defaultUI.js",
-                             "/timemachine-viewer/js/org/gigapan/timelapse/urlEncoder.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/crossdomain_api.js",
                              "/timemachine-viewer/template_includes.js",
+                             "/extras/jquery.xdomainrequest.min.js",
                              "#{@root_url}/timemachines/#{@location_id}/#{@location_id}.js",
                              "zoomify-bundle.js"  %>
 
   <style type="text/css">
-    #datepicker { font-size: 10px;}
-    #datepicker .ui-state-default { background: white; }
-    #datepicker .date-highlight a { background: rgb(240, 240, 240); }
-    #datepicker .ui-state-active { border: 1px solid #000000; }
-    .ui-datepicker-today a.ui-state-highlight {
-      border-color: #d3d3d3;
+    #timeMachine {
+      position: fixed;
+      left: 0px;
+      right: 216px;
+      top: 0px;
+      width: auto;
+      height: 100%;
+      z-index: 5;
+    }
+    #datepicker {
+      right: 0px !important;
+    }
+    #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
+      cursor: pointer;
+    }
+    #datepicker .ui-datepicker-header {
+      color: white;
+      background: rgb(150, 150, 150);
+      border: 0px solid rgb(204, 204, 204);
+      border-radius: 3px !important;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-datepicker {
+      font-size: 12px;
+      height: 190px;
+      border-radius: 0;
       color: #555555;
+      background: rgb(248, 248, 248);
+      border: 1px solid rgb(150, 150, 150);
+    }
+    #datepicker .ui-state-default {
+      background: rgb(150, 150, 150);
+      border-radius: 3px !important;
+      color: white;
+      box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-state-hover {
+      background: rgb(100, 100, 100) !important;
+    }
+    #datepicker .date-highlight a {
+      color: white;
+      background: rgb(150, 150, 150);
+      border: 1px solid rgb(204, 204, 204);
+    }
+    #datepicker .ui-state-active {
+      border: 1px solid rgb(204, 204, 204) !important;
+      background: #2794DD !important;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    }
+    #datepicker .ui-datepicker-header .ui-icon {
+      background-image: url(<%= asset_path('ui-icons_custom_256x240.png') %>);
     }
   </style>
 
@@ -84,13 +130,12 @@
             // 12 fps * 5 seconds = 60 frames
             var fiveSecondsFromEnd = numFrames - 60;
             timelapse.seekToFrame(fiveSecondsFromEnd);
-            timelapse.warpTo(timelapse.homeView());
           }
           showContent();
         }
       };
 
-      timelapse = new org.gigapan.timelapse.Timelapse("player1", viewerOptions);
+      timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", viewerOptions);
 
       var dateArray = startingDate.split("-");
       $("#datepicker").datepicker({
@@ -195,7 +240,7 @@
   </div>
   <div>
     <div id="timelapse_feed" class="timelapse_feed_embed">
-      <div id="player1"></div>
+      <div id="timeMachine"></div>
       <div id="datepicker" class="datepicker_embed"></div>
     </div>
     <div id="image_feed" class="image_feed_embed">
