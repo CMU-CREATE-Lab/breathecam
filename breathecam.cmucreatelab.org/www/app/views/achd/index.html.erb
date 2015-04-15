@@ -2220,11 +2220,11 @@
             dataType: "json",
             url: ESDR_API_ROOT_URL + "/feeds/" + sourceId + "/channels/" + source + "/tiles/" + level + "." + offset,
             success: function(json) {
-              var dataArray = json.data;
+              var dataArray = json.data.data;
               for (var i = 0; i < dataArray.length; i++) {
                 dataArray[i][1] = unitConversion(channelName, dataArray[i][1]);
               }
-              successCallback(JSON.stringify(dataArray));
+              successCallback(JSON.stringify(json.data));
             },
             failure: failureCallback
           });

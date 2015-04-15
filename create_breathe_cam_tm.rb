@@ -604,7 +604,10 @@ class Compiler
       puts "[#{Time.now}] Appending black frames to initial master set."
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
         # Take master and append the black frame chunk to it. Also prepare the file for future frames.
-        system("concatenate-mp4-videos.py #{master_video} #{path_to_trailer} --future_frames=#{$future_appending_frames}")
+        unless system("concatenate-mp4-videos.py #{master_video} #{path_to_trailer} --future_frames=#{$future_appending_frames}")
+          puts "[#{Time.now}] Error appending first time black frames to master set."
+          exit
+        end
       end
     else
       puts "[#{Time.now}] Appending current set to master video files."
@@ -627,7 +630,10 @@ class Compiler
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
         next_segment_video = next_segment_videos[index]
         # Take master without the black frame chunk at the end, append the new segment, and then append the black frame chunk
-        system("concatenate-mp4-videos.py '#{master_video}[0:-1]' #{next_segment_video} #{path_to_trailer}")
+        unless system("concatenate-mp4-videos.py '#{master_video}[0:-1]' #{next_segment_video} #{path_to_trailer}")
+          puts "[#{Time.now}] Error appending black frames to master set."
+          exit
+        end
       end
 
       tmp_time = Time.now

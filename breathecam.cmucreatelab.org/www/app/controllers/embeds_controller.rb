@@ -13,7 +13,7 @@ class EmbedsController < ApplicationController
     imageArray = []
     begin
       open(img_path) {|html|
-        imageArray = html.read.scan(/\d*_full.jpg/).uniq.sort
+        imageArray = html.read.scan(/\w*_full.jpg|\w*_full.JPG/).uniq.sort
       }
     rescue => e
       # Some error encountered. Most likely an invalid link.
@@ -23,11 +23,11 @@ class EmbedsController < ApplicationController
     # Or things might have really broken, so backtrack up to 3 weeks.
     # If we have not noticed a camera down in that timeframe, then shame on us.
     i = 1
-    while i < 21 and imageArray.blank? and subdomain != "ecam"
+    while i < 21 and imageArray.blank?
       img_path = img_path.gsub((date_today - (i - 1)).to_s,(date_today - i).to_s)
       begin
         open(img_path) {|html|
-          imageArray = html.read.scan(/\d*_full.jpg/).uniq.sort
+          imageArray = html.read.scan(/\w*_full.jpg|\w*_full.JPG/).uniq.sort
         }
       rescue => e
         # Some error encountered. Most likely an invalid link.
@@ -46,7 +46,7 @@ class EmbedsController < ApplicationController
       return
     end
     useTime = imageArray.first.scan(/^\d*/)[0].to_i if subdomain != "ecam"
-    @stitched_image = img_path + useTime.to_s + "_full" + ".jpg" if subdomain != "ecam"
+    @stitched_image = img_path + imageArray.first unless imageArray.blank?
     @pretty_time = Time.at(useTime).to_datetime.strftime("%m/%d/%Y %I:%M %p") if subdomain != "ecam"
 
     render :template => 'embeds/ecam' if subdomain == "ecam"

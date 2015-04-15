@@ -13,14 +13,14 @@ class LocationsHandlerController < ApplicationController
       FileUtils.mkdir_p(directory)
       num_images = params[:images].length
       params[:images].each_with_index do |image, index|
-        name = image.original_filename
+        name = params[:time] ? (DateTime.parse(params[:time]).strftime("%s") + File.extname(image.original_filename)) : image.original_filename
         path = File.join(directory, name)
         File.open(path, "wb") { |f| f.write(image.read) }
         if index == num_images - 1
           latest_stitch_directory = File.join(directory, "latest_stitch")
           FileUtils.mkdir_p(latest_stitch_directory)
           FileUtils.rm_rf(Dir.glob("#{latest_stitch_directory}/*"))
-          latest_stitch_path = File.join(latest_stitch_directory, File.basename(name , File.extname(name)).chomp("_image") + "_full" + File.extname(name))
+          latest_stitch_path = File.join(latest_stitch_directory, File.basename(name, File.extname(name)).chomp("_image") + "_full" + File.extname(name))
           FileUtils.cp(path, latest_stitch_path)
         end
       end
