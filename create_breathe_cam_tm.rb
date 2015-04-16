@@ -516,7 +516,7 @@ class Compiler
     extra_flags += "--skip-trailer " if $skip_trailer
     extra_flags += "--skip-leader " if $skip_leader
     extra_flags += "--skip-videos --preserve-source-tiles " if $skip_videos
-    extra_flags += "--sort-by-exif-dates" if $sort_by_exif_dates
+    extra_flags += "--sort-by-exif-dates " if $sort_by_exif_dates
     # TODO: Assumes Ruby is installed and ct.rb is in the PATH
     Dir.chdir($working_dir) do
       puts "ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}"
@@ -647,7 +647,7 @@ class Compiler
       # Update tm.json with capture times for the new frames being added.
       master_tm_json = open(path_to_master_tm_json) {|fh| JSON.load(fh)}
       new_tm_json = open(path_to_new_tm_json) {|fh| JSON.load(fh)}
-      master_tm_json["capture-times"] += new_tm_json["capture-times"]
+      master_tm_json["capture-times"] += new_tm_json["capture-times"] if new_tm_json["capture-times"]
       tmp_path_to_master_tm_json = path_to_master_tm_json + "_#{tmp_time}"
       open(tmp_path_to_master_tm_json, "w") {|fh| fh.puts(JSON.generate(master_tm_json))}
       FileUtils.mv(tmp_path_to_master_tm_json, path_to_master_tm_json, :force => true)

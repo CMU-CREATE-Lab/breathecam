@@ -5,6 +5,7 @@ require "time"
 
 capture_times = []
 dir = ARGV[0].dup
+time_diff = 0
 
 while !ARGV.empty?
   arg = ARGV.shift
@@ -12,6 +13,8 @@ while !ARGV.empty?
     subsample_input = ARGV.shift.to_i
   elsif arg == "--print-seconds"
     print_seconds = true
+  elsif arg == "-capture-time-diff"
+    time_diff = ARGV.shift.to_i
   end
 end
 
@@ -22,6 +25,7 @@ files = Dir.glob(path).sort
 files.each do |img_path|
  file = File.basename(img_path)
  date = file.split("_")[0].to_i
+ date += time_diff
  extra = print_seconds ? ":%S" : ""
  capture_times << Time.at(date).to_datetime.strftime("%m/%d/%Y %I:%M#{extra} %p")
 end
