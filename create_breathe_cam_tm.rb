@@ -217,6 +217,7 @@ class Compiler
           $start_time["hour"] = last_pull_date.hour
           $start_time["minute"] = last_pull_date.min
           $start_time["sec"] = "00"
+          $start_time["full"] = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{$start_time['sec']}"
           $current_day = Date.parse(last_pull_date.to_s).to_s
           new_last_pull_date = last_pull_date + time_chunk_in_seconds
           $end_time["hour"] = new_last_pull_date.hour
@@ -273,6 +274,7 @@ class Compiler
   def calculate_rsync_input_range
     $start_time["hour"] = $end_time["hour"]
     $start_time["minute"] = $end_time["minute"] - $incremental_update_interval
+    $start_time["sec"] = "00"
     if $start_time["minute"] < 0
       hour_diff = ($start_time["minute"].abs / 60.0).ceil
       $start_time["hour"] = $end_time["hour"] - hour_diff
@@ -301,6 +303,7 @@ class Compiler
         end
       end
     end
+    $start_time["full"] = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{$start_time['sec']}"
   end
 
   def clear_working_dir
@@ -368,6 +371,11 @@ class Compiler
           file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
           File.open(file, 'w') {|f| f.write(Time.now)}
         end
+        exit
+      elsif dir.length == 1 and $do_incremental_update and $input_date_from_file
+        puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
+        file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
+        File.open(file, 'w') {|f| f.write($start_time["full"])}
         exit
       end
       create_tm
@@ -511,6 +519,8 @@ class Compiler
   def create_tm
     puts "[#{Time.now}] Creating Time Machine..."
     $timemachine_output_dir = $create_videoset_segment_directory ? "#{$current_day}-#{$incremental_update_interval}m.timemachine" : "#{$current_day}.timemachine"
+    # If the *.timemachine directory already exists, remove it since ct.rb will most likely become confused and not make new video tiles
+    FileUtils.rm_rf("#{$timemachine_output_path}/#{$timemachine_output_dir}")
     $timemachine_master_output_dir = "#{$current_day}.timemachine"
     extra_flags = ""
     extra_flags += "--skip-trailer " if $skip_trailer
@@ -605,7 +615,7 @@ class Compiler
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
         # Take master and append the black frame chunk to it. Also prepare the file for future frames.
         unless system("concatenate-mp4-videos.py #{master_video} #{path_to_trailer} --future_frames=#{$future_appending_frames}")
-          puts "[#{Time.now}] Error appending first time black frames to master set."
+          puts "[#{Time.now}] Error first time appending frames to master set."
           exit
         end
       end
@@ -631,7 +641,7 @@ class Compiler
         next_segment_video = next_segment_videos[index]
         # Take master without the black frame chunk at the end, append the new segment, and then append the black frame chunk
         unless system("concatenate-mp4-videos.py '#{master_video}[0:-1]' #{next_segment_video} #{path_to_trailer}")
-          puts "[#{Time.now}] Error appending black frames to master set."
+          puts "[#{Time.now}] Error appending additional frames to master set."
           exit
         end
       end
