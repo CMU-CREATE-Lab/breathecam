@@ -1959,11 +1959,7 @@
     function changeSensorValues() {
       var currentCaptureTimeDateObj = new Date(timelapse.getCurrentCaptureTime());
       var currentCaptureTimeDateObjMins = currentCaptureTimeDateObj.getMinutes();
-      var currentCaptureTimeDateObjHours = currentCaptureTimeDateObj.getHours();
-      currentCaptureTimeDateObj.setMinutes(30);
-      if (currentCaptureTimeDateObjMins < 30 && currentCaptureTimeDateObjHours > 0) {
-        currentCaptureTimeDateObj.setHours(currentCaptureTimeDateObjHours - 1);
-      }
+      currentCaptureTimeDateObj.setMinutes(0);
       currentCaptureTimeDateObj /= 1000;
 
       var sensorNamesArray = achdData[currentLocation] ? Object.keys(achdData[currentLocation].sensors) : [];
@@ -2040,7 +2036,9 @@
                   for (var j = 1; j < csvLineAsArray.length; j++) {
                     var tmpChannelHeading = headingsArray[j].split(".");
                     var channelHeading = sensors[sensorIdx] + "." + tmpChannelHeading[tmpChannelHeading.length - 1];
-                    achdData[currentLocation].sensors[sensors[sensorIdx]].channels[channelHeading].summary[csvLineAsArray[0]] = unitConversion(headingsArray[j], parseFloat(csvLineAsArray[j]));
+                    // ESDR values are at the half hour mark for the sake of graphing, but really that value spans for that whole hour
+                    var timeStamp = csvLineAsArray[0] - 1800;
+                    achdData[currentLocation].sensors[sensors[sensorIdx]].channels[channelHeading].summary[timeStamp] = unitConversion(headingsArray[j], parseFloat(csvLineAsArray[j]));
                   }
                 }
                 if ($(".sensor").length === 0)
