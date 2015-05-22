@@ -8,7 +8,8 @@ symlink_root = ARGV[3]
 previous_day = (Date.today - 1).to_s
 
 src_tm_path  = "#{src_root}/#{previous_day}.timemachine"
-final_output_tm_path = "#{dest_path}/#{previous_day}.timemachine"
+year_month_day = previous_day.split("-")
+final_output_tm_path = "#{dest_path}/#{year_month_day[0]}/#{year_month_day[1]}/#{previous_day}.timemachine"
 tmp_output_tm_path = final_output_tm_path + ".tmp"
 
 system("find #{src_tm_path} -type f -name '*.mp4' -exec qtfaststart {} \\;")
