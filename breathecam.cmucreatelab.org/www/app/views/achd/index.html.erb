@@ -1785,7 +1785,7 @@
       return (new Date(timelapse.getCurrentCaptureTime()).getTime()) / 1000;
     }
 
-    function changeLocation(locationName, newDate, newView, newTime, doLoad, callBack) {
+    function changeLocation(locationName, newDate, newView, newTime, doLoad, callBack, newTimeAsDateObj) {
       currentLocation = locationName;
       if (timelapseFeedUnavailable) {
         var dateObj = new Date();
@@ -1848,10 +1848,10 @@
           if (doLoad) {
             if (timelapse && startingDataset) {
               newTime = parseFloat(newTime);
-              timelapse.loadTimelapse(startingDataset, newView, newTime, false, null, function() {
+              timelapse.loadTimelapse(startingDataset, newView, newTime, false, newTimeAsDateObj, function() {
                 filter();
                 addTimeLineSliderListeners();
-                if (isNaN(newTime)) {
+                if (!newTimeAsDateObj && isNaN(newTime)) {
                   var numFrames = timelapse.getNumFrames();
                   // 12 fps * 5 seconds = 60 frames
                   var fiveSecondsFromEnd = numFrames - 60;
@@ -2639,11 +2639,14 @@
       locationDivId = "<%= @location_id %>" + "_overlay";
 
       $(".location_thumbnail_container").on("click", function() {
-        window.location.hash = "";
+        if (window.location.hash)
+          window.location.hash = "";
         post("clear_hash", {"changeDetectHeight" : (!!$("#changeDetect").is(":visible") * 3)});
         var newLocation = $(this).attr("data-location-id");
+        if (timelapse)
+          var captureTimeAsDateObj = new Date(timelapse.getCurrentCaptureTime().replace(/-/g,"/"));
         if (currentLocation != newLocation)
-          changeLocation(newLocation, null, null, null, true);
+          changeLocation(newLocation, currentDate, null, null, true, null, captureTimeAsDateObj);
       });
 
       $(window).resize(function() {
