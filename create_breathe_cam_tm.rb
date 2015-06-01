@@ -372,10 +372,12 @@ class Compiler
           File.open(file, 'w') {|f| f.write(Time.now)}
         end
         exit
-      elsif dir.length == 1 and $do_incremental_update and $input_date_from_file
+      elsif dir.length == 1
         puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
-        file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
-        File.open(file, 'w') {|f| f.write($start_time["full"])}
+        if $do_incremental_update and $input_date_from_file
+          file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
+          File.open(file, 'w') {|f| f.write($start_time["full"])}
+        end
         exit
       end
       create_tm
@@ -394,6 +396,9 @@ class Compiler
     num_images_being_processed = images.length
     if num_images_being_processed == 0
       puts "No images found to be processed. Aborting."
+      exit
+    elsif num_images_being_processed <= 4
+      puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
       exit
     end
     images.each do |img|
