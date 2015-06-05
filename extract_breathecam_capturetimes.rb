@@ -6,6 +6,8 @@ require "time"
 capture_times = []
 dir = ARGV[0].dup
 time_diff = 0
+print_seconds = false
+path_to_tm_json = ARGV[1]
 
 while !ARGV.empty?
   arg = ARGV.shift
@@ -30,7 +32,7 @@ files.each do |img_path|
  capture_times << Time.at(date).to_datetime.strftime("%m/%d/%Y %I:%M#{extra} %p")
 end
 
-json = open(ARGV[1]) {|fh| JSON.load(fh)}
+json = open(path_to_tm_json) {|fh| JSON.load(fh)}
 json["capture-times"] = capture_times
-open(ARGV[1], "w") {|fh| fh.puts(JSON.generate(json))}
-STDERR.puts "Successfully wrote capture times to #{ARGV[1]}"
+open(path_to_tm_json, "w") {|fh| fh.puts(JSON.generate(json))}
+STDERR.puts "Successfully wrote capture times to #{path_to_tm_json}"
