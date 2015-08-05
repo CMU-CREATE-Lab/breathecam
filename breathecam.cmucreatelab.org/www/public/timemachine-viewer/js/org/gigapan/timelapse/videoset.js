@@ -182,6 +182,8 @@ if (!window['$']) {
     var browserSupportsPlaybackRate = UTIL.playbackRateSupported();
     var activeVideoSrcList = {};
 
+    var ieSeekRedrawTimer = null;
+
     ////////////////////////
     //
     // Public methods
@@ -1052,6 +1054,7 @@ if (!window['$']) {
         return;
 
       if (viewerType != "video") {
+        video.fromSeek = true;
         if (isIE9) {
           // IE 9 is lying, it has not fully seeked yet
           setTimeout(function() {
@@ -1362,6 +1365,16 @@ if (!window['$']) {
     var drawToCanvas = function(video) {
       // DEBUG 4
       if (video.active && video.ready && !video.seeking && video.readyState >= 2 && video.canDraw == true) {
+        if ((isIE || isFirefox) && video.fromSeek && video.readyState != 4) {
+           if (!ieSeekRedrawTimer) {
+             ieSeekRedrawTimer = setTimeout(function() {
+               ieSeekRedrawTimer = null;
+               drawToCanvas(video);
+             }, 1);
+           }
+        }
+        video.fromSeek = false;
+
         // Black frame detection
         var videoGeometry = video.geometry;
         if (blackFrameDetectionCanvas) {

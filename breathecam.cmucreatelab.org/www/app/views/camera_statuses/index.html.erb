@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>E-Cam Status Page</title>
+    <style type="text/css">
+    th {
+      text-decoration: underline;
+      text-align: left;
+    }
+    table {
+      width: 100%;
+    }
+    </style>
+  <head>
+  <body>
+    <table>
+      <tr>
+        <th>Camera</th>
+        <th>Last Upload Timestamp</th>
+        <th>Last Uploaded Image Timestamp</th>
+        <th>Last Processed Image Timestamp</th>
+      </tr>
+      <% @camera_statuses.each_with_index do |camera, i| %>
+        <tr>
+          <td>
+            <%= link_to("#{camera.camera_name}", "/embeds/#{camera.camera_name.split('_').last}") %>
+          </td>
+          <td>
+            <%= camera.last_upload_time %>
+          </td>
+          <td>
+            <%= camera.last_image_time %>
+          </td>
+          <td>
+            <%= @last_processed_times[i]%>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </body>
+</html>

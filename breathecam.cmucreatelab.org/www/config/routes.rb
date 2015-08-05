@@ -2,6 +2,8 @@ Breathecam::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
+  match '/status' => 'camera_statuses#index'
+
   # TODO: This can probably be combined into one statement.
   root :to => "embeds#index", :constraints => { :subdomain  => "ecam" }
   match '(*path)/:location' => "embeds#index", :constraints => { :subdomain  => "ecam" }

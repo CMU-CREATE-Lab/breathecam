@@ -1,19 +1,49 @@
 class LocationsHandlerController < ApplicationController
   require 'date'
   require 'fileutils'
-
   # We would need to pass a token back with each request,
   # but the arduino does not know this value, so we just skip this.
   protect_from_forgery :except => [:receive_data, :upload]
 
   def upload
     if params[:id]
-      current_date = Date.today.to_s
-      directory = File.join(Rails.public_path, "upload", params[:id], "050-original-images", current_date)
-      FileUtils.mkdir_p(directory)
+      upload_time = DateTime.now
       num_images = params[:images].length
       params[:images].each_with_index do |image, index|
-        name = params[:time] ? (DateTime.parse(params[:time]).strftime("%s") + File.extname(image.original_filename)) : image.original_filename
+        begin
+          s = `/usr/bin/exiftool -time:CreateDate #{image.path}`
+          a = s.split(": ")
+          a[1] = a[1].chomp
+          a2 = a[1].split(" ")
+          a2[0].gsub!(":", "-")
+          final = a2[0] + " " + a2[1]
+          t = Time.parse(final)
+        rescue
+          Rails.logger.info("#{Time.now} Corrupted image detected")
+          respond_to do |format|
+            format.json { render json: { "success" => true } }
+            format.all { head :ok, :content_type => 'application/json' }
+          end
+          return
+        end
+        if params[:time] and params[:id] == "a7s_shenango2"
+          # 31535957 = (1 year - 45 seconds)
+          corrected_time = t + 31535957
+          corrected_time_in_seconds = corrected_time.to_i
+          current_date = corrected_time.to_s.split(" ")[0]
+          image_time =  DateTime.parse(corrected_time.to_s)
+          name = corrected_time_in_seconds.to_s + File.extname(image.original_filename)
+        else
+          current_date = upload_time.to_date.to_s
+          image_time = DateTime.parse(t.to_s)
+          name = image.original_filename
+        end
+        camera_status = CameraStatus.find_or_create_by_camera_name(params[:id].split("_").last) do |cs|
+          cs.camera_type = 'ecam'
+        end
+        camera_status.update_attributes(:last_upload_time => upload_time, :last_image_time => image_time)
+        directory = File.join(Rails.public_path, "upload", params[:id], "050-original-images", current_date)
+        FileUtils.mkdir_p(directory)
         path = File.join(directory, name)
         File.open(path, "wb") { |f| f.write(image.read) }
         if index == num_images - 1
@@ -97,5 +127,4 @@ class LocationsHandlerController < ApplicationController
       format.all { head :ok, :content_type => 'text/html' }
     end
   end
-
 end
