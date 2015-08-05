@@ -7,6 +7,7 @@ require 'date'
 require 'time'
 require 'json'
 require 'parallel'
+require 'active_support/core_ext'
 
 $RUNNING_WINDOWS = /(win|w)32$/.match(RUBY_PLATFORM)
 $RUNNING_MAC = RUBY_PLATFORM.downcase.include?("darwin")
@@ -43,6 +44,7 @@ $start_time = {}
 $end_time = {}
 $append_inplace = false
 $future_appending_frames = 17000
+$checked_current_time = false
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -55,13 +57,7 @@ class Compiler
       usage
     end
 
-    $current_time = Time.now
-    puts "Start Time: #{$current_time}"
-
-    $end_time["full"] = $current_time
-    $end_time["hour"] = $current_time.strftime("%H").to_i
-    $end_time["minute"] = $current_time.strftime("%M").to_i
-    $end_time["sec"] = 0
+    puts "Start Time: #{Time.now}"
 
     $input_path = ARGV[0]
     $output_path = ARGV[1]
@@ -143,6 +139,10 @@ class Compiler
         $append_inplace = true
       elsif arg == "-future-appending-frames"
         $future_appending_frames = ARGV.shift.to_i
+      elsif arg == "--image-store-v2"
+        $image_store_v2 = true
+      elsif arg == "--file-names-include-dates"
+        $file_names_include_dates = true
       end
     end
 
@@ -194,13 +194,23 @@ class Compiler
     FileUtils.touch(File.join($working_dir, "WIP"))
     create_definition_file
 
+    # Set time zone based on definition file
+    Time.zone = $time_zone || "Eastern Time (US & Canada)"
+
+    $current_time = Time.zone.now
+
+    $end_time["full"] = $current_time
+    $end_time["hour"] = $current_time.strftime("%H").to_i
+    $end_time["minute"] = $current_time.strftime("%M").to_i
+    $end_time["sec"] = 0
+
     if $do_incremental_update
       if $input_date_from_file
         file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
         if File.exists?(file)
           time_chunk_in_seconds = (60 * $incremental_update_interval)
-          last_pull_date = Time.parse(File.open(file, &:readline))
-          time_diff = (Time.now - last_pull_date).floor
+          last_pull_date = Time.zone.parse(File.open(file, &:readline))
+          time_diff = (Time.zone.now - last_pull_date).floor
           puts "[#{Time.now}] Time drift: #{time_diff} vs #{time_chunk_in_seconds}"
           if (time_diff < 0)
             puts "[#{Time.now}] Last pull date is greater than the current time. Exiting process."
@@ -214,11 +224,11 @@ class Compiler
             puts "[#{Time.now}] Gap less than #{$incremental_update_interval} minutes, which is less than the minimum segment. Exiting process."
             exit
           end
+          $current_day = Date.parse(last_pull_date.to_s).to_s
           $start_time["hour"] = last_pull_date.hour
           $start_time["minute"] = last_pull_date.min
-          $start_time["sec"] = "00"
+          $start_time["sec"] = last_pull_date.sec
           $start_time["full"] = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{$start_time['sec']}"
-          $current_day = Date.parse(last_pull_date.to_s).to_s
           new_last_pull_date = last_pull_date + time_chunk_in_seconds
           $end_time["hour"] = new_last_pull_date.hour
           $end_time["minute"] = new_last_pull_date.min
@@ -245,7 +255,10 @@ class Compiler
 
   def create_definition_file
     path_to_definition_file = "#{$working_dir}/definition.tmc"
-    unless File.exists?(path_to_definition_file)
+    if File.exists?(path_to_definition_file)
+      json = open(path_to_definition_file) {|fh| JSON.load(fh)}
+      $time_zone = json["source"]["time_zone"]
+    else
       FileUtils.cp("#{File.dirname(__FILE__)}/default_definition.tmc", path_to_definition_file)
       json = open(path_to_definition_file) {|fh| JSON.load(fh)}
       location_name = camera_name_remap($camera_location)
@@ -324,7 +337,6 @@ class Compiler
   end
 
   def get_source_images
-    puts "[#{Time.now}] Rsycning images from #{$input_path}/#{$current_day}"
     image_path = $skip_stitch ? "0100-original-images" : "050-raw-images"
     new_input_path = File.join($working_dir, image_path)
     FileUtils.mkdir_p(new_input_path)
@@ -339,7 +351,23 @@ class Compiler
       $end_time["minute"] = 59
       $end_time["sec"] = 59
     end
-    file_list_command = "find #{src_path}/#{$current_day} -path #{src_path}/#{$current_day}/latest_stitch -prune -o -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
+    if $image_store_v2
+      year_month_day = $current_day.split("-")
+      src_path = File.join(src_path, year_month_day[0], year_month_day[1])
+    end
+    puts "[#{Time.now}] Rsycning images from #{src_path}"
+    if $file_names_include_dates
+      start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
+      end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
+      start_date_in_sec = Time.zone.parse(start_date).to_i
+      end_date_in_sec = Time.zone.parse(end_date).to_i
+      #file_list_command = "echo #{src_path}/#{$current_day}/{#{start_date_in_sec}..#{end_date_in_sec}}.jpg | xargs sh -c 'find \"$@\" -type f -maxdepth 0' sh 2>/dev/null"
+      #file_list_command = "find | perl -ne 'print if(m!^\./(\d+)! and $1 >= {start_date_in_sec} and $1 <= #{end_date_in_sec})'"
+      #file_list_command = "find #{src_path}/#{$current_day}/ -type f -regextype awk -regex \".*($(seq -s'|' #{start_date_in_sec} #{end_date_in_sec})).jpg\" -exec echo {} \;"
+      file_list_command = "find #{src_path}/#{$current_day} -path #{src_path}/#{$current_day}/latest_stitch -prune -o -name '*.[jJ][pP][gG]' | perl -ne 'print if (m!.*/(\\d+)! and $1 > #{start_date_in_sec} and $1 <= #{end_date_in_sec})'"
+    else
+      file_list_command = "find #{src_path}/#{$current_day} -path #{src_path}/#{$current_day}/latest_stitch -prune -o -name '*.[jJ][pP][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
+    end
     subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
     puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
     if $symlink_input
@@ -363,27 +391,52 @@ class Compiler
     # We need to reference files locally now that we have rsynced everything over
     $input_path = new_input_path
     puts "[#{Time.now}] Finished rsyncing input images."
+
+    remove_corrupted_images
+
     if $skip_stitch
       dir = Dir.glob("#{$input_path}/*.[jJ][pP][gG]") + Dir.glob("#{$input_path}/*/*.[jJ][pP][gG]")
+      file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt") if $do_incremental_update and $input_date_from_file
       if dir.empty?
         puts "No images found to be processed. Aborting."
-        if $do_incremental_update and $input_date_from_file
-          file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
-          File.open(file, 'w') {|f| f.write(Time.now)}
+        if $file_names_include_dates and !$checked_current_time
+          puts "Look at current time for possible images."
+          $checked_current_time = true
+          $current_time = Time.zone.now
+          $end_time["full"] = $current_time
+          $end_time["hour"] = $current_time.strftime("%H").to_i
+          $end_time["minute"] = $current_time.strftime("%M").to_i
+          $end_time["sec"] = 0
+          calculate_rsync_input_range
+          clear_working_dir
+          get_source_images
+        elsif $do_incremental_update and $input_date_from_file and !$file_names_include_dates
+          File.open(file, 'w') {|f| f.write(Time.zone.now)}
         end
         exit
       elsif dir.length == 1
         puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
         if $do_incremental_update and $input_date_from_file
-          file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
           File.open(file, 'w') {|f| f.write($start_time["full"])}
         end
         exit
+      elsif $file_names_include_dates
+        if $do_incremental_update and $input_date_from_file
+          last_pulled_image = Dir.glob("#{$input_path}/*.[jJ][pP][gG]").sort.last
+          last_pulled_epoch_time = File.basename(last_pulled_image, File.extname(last_pulled_image))
+          File.open(file, 'w') {|f| f.write(Time.zone.at(last_pulled_epoch_time.to_i).to_s)}
+        end
       end
       create_tm
     else
       organize_images
     end
+  end
+
+  def remove_corrupted_images
+    puts "[#{Time.now}] Checking for corrupted images."
+    system("find #{$input_path} -maxdepth 2 -name *.[jJ][pP][gG] | xargs jpeginfo -cd")
+    #system("jpeginfo -cd #{$input_path}/*.[jJ][pP][gG]; jpeginfo -cd #{$input_path}/*/*.[jJ][pP][gG]")
   end
 
   def organize_images
@@ -535,7 +588,7 @@ class Compiler
     # TODO: Assumes Ruby is installed and ct.rb is in the PATH
     Dir.chdir($working_dir) do
       puts "ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}"
-      system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}")
+      system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}") or raise "[#{Time.now}] Error encountered processing Time Machine. Exiting."
     end
     puts "[#{Time.now}] Time Machine created."
     add_entry_to_json
