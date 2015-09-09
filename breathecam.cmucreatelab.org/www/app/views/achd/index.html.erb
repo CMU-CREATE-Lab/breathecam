@@ -2011,8 +2011,8 @@
               data = sensorData[sensorDataTimes[k]];
               currentCaptureTimeDate = sensorDataTimes[k];
               if (typeof(data) === "number") break;
-              // Only look back at most a day
-              if (startTimeIdx - k >= 23) {
+              // Only look back 6 hours
+              if (startTimeIdx - k >= 5) {
                 data = undefined;
                 break;
               }
