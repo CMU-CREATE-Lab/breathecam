@@ -2011,6 +2011,11 @@
               data = sensorData[sensorDataTimes[k]];
               currentCaptureTimeDate = sensorDataTimes[k];
               if (typeof(data) === "number") break;
+              // Only look back at most a day
+              if (startTimeIdx - k >= 23) {
+                data = undefined;
+                break;
+              }
             }
           }
           var $channelElm = $('div.sensor[data-channel="' + channelNamesArray[j] + '"]');
