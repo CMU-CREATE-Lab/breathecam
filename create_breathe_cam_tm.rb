@@ -378,7 +378,7 @@ class Compiler
           system("ln -s #{file} #{new_input_path}/#{File.basename(file)}")
         end
       else
-        system("ln -s #{$input_path}/#{$current_day} #{new_input_path}")
+        system("ln -s #{$input_path}/#{$current_day}/* #{new_input_path}")
       end
     else #rsync
       if $do_incremental_update or $subsample_input
