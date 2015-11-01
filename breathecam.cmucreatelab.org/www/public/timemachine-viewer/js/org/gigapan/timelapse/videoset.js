@@ -170,19 +170,20 @@ if (!window['$']) {
 
     var isIE = UTIL.isIE();
     var isIE9 = UTIL.isIE9();
+    var isIEEdge = UTIL.isIEEdge();
     var isOperaLegacy = UTIL.isOperaLegacy();
     var isChrome = UTIL.isChrome();
     var isSafari = UTIL.isSafari();
     var isFirefox = UTIL.isFirefox();
-    var doChromeSeekableHack = timelapse.doChromeSeekableHack();
-    var doChromeBufferedHack = timelapse.doChromeBufferedHack();
+    //var doChromeSeekableHack = timelapse.doChromeSeekableHack();
+    //var doChromeBufferedHack = timelapse.doChromeBufferedHack();
     var doChromeCacheBreaker = timelapse.doChromeCacheBreaker();
     var spinnerTimeoutId;
     var videoIsSeekingIntervalCheck;
     var browserSupportsPlaybackRate = UTIL.playbackRateSupported();
     var activeVideoSrcList = {};
-
-    var ieSeekRedrawTimer = null;
+    var seekRedrawTimer = null;
+    var drawListenerTimer = null;
 
     ////////////////////////
     //
@@ -242,9 +243,9 @@ if (!window['$']) {
 
     this.setLeader = function(newLeader) {
       timeOffset = 0;
-      var currentTime = _getCurrentTime();
       // Subtract 0 to force this to be a number
       leader = newLeader - 0;
+      //var currentTime = _getCurrentTime();
       //_seek(currentTime);
     };
 
@@ -285,7 +286,7 @@ if (!window['$']) {
     };
     this.getFragment = _getFragment;
 
-    var getPerf = function() {
+    /*var getPerf = function() {
       var perf = "Videos added: " + perfAdded;
       perf += "; initial seeks: " + perfInitialSeeks;
       perf += "; # time correction seeks: " + perfTimeSeeks;
@@ -297,7 +298,7 @@ if (!window['$']) {
         perf += perfTimeCorrections[i].toFixed(4);
       }
       return perf;
-    };
+    };*/
 
     ///////////////////////////
     // Add and remove videos
@@ -368,21 +369,24 @@ if (!window['$']) {
 
       // New workaround for the Chrome cache loading bug.
       // https://code.google.com/p/chromium/issues/detail?id=31014
-      if (isChrome && doChromeCacheBreaker) {
-        var creationTime = (new Date()).getTime();
-        // The src may be a relative path. When we later call video.src we always get an absolute path,
-        // so we need to ensure that we always store absolute paths.
-        if (src.substring(0, 2) == "./" || src.substring(0, 3) == "../") {
-          src = UTIL.relativeToAbsolutePath(src);
+      try {
+        if (isChrome && doChromeCacheBreaker) {
+          var creationTime = (new Date()).getTime();
+          // The src may be a relative path. When we later call video.src we always get an absolute path,
+          // so we need to ensure that we always store absolute paths.
+          if (src.substring(0, 2) == "./" || src.substring(0, 3) == "../") {
+            src = UTIL.relativeToAbsolutePath(src);
+          }
+          if (activeVideoSrcList[src]) {
+            UTIL.log("Video found in local storage, adding cache breaker: " + src);
+            src = src + "?time=" + creationTime;
+          }
+          activeVideoSrcList[src] = creationTime;
+          window.localStorage.setItem('activeVideoSrcList', JSON.stringify(activeVideoSrcList));
         }
-        if (activeVideoSrcList[src]) {
-          UTIL.log("Video found in local storage, adding cache breaker: " + src);
-          src = src + "?time=" + creationTime
-        }
-        activeVideoSrcList[src] = creationTime;
-        window.localStorage.setItem('activeVideoSrcList', JSON.stringify(activeVideoSrcList));
+      } catch(e) {
+        UTIL.error("User has disabled local file storage of cookies: " + e);
       }
-
       //UTIL.log(getVideoSummaryAsString(video));
       if (video.src == '')
         video.setAttribute('src', src);
@@ -414,8 +418,8 @@ if (!window['$']) {
 
       _deleteUnneededVideos();
 
-      if (isOperaLegacy) {
-        // Videos in Opera <= 12 often seem to get stuck in a state of always seeking.
+      if (isIEEdge || isOperaLegacy) {
+        // Videos in Opera <= 12 and IE Edge often seem to get stuck in a state of always seeking.
         // This will ensure that if we are stuck, we reload the video.
         video.addEventListener('seeking', videoSeeking, false);
       }
@@ -460,6 +464,10 @@ if (!window['$']) {
 
       if (viewerType != "video") {
         video.addEventListener('playing', function() {
+          if (video.handleSeekStuck && !advancing) {
+            video.pause();
+            video.handleSeekStuck = null;
+          }
           if (video.drawIntervalId == null)
             video.drawIntervalId = setInterval(function() {
               drawToCanvas(video);
@@ -487,7 +495,7 @@ if (!window['$']) {
 
     var _videoName = function(video) {
       return 'video(' + _idNumFromVideo(video) + ')';
-    }
+    };
     this.videoName = _videoName;
 
     var _deleteUnneededVideos = function() {
@@ -504,7 +512,7 @@ if (!window['$']) {
           _deleteVideo(video);
         }
       }
-    }
+    };
     this.deleteUnneededVideos = _deleteUnneededVideos;
 
     var _repositionVideo = function(video, geometry) {
@@ -525,10 +533,14 @@ if (!window['$']) {
     this.repositionVideo = _repositionVideo;
 
     var stopStreaming = function(video) {
-      if (isChrome && doChromeCacheBreaker) {
-        delete activeVideoSrcList[video.src];
-        UTIL.log("Video deleted from local storage: " + video.src);
-        window.localStorage.setItem('activeVideoSrcList', JSON.stringify(activeVideoSrcList));
+      try {
+        if (isChrome && doChromeCacheBreaker) {
+          delete activeVideoSrcList[video.src];
+          UTIL.log("Video deleted from local storage: " + video.src);
+          window.localStorage.setItem('activeVideoSrcList', JSON.stringify(activeVideoSrcList));
+        }
+      } catch(e) {
+        UTIL.error("User has disabled local file storage of cookies: " + e);
       }
       video.src = "";
     };
@@ -1042,8 +1054,10 @@ if (!window['$']) {
     var videoSeeking = function(event) {
       window.clearInterval(videoIsSeekingIntervalCheck);
       videoIsSeekingIntervalCheck = window.setInterval(function() {
-        UTIL.error("We're still seeking after 250ms, so let's reload the video. This is an Opera <= 12 only workaround.");
+        UTIL.error("We're still seeking after 250ms, so let's reload the video. This is an Opera <= 12 and IE Edge only workaround.");
         event.target.load();
+        event.target.handleSeekStuck = true;
+        event.target.play();
       }, 250);
     };
 
@@ -1365,16 +1379,6 @@ if (!window['$']) {
     var drawToCanvas = function(video) {
       // DEBUG 4
       if (video.active && video.ready && !video.seeking && video.readyState >= 2 && video.canDraw == true) {
-        if ((isIE || isFirefox) && video.fromSeek && video.readyState != 4) {
-           if (!ieSeekRedrawTimer) {
-             ieSeekRedrawTimer = setTimeout(function() {
-               ieSeekRedrawTimer = null;
-               drawToCanvas(video);
-             }, 1);
-           }
-        }
-        video.fromSeek = false;
-
         // Black frame detection
         var videoGeometry = video.geometry;
         if (blackFrameDetectionCanvas) {
@@ -1414,6 +1418,35 @@ if (!window['$']) {
             UTIL.error(e.message);
           }
         }
+        // Notify draw listeners
+        var listeners = eventListeners['videoset-draw'];
+        if (listeners) {
+          var currentDrawView = timelapse.getView();
+          for (var i = 0; i < listeners.length; i++) {
+            try {
+              if (!drawListenerTimer) {
+                (function() {
+                  var idx = i;
+                  drawListenerTimer = setTimeout(function() {
+                    listeners[idx](currentDrawView);
+                    drawListenerTimer = null;
+                  }, 1);
+                })(i);
+              }
+            } catch(e) {
+              UTIL.error(e.name + " while publishing to videoset 'videoset-draw' event listener: " + e.message, e);
+            }
+          }
+        }
+        if ((isIE || isOperaLegacy) && video.fromSeek && video.readyState != 4) {
+           if (!seekRedrawTimer) {
+             seekRedrawTimer = setTimeout(function() {
+               seekRedrawTimer = null;
+               drawToCanvas(video);
+             }, 1);
+           }
+        }
+        video.fromSeek = false;
       }
     };
 
@@ -1429,12 +1462,15 @@ if (!window['$']) {
     // Clear out the local storage related to videos loaded.
     // This is a workaround for a Chrome cache bug.
     // See new code (and bug report link) in _addVideo()
-    if (isChrome && doChromeCacheBreaker) {
-      activeVideoSrcList = JSON.parse(window.localStorage.getItem('activeVideoSrcList')) || {};
-      $(window).on('beforeunload', clearOutVideoLocalStore);
-      clearOutVideoLocalStore(true)
+    try {
+      if (isChrome && doChromeCacheBreaker) {
+        activeVideoSrcList = JSON.parse(window.localStorage.getItem('activeVideoSrcList')) || {};
+        $(window).on('beforeunload', clearOutVideoLocalStore);
+        clearOutVideoLocalStore(true);
+      }
+    } catch(e) {
+      UTIL.error("User has disabled local file storage of cookies: " + e);
     }
-
     this.setStatusLoggingEnabled(false);
   };
 })();

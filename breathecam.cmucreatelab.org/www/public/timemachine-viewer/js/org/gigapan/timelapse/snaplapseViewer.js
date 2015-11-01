@@ -42,7 +42,7 @@ var org;
 if (!org) {
   org = {};
 } else {
-  if ( typeof org != "object") {
+  if (typeof org != "object") {
     var orgExistsMessage = "Error: failed to create org namespace: org already exists and is not an object";
     alert(orgExistsMessage);
     throw new Error(orgExistsMessage);
@@ -53,7 +53,7 @@ if (!org) {
 if (!org.gigapan) {
   org.gigapan = {};
 } else {
-  if ( typeof org.gigapan != "object") {
+  if (typeof org.gigapan != "object") {
     var orgGigapanExistsMessage = "Error: failed to create org.gigapan namespace: org.gigapan already exists and is not an object";
     alert(orgGigapanExistsMessage);
     throw new Error(orgGigapanExistsMessage);
@@ -64,7 +64,7 @@ if (!org.gigapan) {
 if (!org.gigapan.timelapse) {
   org.gigapan.timelapse = {};
 } else {
-  if ( typeof org.gigapan.timelapse != "object") {
+  if (typeof org.gigapan.timelapse != "object") {
     var orgGigapanTimelapseExistsMessage = "Error: failed to create org.gigapan.timelapse namespace: org.gigapan.timelapse already exists and is not an object";
     alert(orgGigapanTimelapseExistsMessage);
     throw new Error(orgGigapanTimelapseExistsMessage);
@@ -75,7 +75,7 @@ if (!org.gigapan.timelapse) {
 if (!org.gigapan.timelapse.snaplapse) {
   org.gigapan.timelapse.snaplapse = {};
 } else {
-  if ( typeof org.gigapan.timelapse.snaplapse != "object") {
+  if (typeof org.gigapan.timelapse.snaplapse != "object") {
     var orgGigapanTimelapseExistsMessage = "Error: failed to create org.gigapan.timelapse.snaplapse namespace: org.gigapan.timelapse.snaplapse already exists and is not an object";
     alert(orgGigapanTimelapseExistsMessage);
     throw new Error(orgGigapanTimelapseExistsMessage);
@@ -90,7 +90,6 @@ if (!org.gigapan.timelapse.snaplapse) {
   org.gigapan.timelapse.snaplapse.SnaplapseViewer = function(snaplapse, timelapse, settings, mode) {
 
     // Objects
-    var thisObj = this;
     var videoset = timelapse.getVideoset();
     var eventListeners = {};
 
@@ -105,17 +104,18 @@ if (!org.gigapan.timelapse.snaplapse) {
     var useCustomUI = timelapse.useCustomUI();
     var useThumbnailServer = ( typeof (settings["useThumbnailServer"]) == "undefined") ? true : settings["useThumbnailServer"];
     var thumbnailServerRootTileUrl = ( typeof (settings["thumbnailServerRootTileUrl"]) == "undefined") ? settings["url"] : settings["thumbnailServerRootTileUrl"];
+    var thumbnailUrlList = ( typeof (settings["thumbnailUrlList"]) == "undefined") ? [] : settings["thumbnailUrlList"];
     var showFullScreenBtn = ( typeof (settings["showFullScreenBtn"]) == "undefined") ? true : settings["showFullScreenBtn"];
     var showEditorModeButton = ( typeof (settings["showEditorModeButton"]) == "undefined") ? true : settings["showEditorModeButton"];
     var showAddressLookup = ( typeof (settings["showAddressLookup"]) == "undefined") ? false : settings["showAddressLookup"];
-    var disableKeyframeTitle = ( typeof (settings["disableKeyframeTitle"]) == "undefined") ? false : settings["disableKeyframeTitle"];
     var screenIdleTime = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["screenIdleTime"]) != "undefined") ? settings["presentationSliderSettings"]["screenIdleTime"] : 20000;
     var waypointDelayTime = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["waypointDelayTime"]) != "undefined") ? settings["presentationSliderSettings"]["waypointDelayTime"] : 10000;
     var doAutoMode = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["doAutoMode"]) != "undefined") ? settings["presentationSliderSettings"]["doAutoMode"] : false;
-    var showAnnotations = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["showAnnotations"]) != "undefined") ?  settings["presentationSliderSettings"]["showAnnotations"] : true;
+    var showAnnotations = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["showAnnotations"]) != "undefined") ? settings["presentationSliderSettings"]["showAnnotations"] : true;
     var initialWaypointIndex = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["initialWaypointIndex"]) != "undefined") ? settings["presentationSliderSettings"]["initialWaypointIndex"] : 0;
     var presentationSliderLoadAnimation = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["onLoadAnimation"]) != "undefined") ? settings["presentationSliderSettings"]["onLoadAnimation"] : "zoom";
-    var presentationSliderPlayAfterAnimation = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["playAfterAnimation"]) != "undefined") ? settings["presentationSliderSettings"]["playAfterAnimation"] : "true";
+    var presentationSliderPlayAfterAnimation = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["playAfterAnimation"]) != "undefined") ? settings["presentationSliderSettings"]["playAfterAnimation"] : true;
+
     // Flags
     var didOnce = false;
     var presentationSliderEnabled = timelapse.isPresentationSliderEnabled();
@@ -133,10 +133,6 @@ if (!org.gigapan.timelapse.snaplapse) {
     var $videoSizeSelect;
     var $createSubtitle_dialog = $("#" + composerDivId + " .createSubtitle_dialog");
     var $keyframeContainer = $("#" + composerDivId + " .snaplapse_keyframe_container");
-
-    if (useTouchFriendlyUI)
-      timelapse.touchHorizontalScroll($keyframeContainer);
-
     var $toolbar = $("#" + composerDivId + " .toolbar");
 
     // Parameters
@@ -151,7 +147,6 @@ if (!org.gigapan.timelapse.snaplapse) {
       from: undefined,
       to: undefined
     };
-    var toolbarHeight = $toolbar.outerHeight();
     var KEYFRAME_THUMBNAIL_WIDTH = useTouchFriendlyUI ? 146 : 126;
     var KEYFRAME_THUMBNAIL_HEIGHT = useTouchFriendlyUI ? 101 : 73;
 
@@ -181,8 +176,8 @@ if (!org.gigapan.timelapse.snaplapse) {
         isHidingCustomUI = true;
         $("#" + viewerDivId + " .sideToolBar").hide();
         $("#" + viewerDivId + " .googleLogo").css("bottom", "-=45px");
-        $("#" + viewerDivId + " .toggleGoogleMapBtn").hide();
-        $("#" + viewerDivId + " .smallMapResizer").hide();
+        $("#" + viewerDivId + " .toggleContextMapBtn").hide();
+        $("#" + viewerDivId + " .contextMapResizer").hide();
         $("#" + viewerDivId + " .customTimeline").hide();
         $("#" + viewerDivId + " .customHelpLabel").hide();
         $("#" + viewerDivId + " .videoQualityContainer").hide();
@@ -206,8 +201,8 @@ if (!org.gigapan.timelapse.snaplapse) {
         isHidingCustomUI = false;
         $("#" + viewerDivId + " .sideToolBar").show();
         $("#" + viewerDivId + " .googleLogo").css("bottom", "+=45px");
-        $("#" + viewerDivId + " .toggleGoogleMapBtn").show();
-        $("#" + viewerDivId + " .smallMapResizer").show();
+        $("#" + viewerDivId + " .toggleContextMapBtn").show();
+        $("#" + viewerDivId + " .contextMapResizer").show();
         $("#" + viewerDivId + " .customTimeline").show();
         $("#" + viewerDivId + " .customHelpLabel").show();
         $("#" + viewerDivId + " .videoQualityContainer").show();
@@ -230,7 +225,7 @@ if (!org.gigapan.timelapse.snaplapse) {
       var $keyframeItems = $("#" + composerDivId + " .snaplapse_keyframe_list").children();
       var numItems = $keyframeItems.length;
       // Unhide the transition options
-      if ( typeof (showIdx) == "undefined" || showIdx == numItems - 1)
+      if (typeof (showIdx) == "undefined" || showIdx == numItems - 1)
         showIdx = numItems - 2;
       var $keyframeItems_show = $keyframeItems.eq(showIdx);
       if ($keyframeItems_show) {
@@ -308,6 +303,8 @@ if (!org.gigapan.timelapse.snaplapse) {
     this.animateTourOverlayAndPlay = animateTourOverlayAndPlay;
 
     var initializeSnaplapseUI = function() {
+      timelapse.touchHorizontalScroll($keyframeContainer);
+
       if (!usePresentationSlider && uiEnabled) {
         createEditorToolbar();
         createDialogWindows();
@@ -364,10 +361,15 @@ if (!org.gigapan.timelapse.snaplapse) {
 
       // Handle editor hiding
       if (!usePresentationSlider) {
-        if (!showEditorOnLoad && !useCustomUI)
+        if (!showEditorOnLoad && !useCustomUI) {
           $("#" + composerDivId).hide();
-      } else
+        }
+        if (UTIL.getSharedDataType() == "presentation") {
+          $("#" + composerDivId).hide();
+        }
+      } else {
         $("#" + composerDivId).hide();
+      }
 
       // Handle description box
       if (uiEnabled && !usePresentationSlider)
@@ -410,9 +412,9 @@ if (!org.gigapan.timelapse.snaplapse) {
       $("#" + composerDivId + " .loadTimewarpWindow").dialog({
         resizable: false,
         autoOpen: false,
+        dialogClass: "customDialog",
         appendTo: "#" + composerDivId,
-        width: 400,
-        height: 200
+        width: 361
       });
 
       // Load button in load dialog
@@ -434,22 +436,16 @@ if (!org.gigapan.timelapse.snaplapse) {
       $("#" + composerDivId + " .saveTimewarpWindow").dialog({
         resizable: false,
         autoOpen: false,
+        dialogClass: "customDialog",
         appendTo: "#" + composerDivId,
-        width: 410,
-        height: 484
+        width: 387
       });
 
       // Create the subtitle dialog
-      var dialogHeight = disableKeyframeTitle ? 210 : 250;
-      if (disableKeyframeTitle) {
-        $(".keyframe_title_container").hide();
-        $(".createSubtitle_dialog_txt").css("top", "11px");
-        $(".subtitle_textarea").css("top", "31px");
-      }
       $createSubtitle_dialog.dialog({
         autoOpen: false,
-        height: dialogHeight,
-        width: 310,
+        width: 313,
+        dialogClass: "customDialog",
         modal: true,
         resizable: false,
         appendTo: "#" + composerDivId,
@@ -504,7 +500,7 @@ if (!org.gigapan.timelapse.snaplapse) {
         UTIL.addGoogleAnalyticEvent('button', 'click', 'editor-add-keyframe');
       });
       // Create save button
-      $editorModeToolbar.append('<button class="saveTimewarp" title="Share a tour">Share</button>');
+      $editorModeToolbar.append('<button class="saveTimewarp" title="Share a tour or slideshow">Share</button>');
       $("#" + composerDivId + " .toolbar .saveTimewarp").button({
         icons: {
           primary: "ui-icon-person"
@@ -516,7 +512,7 @@ if (!org.gigapan.timelapse.snaplapse) {
         UTIL.addGoogleAnalyticEvent('button', 'click', 'editor-show-share-dialog');
       });
       // Create load button
-      $editorModeToolbar.append('<button class="loadTimewarp" title="Load a tour">Load</button>');
+      $editorModeToolbar.append('<button class="loadTimewarp" title="Load a tour or slideshow">Load</button>');
       $("#" + composerDivId + " .toolbar .loadTimewarp").button({
         icons: {
           primary: "ui-icon-folder-open"
@@ -646,11 +642,11 @@ if (!org.gigapan.timelapse.snaplapse) {
       if (mode == "tour")
         return "Tour Editor";
       else if (mode == "presentation")
-        return "Presentation Editor";
+        return "Slideshow Editor";
     };
 
     var setAddressLookupUI = function() {
-      if ( typeof google === "undefined")
+      if (typeof google === "undefined")
         return;
 
       var $addressLookupElem = $('<input>').attr({
@@ -784,7 +780,6 @@ if (!org.gigapan.timelapse.snaplapse) {
           var elementOffset = $element.offset();
           var elementWidth = $element.width();
           var captionWidth = $keyframeSubtitleBox.width();
-          var documentHeight = $(document).height();
           var pointerLeft = elementOffset.left + elementWidth / 2;
           var captionLeft = pointerLeft - captionWidth / 2;
           var distanceBetweenElementAndLeftEdge = elementOffset.left + elementWidth - containerOffset.left;
@@ -803,7 +798,8 @@ if (!org.gigapan.timelapse.snaplapse) {
             pointerLeft = maxPointerLeft - 5;
           var pointerLeftPercent = ((pointerLeft - captionLeft) / captionWidth) * 100;
           $keyframeSubtitleBox.css({
-            "left": captionLeft + "px"
+            "left": captionLeft + "px",
+            "bottom": ($keyframeContainer.height() + 10) + "px"
           });
           $keyframeSubtitle.css({
             "background-position": pointerLeftPercent + "% 100%"
@@ -952,9 +948,10 @@ if (!org.gigapan.timelapse.snaplapse) {
             $("#" + timeMachineDivId + " .presentationSlider").hide();
             if (useCustomUI)
               $("#" + timeMachineDivId + " .composer").hide();
-            else
-              setDefaultUIToPlayerMode();
-          };
+            else {
+              $("#" + viewerDivId + " .toolDialog .accordion").accordion("option", "active", false);
+            }
+          }
 
           if (!useCustomUI) {
             $sideToolbar.hide();
@@ -1050,34 +1047,40 @@ if (!org.gigapan.timelapse.snaplapse) {
                 // so swaping it with other keyframes will give a default value
                 snaplapse.resetKeyframe();
                 if (usePresentationSlider) {
+                  var $desiredSlide;
                   $("#" + composerDivId + " .snaplapse_keyframe_container").scrollLeft(0);
                   if (presentationSliderLoadAnimation != "none") {
                     var unsafeHashObj = UTIL.getUnsafeHashVars();
                     // Go to the desired keyframe if there is no shared view and no tour
-                    if ( typeof unsafeHashObj.v == "undefined" && typeof unsafeHashObj.tour == "undefined") {
-                      var $desiredSlide;
-                      if ( typeof unsafeHashObj.slide != "undefined") {
+                    if (typeof unsafeHashObj.v == "undefined" && typeof unsafeHashObj.tour == "undefined") {
+                      if (typeof unsafeHashObj.slide != "undefined") {
                         $desiredSlide = $("#" + unsafeHashObj.slide);
                       }
                       if (!$desiredSlide || $desiredSlide.length == 0) {
                         if (initialWaypointIndex > 0) {
                           var waypointId = $("#" + composerDivId + " .snaplapse_keyframe_list").children().eq(initialWaypointIndex).children()[0].id;
-                          $desiredSlide = $("#" + waypointId)
+                          $desiredSlide = $("#" + waypointId);
                         } else {
                           // Go to the first keyframe if there is no desired keyframe
                           var firstFrame = snaplapse.getKeyframes()[0];
                           $desiredSlide = $("#" + timeMachineDivId + "_snaplapse_keyframe_" + firstFrame.id).children(".snaplapse_keyframe_list_item_thumbnail_container_presentation");
                         }
                       }
+                      var keyframeId = $desiredSlide.parent().attr("id").split("_")[3];
+                      var frames = snaplapse.getKeyframeById(keyframeId);
+                      var newView;
+                      if (typeof (timelapse.getTmJSON()['projection-bounds']) != "undefined") {
+                        newView = timelapse.pixelBoundingBoxToLatLngCenterView(frames['bounds']);
+                      } else {
+                        newView = timelapse.pixelBoundingBoxToPixelCenterView(frames['bounds']);
+                      }
+                      if (presentationSliderLoadAnimation == "zoom") {
+                        timelapse.setNewView(newView, false, presentationSliderPlayAfterAnimation);
+                      } else if (presentationSliderLoadAnimation == "warp") {
+                        timelapse.setNewView(newView, true, presentationSliderPlayAfterAnimation);
+                      }
+                      selectAndGo($("#" + timeMachineDivId + "_snaplapse_keyframe_" + keyframeId), keyframeId, true, true, true);
                     }
-                    var keyframeId = $desiredSlide.parent().attr("id").split("_")[3];
-                    var frames = snaplapse.getKeyframeById(keyframeId);
-                    if (presentationSliderLoadAnimation == "zoom") {
-                      timelapse.setNewView(timelapse.pixelBoundingBoxToLatLngCenterView(frames['bounds']), false, presentationSliderPlayAfterAnimation);
-                    } else if (presentationSliderLoadAnimation == "warp") {
-                      timelapse.setNewView(timelapse.pixelBoundingBoxToLatLngCenterView(frames['bounds']), true, presentationSliderPlayAfterAnimation);
-                    }
-                    selectAndGo($("#" + timeMachineDivId + "_snaplapse_keyframe_" + keyframeId), keyframeId, true, true, true);
                   } else {
                     if (currentAutoModeWaypointIdx != -1) currentAutoModeWaypointIdx--;
                   }
@@ -1085,7 +1088,7 @@ if (!org.gigapan.timelapse.snaplapse) {
                   var firstFrame = snaplapse.getKeyframes()[0];
                   var $firstFrameThumbnailButton = $("#" + timeMachineDivId + "_snaplapse_keyframe_" + firstFrame.id).children(".snaplapse_keyframe_list_item_thumbnail_container_presentation");
                   var slideWidth = $firstFrameThumbnailButton.width() + 2;
-                  var stripWidth = slideWidth*keyframes.length;
+                  var stripWidth = slideWidth * keyframes.length;
                   var maxWidth = $("#" + timeMachineDivId + " .player").width();
                   var viewerDivBottom = 100;
                   if (stripWidth < maxWidth) {
@@ -1146,9 +1149,9 @@ if (!org.gigapan.timelapse.snaplapse) {
           $("#" + timeMachineDivId + "_snaplapse_keyframe_" + keyframe['id'] + "_timestamp").text(keyframe['captureTime']);
           // TODO: check if the thumbnail server is down and set the flag automatically
           if (useThumbnailServer)
-            loadThumbnailFromServer(keyframe);
+            loadThumbnailFromUrl(keyframe);
           else
-            setKeyframeThumbail(keyframe);
+            setKeyframeThumbnail(keyframe);
         });
 
         snaplapse.addEventListener('keyframe-interval-change', function(keyframe) {
@@ -1166,7 +1169,7 @@ if (!org.gigapan.timelapse.snaplapse) {
       $("#" + viewerDivId + " .snaplapse-annotation-description > div").text("");
 
       // Set the UI after starting to load a new tour
-      if ( typeof json != 'undefined' && json != null) {
+      if (typeof json != 'undefined' && json != null) {
         var loadJSON = JSON.parse(json);
         var tourTitle = loadJSON['snaplapse']['unsafe_string_title'] ? loadJSON['snaplapse']['unsafe_string_title'] : "Untitled";
         if (uiEnabled && !usePresentationSlider) {
@@ -1175,10 +1178,14 @@ if (!org.gigapan.timelapse.snaplapse) {
         }
         if (usePresentationSlider) {
           var unsafeHashObj = UTIL.getUnsafeHashVars();
-          if ( typeof unsafeHashObj.tour == "undefined")
+          if (typeof unsafeHashObj.tour == "undefined")
             $("#" + composerDivId).show();
-          if (useCustomUI && uiEnabled)
+          if (uiEnabled) {
             $("#" + timeMachineDivId + " .composer").hide();
+            if (!useCustomUI) {
+              $("#" + timeMachineDivId + " .tool").hide();
+            }
+          }
         }
         if (!uiEnabled && !usePresentationSlider) {
           timelapse.pause();
@@ -1196,7 +1203,7 @@ if (!org.gigapan.timelapse.snaplapse) {
             $("#" + viewerDivId + " .controls").hide();
             $("#" + viewerDivId + " .sideToolBar").hide();
             setCaptureTimePosition("down");
-            setDefaultUIToPlayerMode();
+            $("#" + viewerDivId + " .toolDialog .accordion").accordion("option", "active", false);
           }
         }
         return snaplapse.loadFromJSON(json, 0);
@@ -1216,35 +1223,19 @@ if (!org.gigapan.timelapse.snaplapse) {
     };
 
     var setCaptureTimePosition = function(position) {
-      var positionBottom;
-      var positionLeft;
-      var fontSize;
+      var $captureTime = $("#" + viewerDivId + " .captureTime");
       if (position == "up") {
-        positionLeft = 90;
-        positionBottom = 42;
-        fontSize = 18;
+        if($captureTime.hasClass("captureTimeSmall")) {
+          $captureTime.removeClass("captureTimeSmall");
+        }
       } else if (position == "down") {
-        positionLeft = 8;
-        positionBottom = 5;
-        fontSize = 15;
+        if(!$captureTime.hasClass("captureTimeSmall")) {
+          $captureTime.addClass("captureTimeSmall");
+        }
       }
-      $("#" + viewerDivId + " .captureTime").css({
-        "bottom": positionBottom + "px",
-        "left": positionLeft + "px",
-        "font-size": fontSize + "px"
-      });
     };
 
-    var setDefaultUIToPlayerMode = function() {
-      var $editorToggleCheckbox = $("#" + viewerDivId + " .editorToggleCheckbox");
-      var $annotatorToggleCheckbox = $("#" + viewerDivId + " .annotatorToggleCheckbox");
-      if ($editorToggleCheckbox.is(":checked"))
-        $editorToggleCheckbox.click();
-      if ($annotatorToggleCheckbox.is(":checked"))
-        $annotatorToggleCheckbox.click();
-    };
-
-    var setKeyframeThumbail = function(keyframe) {
+    var setKeyframeThumbnail = function(keyframe) {
       if (!uiEnabled)
         return;
       try {
@@ -1270,7 +1261,7 @@ if (!org.gigapan.timelapse.snaplapse) {
             ctx.drawImage(canvas, 0, 0, cWidth, cHeight, 0, 0, KEYFRAME_THUMBNAIL_WIDTH, KEYFRAME_THUMBNAIL_HEIGHT);
           }
         } else {
-          UTIL.error("setKeyframeThumbail(): failed to find a good video");
+          UTIL.error("setKeyframeThumbnail(): failed to find a good video");
         }
       } catch(e) {
         UTIL.error("Exception while trying to create thumbnail: " + e);
@@ -1334,12 +1325,12 @@ if (!org.gigapan.timelapse.snaplapse) {
         content += '      <div id="' + timestampId + '" class="snaplapse_keyframe_list_item_timestamp">' + keyframe['captureTime'] + '</div>';
         content += '			<div id="' + thumbnailButtonId + '" class="snaplapse_keyframe_list_item_thumbnail_container" title="Go to this keyframe">';
         content += '				<div class="snaplapse_keyframe_list_item_thumbnail_overlay"></div>';
-        if (useThumbnailServer)
+        if (useThumbnailServer) {
           content += '      	<img id="' + thumbnailId + '" width="' + KEYFRAME_THUMBNAIL_WIDTH + '" height="' + KEYFRAME_THUMBNAIL_HEIGHT + '" class="snaplapse_keyframe_list_item_thumbnail"></img>';
-        else
+        } else {
           content += '      	<canvas id="' + thumbnailId + '" width="' + KEYFRAME_THUMBNAIL_WIDTH + '" height="' + KEYFRAME_THUMBNAIL_HEIGHT + '" class="snaplapse_keyframe_list_item_thumbnail"></canvas>';
-        if (!disableKeyframeTitle)
-          content += '				<div id="' + titleId + '" class="snaplapse_keyframe_list_item_title"></div>';
+        }
+        content += '				<div id="' + titleId + '" class="snaplapse_keyframe_list_item_title"></div>';
         content += '			</div>';
         content += '      <div id="' + buttonContainerId + '" class="keyframe-button-container">';
         content += '        <button id="' + updateButtonId + '" title="Update this keyframe to current view">&nbsp</button>';
@@ -1412,7 +1403,7 @@ if (!org.gigapan.timelapse.snaplapse) {
 
       var $keyframeTable = $("#" + keyframeTableId);
 
-      $keyframeTable.mousedown(function(event) {
+      $keyframeTable.click(function(event) {
         selectAndGo($("#" + keyframeListItem.id));
         displaySnaplapseFrameAnnotation(null);
         UTIL.addGoogleAnalyticEvent('button', 'click', 'editor-select-keyframe');
@@ -1435,12 +1426,13 @@ if (!org.gigapan.timelapse.snaplapse) {
       $thumbnailButton.click(function(event) {
         clearAutoModeTimeout();
         wayPointClickedByAutoMode = (event.pageX == 0 && event.pageY == 0) ? true : false;
-        //event.stopPropagation();
         var keyframeId = $(this).parent().attr("id").split("_")[3];
-        selectAndGo($("#" + keyframeListItem.id), keyframeId);
+        if (usePresentationSlider) {
+          selectAndGo($("#" + keyframeListItem.id), keyframeId);
+        } else {
+          selectAndGo($("#" + keyframeListItem.id), keyframeId, null, null, null, false);
+        }
         UTIL.addGoogleAnalyticEvent('button', 'click', 'editor-go-to-keyframe');
-      }).mousedown(function() {
-        //event.stopPropagation();
       });
 
       if (usePresentationSlider) {
@@ -1453,18 +1445,19 @@ if (!org.gigapan.timelapse.snaplapse) {
           var thisKeyframeId = $(this).parent().attr("id").split("_")[3];
           var thisKeyframe = snaplapse.getKeyframeById(thisKeyframeId);
           setKeyframeCaptionUI(thisKeyframe, this, true);
-        });/*.click(function() {
-          // Change the hash to the current slide
-          // TODO: do not override the original hash
-          var slideId = $(this).attr("id");
-          if (window && (window.self !== window.top)) {
-            // If this is an iframe page
-            window.top.location.hash = "#slide=" + slideId;
-          } else {
-            // If this is a source page
-            window.location.hash = "#slide=" + slideId;
-          }
-        });*/
+        });
+        /*.click(function() {
+         // Change the hash to the current slide
+         // TODO: do not override the original hash
+         var slideId = $(this).attr("id");
+         if (window && (window.self !== window.top)) {
+         // If this is an iframe page
+         window.top.location.hash = "#slide=" + slideId;
+         } else {
+         // If this is a source page
+         window.location.hash = "#slide=" + slideId;
+         }
+         });*/
       }
 
       if (disableTourLooping) {
@@ -1502,10 +1495,12 @@ if (!org.gigapan.timelapse.snaplapse) {
         if (this.checked) {
           snaplapse.setTextAnnotationForKeyframe(thisKeyframeId, undefined, true);
           snaplapse.setTitleForKeyframe(thisKeyframeId, undefined, true);
-          if (thisKeyframe["unsafe_string_description"] != undefined)
+          if (thisKeyframe["unsafe_string_description"] != undefined) {
             $(".subtitle_textarea").val(thisKeyframe["unsafe_string_description"]);
-          if (thisKeyframe["unsafe_string_frameTitle"] != undefined)
+          }
+          if (thisKeyframe["unsafe_string_frameTitle"] != undefined) {
             $(".keyframe_title_input").val(thisKeyframe["unsafe_string_frameTitle"]);
+          }
           displaySnaplapseFrameAnnotation(thisKeyframe);
           $createSubtitle_dialog.dialog("option", {
             "keyframeId": thisKeyframeId,
@@ -1645,23 +1640,28 @@ if (!org.gigapan.timelapse.snaplapse) {
       if (timelapse.getVisualizer() && !usePresentationSlider && uiEnabled && !useCustomUI)
         timelapse.getVisualizer().addTimeTag(keyframes, insertionIndex, isKeyframeFromLoad);
 
-      // Grab the current video frame and store it as the thumbnail in the canvas
-      if (useThumbnailServer)
-        loadThumbnailFromServer(keyframe);
-      else {
+
+      if (thumbnailUrlList.length > 0) {
+        // Pull from list of provided thumbnail URLs
+        // Assumes list is in order of how thumbnails will be displayed
+        loadThumbnailFromUrl(keyframe, insertionIndex);
+      } else if (useThumbnailServer) {
+        // Call thumbnail server to generate URL
+        loadThumbnailFromUrl(keyframe);
+      } else {
         setTimeout(function() {
-          setKeyframeThumbail(keyframe);
+          // Grab the current video frame and store it as the thumbnail in the canvas
+          setKeyframeThumbnail(keyframe);
         }, 500);
       }
 
       // Select the element
-      UTIL.selectSortableElements($sortable, $("#" + keyframeListItem.id), false);
+      UTIL.selectSortableElements($sortable, $("#" + keyframeListItem.id), "noAnimation");
       setKeyframeTitleUI(keyframe);
     };
 
-    var selectAndGo = function($select, keyframeId, skipAnnotation, skipGo, doNotFireListener) {
+    var selectAndGo = function($select, keyframeId, skipAnnotation, skipGo, doNotFireListener, autoScroll) {
       var setViewCallback = null;
-
       if (doAutoMode) {
         setViewCallback = function() {
           if (wayPointClickedByAutoMode) {
@@ -1669,12 +1669,14 @@ if (!org.gigapan.timelapse.snaplapse) {
           } else {
             startAutoModeIdleTimeout();
           }
-        }
+        };
       } else if (usePresentationSlider) {
         setKeyframeCaptionUI(undefined, undefined, true);
       }
-
-      UTIL.selectSortableElements($sortable, $select, true, function() {
+      if (autoScroll != false) {
+        autoScroll = true;
+      }
+      UTIL.selectSortableElements($sortable, $select, autoScroll, function() {
         if (doAutoMode && showAnnotations) {
           setKeyframeCaptionUI(snaplapse.getKeyframeById(keyframeId), $("#timeMachine_snaplapse_keyframe_" + keyframeId));
         }
@@ -1683,16 +1685,23 @@ if (!org.gigapan.timelapse.snaplapse) {
         $sortable.children().children().children(".snaplapse_keyframe_list_item_thumbnail_overlay_presentation").removeClass("thumbnail_highlight");
         $select.children().children(".snaplapse_keyframe_list_item_thumbnail_overlay_presentation").addClass("thumbnail_highlight");
       }
-      if ( typeof (keyframeId) != "undefined") {
+      if (typeof (keyframeId) != "undefined") {
         var keyframe = snaplapse.getKeyframeById(keyframeId);
         if (skipAnnotation != true) {
           displaySnaplapseFrameAnnotation(keyframe);
           setKeyframeTitleUI(keyframe);
         }
         if (skipGo != true) {
-          var newView = timelapse.pixelBoundingBoxToLatLngCenterView(keyframe['bounds']);
-          // TODO: Hack for hyperwall
-          newView.zoom += 0.8;
+          var newView;
+          if (keyframe['originalView']) {
+            newView = keyframe['originalView'];
+          } else {
+            if (typeof (timelapse.getTmJSON()['projection-bounds']) != "undefined") {
+              newView = timelapse.pixelBoundingBoxToLatLngCenterView(keyframe['bounds']);
+            } else {
+              newView = timelapse.pixelBoundingBoxToPixelCenterView(keyframe['bounds']);
+            }
+          }
           if (usePresentationSlider && useCustomUI) {
             timelapse.setNewView(newView, false, false, setViewCallback);
           } else {
@@ -1716,9 +1725,11 @@ if (!org.gigapan.timelapse.snaplapse) {
     };
     this.selectAndGo = selectAndGo;
 
-    var loadThumbnailFromServer = function(keyframe) {
+    var loadThumbnailFromUrl = function(keyframe, listIndex) {
       var $img = $("#" + timeMachineDivId + "_snaplapse_keyframe_" + keyframe['id'] + "_thumbnail");
-      var thumbnailURL = generateThumbnailURL(thumbnailServerRootTileUrl, keyframe.bounds, $img.width(), $img.height(), keyframe.time);
+      var thumbnailURL = thumbnailUrlList[listIndex];
+      if (!thumbnailUrlList[listIndex])
+        thumbnailURL = generateThumbnailURL(thumbnailServerRootTileUrl, keyframe.bounds, $img.width(), $img.height(), keyframe.time);
       $img.attr("src", thumbnailURL);
     };
 
@@ -1899,7 +1910,7 @@ if (!org.gigapan.timelapse.snaplapse) {
         "position": "absolute",
         "top": newTop + "px",
         "left": "0px",
-        "right": "2px",
+        "right": useTouchFriendlyUI ? "-2px" : "2px",
         "bottom": "",
         "width": "auto",
         "height": ""
@@ -1953,6 +1964,10 @@ if (!org.gigapan.timelapse.snaplapse) {
     //
     // Constructor code
     //
+    if(!useCustomUI) {
+      presentationSliderLoadAnimation = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["onLoadAnimation"]) != "undefined") ? settings["presentationSliderSettings"]["onLoadAnimation"] : "warp";
+      presentationSliderPlayAfterAnimation = ( settings["presentationSliderSettings"] && typeof (settings["presentationSliderSettings"]["playAfterAnimation"]) != "undefined") ? settings["presentationSliderSettings"]["playAfterAnimation"] : false;
+    }
     resizeUI();
     initializeSnaplapseUI();
     loadNewSnaplapse(null);

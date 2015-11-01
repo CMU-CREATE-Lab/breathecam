@@ -36,7 +36,9 @@
 
  Authors:
  Yen-Chia Hsu (legenddolphin@gmail.com)
- */"use strict";
+ */
+
+"use strict";
 
 //
 // VERIFY NAMESPACE
@@ -101,7 +103,6 @@ if (!org.gigapan.timelapse.Timelapse) {
     var $viewer = $("#" + viewerDivId);
     var viewer_offset = $viewer.offset();
     var $video = $("#" + viewerDivId + " .tiledContentHolder");
-    var playerWidth = $video.outerWidth();
     var $customControl;
     var $customPlay;
     var $customHelpLabel;
@@ -115,15 +116,15 @@ if (!org.gigapan.timelapse.Timelapse) {
     var $slowSpeed;
     var $timeTextHover;
     var videoset = timelapse.getVideoset();
-    var captureTimes = timelapse.getCaptureTimes();
-    var numFrames = timelapse.getNumFrames();
+    var captureTimes;
+    var numFrames;
     var timeTickX = [];
     var $defaultUIPlaybackButton = $("#" + viewerDivId + " .playbackButton");
     var numYears;
     var pixelRatio = getPixelRatio();
-    var endFrameIdx = numFrames - 1;
-    var extraHeight = 2;
+    var endFrameIdx;
     var $customSpeedhelp;
+    var addedTimelineSliderListener = false;
 
     // Modis dataset variables
     var $monthSpinnerContainer;
@@ -134,8 +135,9 @@ if (!org.gigapan.timelapse.Timelapse) {
     var locker = "none";
     var yearLockMinPlaybackFrame;
     var yearLockMaxPlaybackFrame;
-    var yearDictionary = {};
-    var frameDictionary = [];
+    var yearDictionary;
+    var yearDictionaryKeys;
+    var frameDictionary;
     var firstYear;
     var endYear;
     var isPlaying = !timelapse.isPaused();
@@ -171,7 +173,6 @@ if (!org.gigapan.timelapse.Timelapse) {
     var timeTickGrow_height = currentTimeTick_height;
     var originalIsPaused;
     var isSafari = org.gigapan.Util.isSafari();
-    var editorEnabled = timelapse.isEditorEnabled();
     var timeTickSpan;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,6 +180,12 @@ if (!org.gigapan.timelapse.Timelapse) {
     // Private methods
     //
     var preProcessLandsat = function() {
+      yearDictionary = {};
+      frameDictionary = [];
+      captureTimes = timelapse.getCaptureTimes();
+      numFrames = timelapse.getNumFrames();
+      firstYear = undefined;
+      endYear = undefined;
       for (var i = 0; i < captureTimes.length; i++) {
         var year = captureTimes[i];
         frameDictionary[i] = {
@@ -199,10 +206,16 @@ if (!org.gigapan.timelapse.Timelapse) {
         yearDictionary[year]["numFramesThisYear"]++;
       }
       numYears = numFrames;
+      yearDictionaryKeys = Object.keys(yearDictionary);
     };
 
     var preProcessModis = function() {
       var year, month;
+      yearDictionary = {};
+      frameDictionary = [];
+      captureTimes = timelapse.getCaptureTimes();
+      numFrames = timelapse.getNumFrames();
+      endFrameIdx = numFrames - 1;
       for (var i = 0; i < captureTimes.length; i++) {
         var time = captureTimes[i].split(" ");
         var timeStart = time[0].split("-").map(parseFloat);
@@ -252,12 +265,12 @@ if (!org.gigapan.timelapse.Timelapse) {
       yearDictionary[firstYear]["maxSpinnerValue"] += firstYearFrameOffset;
       previousEffectiveSpinnerValue = yearDictionary[firstYear]["minSpinnerValue"];
       previousSpinnerValue = previousEffectiveSpinnerValue;
+      yearDictionaryKeys = Object.keys(yearDictionary);
     };
 
     var createCustomControl = function() {
       if (useTouchFriendlyUI)
         $video.addClass("tiledContentHolder-touchFriendly");
-
       $customControl = $('<div class="customControl"></div>');
       // Append element
       $viewer.append($customControl);
@@ -265,15 +278,13 @@ if (!org.gigapan.timelapse.Timelapse) {
       $customControl.append('<div class="googleLogo"></div>');
       if (useTouchFriendlyUI)
         $(".googleLogo").addClass("googleLogo-touchFriendly");
-      // Create the spinner for months
-      if (datasetType == "modis")
-        createMonthSpinner();
       // Create timeline toolbar
       createCustomButtons();
       // Create timeline slider
       createCustomTimeline();
-
       if (datasetType == "modis") {
+        // Create the spinner for months
+        createMonthSpinner();
         timelapse.addTimeChangeListener(function() {
           if (locker == "year") {
             var currentFrame = timelapse.getCurrentFrameNumber();
@@ -648,7 +659,7 @@ if (!org.gigapan.timelapse.Timelapse) {
       // Instruction mask
       var content_instruction = "";
       content_instruction += '<div class="customInstructions">';
-      content_instruction += '  <span class="customZoomhelp"><p>'
+      content_instruction += '  <span class="customZoomhelp"><p>';
       content_instruction += useTouchFriendlyUI ? 'Zoom in and out to explore in greater detail.' : 'Zoom in and out to explore in greater detail. Click or use the mouse scroll wheel.';
       content_instruction += '  </p></span>';
       content_instruction += '  <span class="customMovehelp"><p>';
@@ -725,6 +736,10 @@ if (!org.gigapan.timelapse.Timelapse) {
     };
 
     var createCustomTimeline = function() {
+      if (datasetType == "modis")
+        preProcessModis();
+      else
+        preProcessLandsat();
       // Create slider container
       $timeText = $('<div class="timeText"></div>');
       if (datasetType == "modis")
@@ -774,10 +789,11 @@ if (!org.gigapan.timelapse.Timelapse) {
       if (datasetType == "modis")
         numTicks = numTicks + 1;
       timeTickSpan = 100 / numTicks;
-      var previousTargetFrameIdx = undefined;
-      var targetFrame, targetFrameX, previousTargetFrameX, invisibleSpan;
+      var previousTargetFrameIdx;
+      var targetFrame, targetFrameX, previousTargetFrameX, invisibleSpan, idx;
       for (var i = 0; i < numYears; i++) {
-        targetFrame = yearDictionary[captureTimes[i]]["previousStackEndIdx"] + 1;
+        idx = (datasetType == "modis") ? (firstYear + i) : captureTimes[i];
+        targetFrame = yearDictionary[idx]["previousStackEndIdx"] + 1;
         // Save the x position of every frame
         frameDictionary[targetFrame]["x"] = timeTickSpan * (i + 0.5);
         // Save the x position of every time tick
@@ -866,11 +882,32 @@ if (!org.gigapan.timelapse.Timelapse) {
         "top": currentTimeTick_height + (useTouchFriendlyUI ? 8 : 5) + "px",
         "margin-left": ($timeTextHover.width() / -2) + "px"
       });
-      videoset.addEventListener('sync', function() {
-        updateTimelineSlider(timelapse.getCurrentFrameNumber());
-      });
+      if (!addedTimelineSliderListener) {
+        addedTimelineSliderListener = true;
+        videoset.addEventListener('sync', function() {
+          updateTimelineSlider(timelapse.getCurrentFrameNumber());
+        });
+      }
       updateTimelineSlider(0);
     };
+    this.createCustomTimeline = createCustomTimeline;
+
+    var resetCustomTimeline = function() {
+      $("#" + viewerDivId + " .customTimeline").remove();
+      $("#" + viewerDivId + " .timeText").remove();
+      createCustomTimeline();
+      if (!timelapse.isPaused()) {
+        $("#" + viewerDivId + " .customPlay").button({
+          icons: {
+            primary: "ui-icon-custom-pause"
+          },
+          text: false
+        }).attr({
+          "title": "Pause"
+        });
+      }
+    };
+    this.resetCustomTimeline = resetCustomTimeline;
 
     var handleEndTimeDotMousedown = function(event) {
       originalIsPaused = timelapse.isPaused();
@@ -922,7 +959,7 @@ if (!org.gigapan.timelapse.Timelapse) {
       if (!originalIsPaused)
         timelapse.handlePlayPause();
       var currentYearIdx = parseInt(this.id.split("_")[3]);
-      var currentYear = captureTimes[currentYearIdx];
+      var currentYear = yearDictionaryKeys[currentYearIdx];
       if (locker != "year") {
         if (locker == "month") {
           if (isPlaying)
@@ -950,7 +987,7 @@ if (!org.gigapan.timelapse.Timelapse) {
 
     var handleTimeTickMouseover = function(event) {
       if (isShowHoverEffect) {
-        var currentYearIdx = captureTimes[parseInt(this.id.split("_")[3])];
+        var currentYearIdx = yearDictionaryKeys[parseInt(this.id.split("_")[3])];
         var currentFrameIdx = yearDictionary[currentYearIdx]["previousStackEndIdx"] + 1;
         if (timelapse.getCurrentFrameNumber() == currentFrameIdx)
           $(event.target).removeClass("closedHand").addClass("openHand").attr("title", "Drag to go to a different point in time");
@@ -1043,20 +1080,19 @@ if (!org.gigapan.timelapse.Timelapse) {
       // Binary search
       var minFrameIdx;
       var maxFrameIdx;
-      var totalFrames = timelapse.getNumFrames();
 
       if (locker == "year") {
         var currentYear = getCurrentYear();
         minFrameIdx = yearDictionary[currentYear]["previousStackEndIdx"] + 1;
         maxFrameIdx = yearDictionary[currentYear]["currentStackEndIdx"];
-        if (maxFrameIdx > totalFrames)
-          maxFrameIdx = totalFrames - 1;
+        if (maxFrameIdx > numFrames)
+          maxFrameIdx = numFrames - 1;
       } else if (locker == "month") {
         minFrameIdx = 0;
         maxFrameIdx = numYears - 1;
       } else {
         minFrameIdx = 0;
-        maxFrameIdx = totalFrames - 1;
+        maxFrameIdx = numFrames - 1;
       }
 
       var targetFrameIdx;
@@ -1227,7 +1263,7 @@ if (!org.gigapan.timelapse.Timelapse) {
       if (frameIdx < 0 || frameIdx > numFrames - 1)
         return;
       var currentYear = frameDictionary[frameIdx]["year"];
-      if (datasetType == "modis") {
+      if (datasetType == "modis" && $monthSpinnerTxt) {
         $monthSpinnerTxt.text(frameDictionary[frameIdx]["monthText"]);
         $monthSpinner.val(frameDictionary[frameIdx]["monthFrameIdx"]).trigger('change');
       }
@@ -1284,10 +1320,6 @@ if (!org.gigapan.timelapse.Timelapse) {
     //
     // Constructor code
     //
-    if (datasetType == "modis")
-      preProcessModis();
-    else
-      preProcessLandsat();
 
     createCustomControl();
 

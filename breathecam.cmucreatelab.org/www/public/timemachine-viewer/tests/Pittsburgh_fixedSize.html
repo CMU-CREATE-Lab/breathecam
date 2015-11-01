@@ -8,6 +8,7 @@
     <link href="../css/defaultUI.css" rel="stylesheet" type="text/css"/>
     <link href="../css/visualizer.css" rel="stylesheet" type="text/css"/>
     <link href="../css/annotator.css" rel="stylesheet" type="text/css"/>
+    <link href="../libs/change-detect/css/change.css" media="screen" rel="stylesheet" type="text/css"/>
 
     <script src="../js/jquery/jquery.min.js" type="text/javascript"></script>
     <script src="../js/jquery/jquery-ui.custom.min.js" type="text/javascript"></script>
@@ -29,6 +30,12 @@
     <script src="../js/org/gigapan/postmessage.js" type="text/javascript"></script>
     <script src="../js/org/gigapan/timelapse/crossdomain_api.js" type="text/javascript"></script>
 
+    <script src="../libs/change-detect/js/ThumbnailServiceAPI.js" type="text/javascript"></script>
+    <script src="../libs/change-detect/js/TimeMachineCanvasLayer.js" type="text/javascript"></script>
+    <script src="../libs/change-detect/js/ThumbnailTool.js" type="text/javascript"></script>
+    <script src="../libs/change-detect/js/BoxEventHandler.js" type="text/javascript"></script>
+    <script src="../libs/change-detect/js/ChangeDetectionTool.js" type="text/javascript"></script>
+
     <script src="../template_includes.js" type="text/javascript"></script>
 
     <style>
@@ -45,7 +52,7 @@
       jQuery.support.cors = true;
 
       // Pittsburgh
-      var url = "http://g7.gigapan.org/timemachines/pittsburgh-v12";
+      var url = "http://timemachine1.gc.cs.cmu.edu/timemachines/pittsburgh-v12";
       // Blue Marble
       //var url = "http://g7.gigapan.org/timemachines/blue-marble-v2/";
       // Ocean Chlorophyll

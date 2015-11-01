@@ -70,12 +70,14 @@ if (!org.gigapan) {
 // CODE
 //
 (function() {
-  var isChromeUserAgent = navigator.userAgent.match(/Chrome/) != null;
-  // The Chrome user agent actually has the word "Safari" in it too!
-  var isSafariUserAgent = navigator.userAgent.match(/Safari/) != null && !isChromeUserAgent;
-  var isMSIEUserAgent = navigator.userAgent.match(/MSIE|Trident/) != null;
-  var matchIEVersion = navigator.userAgent.match(/MSIE\s([\d]+)/);
-  var isIE9UserAgent = (isMSIEUserAgent && matchIEVersion && matchIEVersion[1] == 9);
+  var isMSIEUserAgent = navigator.userAgent.match(/MSIE|Trident|Edge/) != null;
+  // The Edge (IE 12+) user agent actually has the word "Chrome" in it.
+  var isChromeUserAgent = navigator.userAgent.match(/Chrome/) != null && !isMSIEUserAgent;
+  // The Chrome and Edge (IE 12+) user agents actually have the word "Safari" in it.
+  var isSafariUserAgent = navigator.userAgent.match(/Safari/) != null && !isChromeUserAgent && !isMSIEUserAgent;
+  var matchIEPre11Version = navigator.userAgent.match(/MSIE\s([\d]+)/);
+  var isIEEdgeUserAgent = !!(isMSIEUserAgent && navigator.userAgent.match(/Edge\/([\d]+)/))
+  var isIE9UserAgent = !!(isMSIEUserAgent && matchIEPre11Version && matchIEPre11Version[1] == 9);
   var isFirefoxUserAgent = navigator.userAgent.match(/Firefox/) != null;
   var isOperaLegacyUserAgent = typeof (window.opera) !== "undefined";
   var isOperaUserAgent = navigator.userAgent.match(/OPR/) != null;
@@ -112,6 +114,25 @@ if (!org.gigapan) {
     }
   };
 
+  org.gigapan.Util.getScrollBarWidth = function() {
+    var $outer = $('<div>').css({visibility: 'hidden', width: 100, overflow: 'scroll'}).appendTo('body');
+    var widthWithScroll = $('<div>').css({width: '100%'}).appendTo($outer).outerWidth();
+    $outer.remove();
+    return 100 - widthWithScroll;
+  };
+
+  org.gigapan.Util.getParentURL = function() {
+    var parentUrl = "";
+    if (window.top === window.self) {
+      // no iframe
+      parentUrl = window.location.href.split("#")[0];
+    } else {
+      // inside iframe
+      parentUrl = document.referrer.split("#")[0];
+    }
+    return parentUrl;
+  };
+
   org.gigapan.Util.browserSupported = function(forcedMediaType) {
     var v = document.createElement('video');
     // We do not support mobile devices (Android, iOS, etc) due to their OS limitations
@@ -122,7 +143,7 @@ if (!org.gigapan) {
       return false;
     // See what video formats are actually supported
     //if (!mediaType) {
-      setMediaType(forcedMediaType);
+      org.gigapan.Util.setMediaType(forcedMediaType);
     //}
     // We may support the video tag, but perhaps we do not support the formats that our viewer uses
     if (supportedMediaTypes.length == 0)
@@ -154,6 +175,10 @@ if (!org.gigapan) {
     return isIE9UserAgent;
   };
 
+  org.gigapan.Util.isIEEdge = function() {
+    return isIEEdgeUserAgent;
+  };
+
   org.gigapan.Util.isOperaLegacy = function() {
     return isOperaLegacyUserAgent;
   };
@@ -166,7 +191,7 @@ if (!org.gigapan) {
     return mediaType;
   };
 
-  function setMediaType(newType) {
+  org.gigapan.Util.setMediaType = function(newType) {
     var v = document.createElement('video');
     if (!mediaType) { // If this is the first time we are setting the media type, check what formats are supported.
       if (!!v.canPlayType('video/webm; codecs="vp8"').replace(/no/, '')) {
@@ -182,7 +207,7 @@ if (!org.gigapan) {
     } else { // Else set to the format passed in.
       mediaType = newType;
     }
-  }
+  };
 
   org.gigapan.Util.getViewerType = function() {
     return viewerType;
@@ -391,6 +416,22 @@ if (!org.gigapan) {
     if (autoScroll == true) {
       var $selectableContainerParent = $selectableContainer.parent();
       $selectableContainerParent.scrollLeft(Math.round($elementsToSelect.position().left - $selectableContainerParent.width() / 3));
+    }
+  };
+
+  org.gigapan.Util.getSharedDataType = function() {
+    var unsafe_matchURL = org.gigapan.Util.getUnsafeHashString().match(/#(.+)/);
+    if (unsafe_matchURL) {
+      var unsafe_sharedVars = org.gigapan.Util.unpackVars(unsafe_matchURL[1]);
+      if (unsafe_sharedVars.tour) {
+        return "tour";
+      } else if (unsafe_sharedVars.presentation) {
+        return "presentation";
+      } else {
+        return null;
+      }
+    } else {
+      return null;
     }
   };
 
