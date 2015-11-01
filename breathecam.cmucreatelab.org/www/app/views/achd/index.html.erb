@@ -1,6 +1,7 @@
 <% content_for :css do %>
   <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
-                             "/timemachine-viewer/css/defaultUI.css"
+                             "/timemachine-viewer/css/defaultUI.css",
+                             "/timemachine-viewer/libs/change-detect/css/change.css"
   %>
 <% end %>
 
@@ -22,9 +23,11 @@
                              "/grapher/gwt/grapher2.nocache.js",
                              "/openseadragon/openseadragon.min.js",
                              "https://www.google.com/jsapi",
-                             "/change-detect/ThumbnailServiceAPI.js",
-                             "/change-detect/TimeMachineCanvasLayer.js",
-                             "/change-detect/ThumbnailTool.js",
+                             "/timemachine-viewer/libs/change-detect/js/ThumbnailServiceAPI.js",
+                             "/timemachine-viewer/libs/change-detect/js/TimeMachineCanvasLayer.js",
+                             "/timemachine-viewer/libs/change-detect/js/ThumbnailTool.js",
+                             "/timemachine-viewer/libs/change-detect/js/BoxEventHandler.js",
+                             "/timemachine-viewer/libs/change-detect/js/ChangeDetectionTool.js",
                              "/extras/jquery.xdomainrequest.min.js",
                              "fbshare-bundle.js",
                              "/extras/jquery.ui.touch-punch.min.js"
@@ -443,23 +446,11 @@
     font-size: 15px;
   }
 
-  .shareView {
-    height: 175px !important;
-    padding-top: 18px !important;
-  }
-  .shareurl {
-    width: 236px;
-    height: 80px;
-  }
-  .shareViewSpacer {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
   #fb_share {
     cursor: pointer;
     width: 224px;
     height: 42px;
+    margin-left: 20px;
   }
 
   #stitched_image {
@@ -687,6 +678,10 @@
   }
 
   #achdSensorDataTable td, #achdSensorDataTable th {
+    text-align: left;
+  }
+
+  .ui-dialog {
     text-align: left;
   }
 </style>
@@ -1631,12 +1626,11 @@
         showFullScreenBtn: true,
         showLogoOnDefaultUI: false,
         datasetType: "breathecam",
+        showThumbnailTool: true,
         onTimeMachinePlayerReady: function(viewerDivId) {
           createTutorialButton(720, 540, "#timeMachine");
-
           fbShareUrl = "http://breatheproject.org/learn/breathe-cam/";
-          $(".shareView").html("<div><img id='fb_share' src='assets/facebook_share.png'></div><div class='shareViewSpacer'>OR</div><div><textarea class='shareurl'></textarea></div>");
-          $(".shareView").dialog({ width: 275 });
+          $(".shareView").prepend("<div><img id='fb_share' src='assets/facebook_share.png'></div>");
           $("#fb_share").on("click", function() {
             fbShare();
           });

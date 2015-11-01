@@ -3,7 +3,9 @@
 <% content_for :css do %>
   <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
                              "/timemachine-viewer/css/defaultUI.css",
-                             "zoomify-bundle.css"
+                             "zoomify-bundle.css",
+                             "/timemachine-viewer/libs/change-detect/css/change.css"
+
   %>
 <% end %>
 
@@ -22,6 +24,11 @@
                              "/timemachine-viewer/js/org/gigapan/timelapse/crossdomain_api.js",
                              "/timemachine-viewer/template_includes.js",
                              "/extras/jquery.xdomainrequest.min.js",
+                             "/timemachine-viewer/libs/change-detect/js/ThumbnailServiceAPI.js",
+                             "/timemachine-viewer/libs/change-detect/js/TimeMachineCanvasLayer.js",
+                             "/timemachine-viewer/libs/change-detect/js/ThumbnailTool.js",
+                             "/timemachine-viewer/libs/change-detect/js/BoxEventHandler.js",
+                             "/timemachine-viewer/libs/change-detect/js/ChangeDetectionTool.js",
                              "#{@root_url}/timemachines/#{@location_id}/#{@location_id}.js",
                              "zoomify-bundle.js"  %>
 
@@ -84,6 +91,9 @@
     .image-zoom-wrapper {
       margin-right: 0px;
     }
+    .ui-dialog {
+      text-align: left;
+    }
   </style>
 
   <script>
@@ -127,9 +137,7 @@
         showFullScreenBtn: false,
         showLogoOnDefaultUI: false,
         datasetType: "breathecam",
-        viewportGeometry: {
-          max: true
-        },
+        showThumbnailTool: true,
         onTimeMachinePlayerReady: function(viewerDivId) {
           if (!hashVars) {
             var numFrames = timelapse.getNumFrames();
