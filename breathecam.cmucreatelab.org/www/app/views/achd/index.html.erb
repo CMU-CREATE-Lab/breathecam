@@ -22,7 +22,7 @@
                              "#{@root_url}/timemachines/#{@location_id}/#{@location_id}.js",
                              "/grapher/gwt/grapher2.nocache.js",
                              "/openseadragon/openseadragon.min.js",
-                             "https://www.google.com/jsapi",
+                             "/timemachine-viewer/js/canvasjs/canvasjs.min.js",
                              "/timemachine-viewer/libs/change-detect/js/ThumbnailServiceAPI.js",
                              "/timemachine-viewer/libs/change-detect/js/TimeMachineCanvasLayer.js",
                              "/timemachine-viewer/libs/change-detect/js/ThumbnailTool.js",
@@ -69,12 +69,6 @@
     width: auto;
     height: 545px;
     z-index: 5;
-  }
-  #changeDetect {
-    position: absolute;
-    top: 542px;
-    width: 100%;
-    display: none;
   }
   #chart {
     height: 150px;
@@ -241,136 +235,6 @@
 
   .btnToggleState {
     background: #B2B2B2 !important;
-  }
-
-  .changeDetectToggle .ui-button-text {
-    margin-left: -16px;
-    font-size: 11px;
-    margin-top: 6px;
-    line-height: 15px;
-    text-align: left;
-  }
-
-  .changeDetectToggle .ui-icon.ui-icon-custom-changeDetectToggle {
-    background-image: none;
-    width: 34px;
-    height: 34px;
-    opacity: 0.55;
-    background-size: contain !important;
-    margin-left: -17px;
-    margin-top: -17px;
-  }
-
-  .changeDetectToggle {
-    position: absolute;
-    height: 50px;
-    bottom: 86px;
-    width: 58px;
-    right: 20px;
-    background: white;
-    border: 1px solid #656565;
-    border-radius: 3px !important;
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-    z-index: 30;
-    outline: none;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 11px;
-  }
-
-  #changeDetectRecenter .ui-icon.ui-icon-custom-changeDetectRecenter {
-    background-image: none;
-    width: 34px;
-    height: 34px;
-    opacity: 0.55;
-    background-size: contain !important;
-    margin-left: -17px;
-    margin-top: -17px;
-  }
-
-  #changeDetectRecenter {
-    position: absolute;
-    height: 35px;
-    bottom: 94px;
-    width: 201px;
-    right: 7px;
-    background: white;
-    border: 1px solid #656565;
-    border-radius: 3px !important;
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-    outline: none;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 11px;
-  }
-
-  #changeDetectRecenter .ui-button-text {
-    padding: 12px 0px 0px 0px;
-    font-size: 11px;
-  }
-
-  #changeDetectMakeThumbnail .ui-icon.ui-icon-custom-changeDetectMakeThumbnail {
-    background-image: none;
-    width: 34px;
-    height: 34px;
-    opacity: 0.55;
-    background-size: contain !important;
-    margin-left: -17px;
-    margin-top: -17px;
-  }
-
-  #changeDetectMakeThumbnail {
-    position: absolute;
-    height: 35px;
-    bottom: 49px;
-    width: 95px;
-    right: 113px;
-    background: white;
-    border: 1px solid #656565;
-    border-radius: 3px !important;
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-    outline: none;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 11px;
-  }
-
-  #changeDetectMakeThumbnail .ui-button-text {
-    padding: 6px 2px 0px 1px;
-    font-size: 11px;
-  }
-
-  #changeDetectMakeGif .ui-icon.ui-icon-custom-changeDetectMakeGif {
-    background-image: none;
-    width: 34px;
-    height: 34px;
-    opacity: 0.55;
-    background-size: contain !important;
-    margin-left: -17px;
-    margin-top: -17px;
-  }
-
-  #changeDetectMakeGif .ui-button-text {
-    padding: 6px 2px 0px 1px;
-    font-size: 11px;
-  }
-
-  #changeDetectMakeGif {
-    position: absolute;
-    height: 35px;
-    bottom: 49px;
-    width: 95px;
-    right: 7px;
-    background: white;
-    border: 1px solid #656565;
-    border-radius: 3px !important;
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
-    outline: none;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 11px;
-  }
-
-  #changeDetectBtns {
-    position: absolute;
-    right: 0px;
-    bottom: -19px;
   }
 
   #toggleStaticVideo .ui-icon.ui-icon-custom-toggleStaticVideo {
@@ -707,6 +571,7 @@
       var thumbnailTool;
       var supportsPointerEventsNone = true;
       var justAddedChannel = false;
+      var changeDetectHeightDiff = 50;
 
       function update() {
         thumbnailTool.update();
@@ -755,8 +620,6 @@
         currentThumbnail.height = bb.ymax - bb.ymin;
         currentThumbnail.frameTime = timelapse.getCurrentFrame() / timelapse.getFps();
       }
-
-      google.load("visualization", "1", {packages:["corechart"]});
 
       function thumbnailInit() {
         $(document).on('keydown', function(event) {
@@ -1627,6 +1490,7 @@
         showLogoOnDefaultUI: false,
         datasetType: "breathecam",
         showThumbnailTool: true,
+        enableChangeDetection: true,
         onTimeMachinePlayerReady: function(viewerDivId) {
           createTutorialButton(720, 540, "#timeMachine");
           fbShareUrl = "http://breatheproject.org/learn/breathe-cam/";
@@ -1636,86 +1500,29 @@
           });
           $("#" + viewerDivId + " .fullScreen").css({
             "right": "20px",
-            "bottom": "150px"
+            "bottom": "86px"
           });
+          $(".shareView .ui-accordion").css("max-height", "550px");
           timelapse.addFullScreenChangeListener(function(browserSupportsFullScreen) {
-            var $changeDetectToggle = $(".changeDetectToggle");
-            if ($changeDetectToggle.hasClass("ui-state-disabled"))
-              $changeDetectToggle.button("enable");
-            else
-              $changeDetectToggle.button("disable");
             if (!browserSupportsFullScreen)
               post("resize_iframe", {fillScreen: true});
           });
 
-          var $changeDetectRecenter = $("#changeDetectRecenter");
-          $changeDetectRecenter.button({
-            icons: {
-              primary: "ui-icon-custom-changeDetectRecenter"
-            },
-            text: true
-          }).on("click", function() {
-            resetFilter();
-          });
-
-          var $changeDetectMakeThumbnail = $("#changeDetectMakeThumbnail");
-          $changeDetectMakeThumbnail.button({
-            icons: {
-              primary: "ui-icon-custom-changeDetectMakeThumbnail"
-            },
-            text: true
-          }).on("click", function() {
-            window.open(thumbnailTool.getCurrentThumbnail());
-          });
-
-          var $changeDetectMakeGif = $("#changeDetectMakeGif");
-          $changeDetectMakeGif.button({
-            icons: {
-              primary: "ui-icon-custom-changeDetectMakeGif"
-            },
-            text: true
-          }).on("click", function() {
-            window.open(thumbnailTool.getCurrentGif());
-          });
-
-          var $changeDetectToggle = $("<div class='changeDetectToggle'>Change Detection</div>");
-          $changeDetectToggle.attr({"id" : "timeMachine_changeDetect", "title" : "Toggle the change detection tool"});
-          $changeDetectToggle.button({
-            icons: {
-              primary: "ui-icon-custom-changeDetectToggle"
-            },
-            text: true
-          }).on("click", function() {
+          $(".toolDialog .accordion").on( "accordionbeforeactivate", function( event, ui ) {
             var grapherHeight;
             if ($("#achd").is(":visible")) {
               grapherHeight = $("#grapher").height();
               $("#achd").hide();
-              $(this).addClass("btnToggleState");
             } else {
               $("#achd").show();
               grapherHeight = $("#grapher").height();
-              $(this).removeClass("btnToggleState");
             }
-            if ($("#changeDetect").is(":visible")) {
-              post("resize_iframe", {height: (grapherHeight - 3)});
-              $("#changeDetect").hide();
+            if (!ui.newPanel.hasClass("accordion-change-detection")) {
+              post("resize_iframe", {height: (grapherHeight - changeDetectHeightDiff)});
             } else {
-              post("resize_iframe", {height: ((-1 * grapherHeight) + 3)});
-              $("#changeDetect").show();
-            }
-            if (!thumbnailTool) {
-              var view = timelapse.getView();
-              var scaleOffsetX = 40/view.scale;
-              var scaleOffsetY = 40/view.scale;
-              var bounds = (view.x - scaleOffsetX) + "," + (view.y - scaleOffsetY) + "," + (view.x + scaleOffsetX) + "," + (view.y + scaleOffsetY);
-              thumbnailTool = new ThumbnailTool(timelapse, bounds);
-            } else {
-              thumbnailTool.toggleLayer();
-              if ($("#changeDetect").is(":visible"))
-                filter();
+              post("resize_iframe", {height: ((-1 * grapherHeight) + changeDetectHeightDiff)});
             }
           });
-          $changeDetectToggle.appendTo($("#timeMachine .controls"));
 
           var captureTimes = timelapse.getCaptureTimes();
           lastCaptureTime = captureTimes[captureTimes.length - 1];
@@ -2683,7 +2490,9 @@
       $(".location_thumbnail_container").on("click", function() {
         if (window.location.hash)
           window.location.hash = "";
-        post("clear_hash", {"changeDetectHeight" : (!!$("#changeDetect").is(":visible") * 3)});
+        post("clear_hash", {"changeDetectHeight" : (!!$("#change-detection-container").is(":visible") * changeDetectHeightDiff)});
+        $("#change-detection-container").addClass("empty-chart");
+        $("#change-detection-container .canvasjs-chart-container").hide();
         var newLocation = $(this).attr("data-location-id");
         if (timelapse)
           var captureTimeAsDateObj = new Date(timelapse.getCurrentCaptureTime().replace(/-/g,"/"));
@@ -2892,15 +2701,6 @@
 <canvas id="overlayCanvas" width="0" height="660"></canvas>
 <div id="timelapse_feed" class="timelapse_feed_embed">
   <div id="timeMachine"></div>
-  <div id="changeDetect">
-    <div id="chart"></div>
-    <div id="thumbnail-tool"></div>
-    <div id="changeDetectBtns">
-      <div id="changeDetectRecenter" title="Recenter rectangle on viewer">Recenter rectangle on viewer</div>
-      <div id="changeDetectMakeThumbnail" title="Create a thumbnail of view">Create thumbnail of view</div>
-      <div id="changeDetectMakeGif" title="Create an animated gif of view">Create animated gif of view</div>
-    </div>
-  </div>
   <div id="achd">
     <div id="achdSensorDataBrowserError">ACHD monitoring station data is not viewable with the browser you are running. Please update your browser to the latest version.</div>
     <div id="achdSensorData">
