@@ -121,7 +121,8 @@
       selectTimelapseFeed();
 
       initialDataset = cached_breathecam.latest.path;
-      var startingDate = cached_breathecam.latest.date;
+      var startingDate = cached_breathecam.latest.date.replace("UTC", "");
+      var splitType = cached_breathecam.split_type || "daily";
 
       var hash = window.location.hash.slice(1);
       var hashVars = unpackVars(hash);
@@ -140,12 +141,22 @@
         datasetType: "breathecam",
         showThumbnailTool: true,
         onTimeMachinePlayerReady: function(viewerDivId) {
-          if (!hashVars) {
-            var numFrames = timelapse.getNumFrames();
-            // 12 fps * 5 seconds = 60 frames
-            var fiveSecondsFromEnd = numFrames - 60;
-            timelapse.seekToFrame(fiveSecondsFromEnd);
+          if (splitType == "monthly") {
+            timelapse.addTimeChangeListener(function() {
+              $('#datepicker').datepicker("setDate", new Date(timelapse.getCurrentCaptureTime().replace(/-/g, "/").replace("UTC","")));
+            });
           }
+          if (!hashVars) {
+            if (splitType == "daily") {
+              var numFrames = timelapse.getNumFrames();
+              // 12 fps * 5 seconds = 60 frames
+              var fiveSecondsFromEnd = numFrames - 60;
+              timelapse.seekToFrame(fiveSecondsFromEnd);
+            } else {
+              timelapse.loadTimelapse(initialDataset, null, null, null, new Date((new Date().setHours(0,0,0,0))));
+            }
+          }
+          $('#datepicker').datepicker("setDate", new Date(timelapse.getCurrentCaptureTime().replace(/-/g, "/").replace("UTC","")));
           showContent();
         }
       };
@@ -221,8 +232,10 @@
     function selectDay(dateText, dateElem) {
       var date = $.datepicker.formatDate('yy-mm-dd', new Date(dateText));
       var path = cached_breathecam.datasets[date];
-      if (typeof(timelapse) !== "undefined" && timelapse && path)
-        timelapse.loadTimelapse(path, null, null, true);
+      if (typeof(timelapse) !== "undefined" && timelapse && path) {
+        var newDate = date + " " + timelapse.getCurrentCaptureTime().substr(11,8);
+        timelapse.loadTimelapse(path, timelapse.getView(), null, false, newDate);
+      }
     }
 
     $(function() {
