@@ -137,7 +137,7 @@ if (!org.gigapan.timelapse.Timelapse) {
     var $thumbnailDurationSlider = $("#" + viewerDivId + " .thumbnail-duration-slider");
     var $timelineSelectorStartHandle;
     var $timelineSelectorEndHandle;
-    var isStartingTimeSpinnerBlurAdded = false;
+    var $shareAccordion = $("#" + viewerDivId + " .shareView .accordion");
 
     // Settings
     var useCustomUI = timelapse.useCustomUI();
@@ -159,6 +159,7 @@ if (!org.gigapan.timelapse.Timelapse) {
     var originalIsPaused;
     var useTouchFriendlyUI = timelapse.useTouchFriendlyUI();
     var timePadding = timelapse.getTimePadding();
+    var isStartingTimeSpinnerBlurAdded = false;
 
     // Parameters
     var mode = "player";
@@ -427,6 +428,14 @@ if (!org.gigapan.timelapse.Timelapse) {
     };
     this.resetShareThumbnailUI = resetShareThumbnailUI;
 
+    var showThumbnailToolWindow = function() {
+      $("#" + viewerDivId + " [aria-controls='share-link-container']").hide();
+      $("#" + viewerDivId + " .shareView .accordion").accordion("option", "active", 1);
+      enableShareThumbnail();
+      $shareViewDialog.dialog("open");
+    };
+    this.showThumbnailToolWindow = showThumbnailToolWindow;
+
     var disableShareThumbnail = function() {
       thumbnailTool.hideCropBox();
       $timelineSelectorFiller.hide();
@@ -453,6 +462,8 @@ if (!org.gigapan.timelapse.Timelapse) {
         if ($shareViewDialog.dialog("isOpen")) {
           $shareViewDialog.dialog("close");
         } else {
+          $("#" + viewerDivId + " [aria-controls='share-link-container']").show();
+          $("#" + viewerDivId + " .shareView .accordion").accordion("option", "active", 0);
           $shareViewDialog.dialog("open");
           updateShareViewTextbox();
           UTIL.addGoogleAnalyticEvent('button', 'click', 'viewer-show-share-dialog');
@@ -478,8 +489,7 @@ if (!org.gigapan.timelapse.Timelapse) {
       if (!showThumbnailTool) {
         removeAccordionPanel("share-thumbnail");
       }
-      var $accordion = $("#" + viewerDivId + " .shareView .accordion");
-      $accordion.accordion({
+      $shareAccordion.accordion({
         heightStyle: "content",
         animate: false,
         beforeActivate: function(event, ui) {
@@ -500,8 +510,8 @@ if (!org.gigapan.timelapse.Timelapse) {
         width: 444,
         minHeight: 50,
         beforeClose: function(event, ui) {
-          var activeIdx = $accordion.accordion("option", "active");
-          var $activePanel = $($accordion.accordion("instance").panels[activeIdx]);
+          var activeIdx = $shareAccordion.accordion("option", "active");
+          var $activePanel = $($shareAccordion.accordion("instance").panels[activeIdx]);
           if ($activePanel.hasClass("share-thumbnail")) {
             disableShareThumbnail();
             $thumbnailPreviewContainer.hide();
@@ -509,8 +519,8 @@ if (!org.gigapan.timelapse.Timelapse) {
           }
         },
         open: function(event, ui) {
-          var activeIdx = $accordion.accordion("option", "active");
-          var $activePanel = $($accordion.accordion("instance").panels[activeIdx]);
+          var activeIdx = $shareAccordion.accordion("option", "active");
+          var $activePanel = $($shareAccordion.accordion("instance").panels[activeIdx]);
           if ($activePanel.hasClass("share-thumbnail")) {
             enableShareThumbnail();
           }
@@ -1244,10 +1254,8 @@ if (!org.gigapan.timelapse.Timelapse) {
         slide: function(e, ui) {
           // $(this).slider('value')  --> previous value
           // ui.value                 --> current value
-          // If we are manually using the slider and we are pulling it back to the start
-          // we wont actually get to time 0 because of how we are snapping.
-          // Manually seek to position 0 when this happens.
-          seekFromTimeLineSlider($(this).slider("value"), ui.value + timePadding);
+          //seekFromTimeLineSlider($(this).slider("value"), ui.value + timePadding);
+          timelapse.seekToFrame(ui.value);
         }
       }).removeClass("ui-corner-all").children().removeClass("ui-corner-all");
       $("#" + viewerDivId + " .timelineSlider .ui-slider-handle").attr("title", "Drag to go to a different point in time");
@@ -1319,10 +1327,10 @@ if (!org.gigapan.timelapse.Timelapse) {
     } else {// custom UI is being used, alter main UI accordingly
       // Create share button
       if (showShareBtn) {
-        createShareButton();
-        var shareButton = $("#" + viewerDivId + " .share");
-        $controls.children().not(shareButton).hide();
-        shareButton.css("bottom", "110px");
+        //createShareButton();
+        //var shareButton = $("#" + viewerDivId + " .share");
+        //$controls.children().not(shareButton).hide();
+        //shareButton.css("bottom", "110px");
       } else {
         $("#" + viewerDivId + " .controls").hide();
         $("#" + viewerDivId + " .shareView").hide();
