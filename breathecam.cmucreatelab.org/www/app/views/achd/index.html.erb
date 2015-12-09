@@ -1879,7 +1879,8 @@
                     var channelHeading = sensors[sensorIdx] + "." + tmpChannelHeading[tmpChannelHeading.length - 1];
                     // ESDR values are at the half hour mark for the sake of graphing, but really that value spans for that whole hour
                     var timeStamp = csvLineAsArray[0] - 1800;
-                    achdData[currentLocation].sensors[sensors[sensorIdx]].channels[channelHeading].summary[timeStamp] = unitConversion(headingsArray[j], parseFloat(csvLineAsArray[j]));
+                    if (isNaN(achdData[currentLocation].sensors[sensors[sensorIdx]].channels[channelHeading].summary[timeStamp]))
+                      achdData[currentLocation].sensors[sensors[sensorIdx]].channels[channelHeading].summary[timeStamp] = unitConversion(headingsArray[j], parseFloat(csvLineAsArray[j]));
                   }
                 }
                 if ($(".sensor").length === 0)
