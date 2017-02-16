@@ -9,55 +9,73 @@ class LocationsHandlerController < ApplicationController
     if params[:id]
       upload_time = DateTime.now
       num_images = params[:images].length
+      time_offset_in_seconds = 0
       params[:images].each_with_index do |image, index|
         begin
-          s = `/usr/bin/exiftool -time:CreateDate #{image.path}`
-          a = s.split(": ")
-          a[1] = a[1].chomp
-          a2 = a[1].split(" ")
-          a2[0].gsub!(":", "-")
-          final = a2[0] + " " + a2[1]
-          t = Time.parse(final)
+          # The time param is legacy, and in theory should be used for the timestamp,
+          # but I do not think it was ever a reliable time to use. So, we force an
+          # exif lookup if we encounter requests with that param.
+          if params[:useEXIF] == "true" || params[:time]
+            s = `/usr/bin/exiftool -time:CreateDate #{image.path}`
+            a = s.split(": ")
+            a[1] = a[1].chomp
+            a2 = a[1].split(" ")
+            a2[0].gsub!(":", "-")
+            final = a2[0] + " " + a2[1]
+            time_obj = Time.parse(final)
+          else
+            tmp_t = File.basename(image.original_filename, ".*").split("_")[0].to_i
+            time_obj = Time.at(tmp_t.to_i)
+          end
         rescue
-          Rails.logger.info("#{Time.now} Corrupted image detected")
           respond_to do |format|
             format.json { render json: { "success" => true } }
             format.all { head :ok, :content_type => 'application/json' }
           end
           return
         end
-        if params[:time] and params[:id] == "a7s_shenango2"
+
+        ### BEGIN TIME CORRECTIONS ###
+        if params[:id] == "a7s_shenango2"
           # 31535957 = (1 year - 45 seconds)
-          corrected_time = t + 31535957
-          corrected_time_in_seconds = corrected_time.to_i
-          current_date = corrected_time.to_s.split(" ")[0]
-          image_time =  DateTime.parse(corrected_time.to_s)
-          name = corrected_time_in_seconds.to_s + File.extname(image.original_filename)
-        else
-          current_date = upload_time.to_date.to_s
-          image_time = DateTime.parse(t.to_s)
-          name = image.original_filename
+          # 31532402 = (1 year - 1 hr)
+          # 31536002 = (1 year + 1 hr)
+          time_offset_in_seconds = 31536002
+        elsif params[:id] == "a7s_shenango1"
+          # 3600 = (1 hr)
+          time_offset_in_seconds = -3600
         end
+        ### END TIME CORRECTIONS ###
+
+        time_obj += time_offset_in_seconds
+        time_in_seconds = time_obj.to_i
+        current_date = time_obj.to_s.split(" ")[0]
+        name = time_in_seconds.to_s + File.extname(image.original_filename)
         camera_status = CameraStatus.find_or_create_by_camera_name(params[:id].split("_").last) do |cs|
           cs.camera_type = 'ecam'
         end
-        camera_status.update_attributes(:last_upload_time => upload_time, :last_image_time => image_time)
+        camera_status.update_attributes(:last_upload_time => upload_time, :last_image_time => time_obj)
         directory = File.join(Rails.public_path, "upload", params[:id], "050-original-images", current_date)
         FileUtils.mkdir_p(directory)
         path = File.join(directory, name)
         File.open(path, "wb") { |f| f.write(image.read) }
-        if index == num_images - 1
-          latest_stitch_directory = File.join(directory, "latest_stitch")
-          FileUtils.mkdir_p(latest_stitch_directory)
-          FileUtils.rm_rf(Dir.glob("#{latest_stitch_directory}/*"))
-          latest_stitch_path = File.join(latest_stitch_directory, File.basename(name, File.extname(name)).chomp("_image") + "_full" + File.extname(name))
-          FileUtils.cp(path, latest_stitch_path)
-        end
+        #if index == num_images - 1
+        #  latest_stitch_directory = File.join(directory, "latest_stitch")
+        #  FileUtils.mkdir_p(latest_stitch_directory)
+        #  FileUtils.rm_rf(Dir.glob("#{latest_stitch_directory}/*"))
+        #  latest_stitch_path = File.join(latest_stitch_directory, File.basename(name, File.extname(name)).chomp("_image") + "_full" + File.extname(name))
+        #  FileUtils.cp(path, latest_stitch_path)
+        #end
       end
-    end
-    respond_to do |format|
-      format.json { render json: { "success" => true } }
-      format.all { head :ok, :content_type => 'application/json' }
+      respond_to do |format|
+        format.json { render json: { "success" => true } }
+        format.all { head :ok, :content_type => 'application/json' }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: { "success" => false } }
+        format.all { head :internal_server_error, :content_type => 'application/json' }
+      end
     end
   end
 
