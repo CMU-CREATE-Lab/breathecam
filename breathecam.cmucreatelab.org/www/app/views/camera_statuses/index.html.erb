@@ -15,7 +15,9 @@
   <body>
     <table>
       <tr>
-        <th>Camera</th>
+        <th>Camera ID</th>
+        <th>Images</th>
+        <th>Timelapse</th>
         <th>Last Upload Timestamp</th>
         <th>Last Uploaded Image Timestamp</th>
         <th>Last Processed Image Timestamp</th>
@@ -23,7 +25,13 @@
       <% @camera_statuses.each_with_index do |camera, i| %>
         <tr>
           <td>
-            <%= link_to("#{camera.camera_name}", "/embeds/#{camera.camera_name.split('_').last}") %>
+            <%= camera.camera_name %>
+          </td>
+          <td>
+            <%= link_to("images", "http://timemachine1.gc.cs.cmu.edu/timemachine_uploads/#{camera.camera_name}/050-original-images/", :target => "_blank") %>
+          </td>
+          <td>
+            <%= link_to("timelapse", "/embeds/#{camera.camera_name}", :target => "_blank") %>
           </td>
           <td>
             <%= camera.last_upload_time %>
