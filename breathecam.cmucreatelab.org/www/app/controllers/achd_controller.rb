@@ -23,7 +23,7 @@ class AchdController < ApplicationController
     # Or things might have really broken, so backtrack up to 3 weeks.
     # If we have not noticed a camera down in that timeframe, then shame on us.
     i = 1
-    while i < 21 && imageArray.blank?
+    while i < 360 && imageArray.blank?
       img_path = img_path.gsub((date_today - (i - 1)).to_s,(date_today - i).to_s)
       begin
         open(img_path) {|html|
@@ -40,9 +40,9 @@ class AchdController < ApplicationController
     # We did not find any stitched images for today or yesterday. There is most likely a problem with the image collection...
     if imageArray.blank?
       @stitched_image = ""
-      respond_to do |format|
-        format.html { render :file => "#{Rails.root}/public/404", :layout => false, :status => :not_found }
-      end
+      #respond_to do |format|
+      #  format.html { render :file => "#{Rails.root}/public/404", :layout => false, :status => :not_found }
+      #end
       return
     end
     useTime = imageArray.first.scan(/^\d*/)[0].to_i
