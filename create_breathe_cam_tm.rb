@@ -47,6 +47,8 @@ $future_appending_frames = 17000
 $checked_current_time = false
 $is_monthly = false
 $skip_img_validation = false
+$num_images_to_stitch = 4
+$stitcher = "hugin"
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -149,6 +151,11 @@ class Compiler
         $is_monthly = true
       elsif arg == "--skip-img-validation"
         $skip_img_validation = true
+      elsif arg == "-multi-camera-list"
+        $multi_camera_list = ARGV.shift.to_s.split(",")
+        $num_images_to_stitch = $multi_camera_list.length
+      elsif arg == "-stitcher"
+        $stitcher = ARGV.shift
       end
     end
 
@@ -293,6 +300,7 @@ class Compiler
   end
 
   def calculate_rsync_input_range
+    puts "[#{Time.now}] Calculating rsync input range."
     $start_time["hour"] = $end_time["hour"]
     $start_time["minute"] = $end_time["minute"] - $incremental_update_interval
     $start_time["sec"] = "00"
@@ -335,6 +343,7 @@ class Compiler
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/050-raw-images/*"))
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/075-organized-raw-images/*"))
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0100-original-images/*"))
+    FileUtils.rm_rf("#{$working_dir}/0100-unstitched")
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0200-tiles/*"))
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0300-tilestacks/*"))
     video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
@@ -346,61 +355,63 @@ class Compiler
   end
 
   def get_source_images
-    puts "[#{Time.now}] Rsycning images from #{$input_path}/#{$current_day}"
-    image_path = $skip_stitch ? "0100-original-images" : "050-raw-images"
-    new_input_path = File.join($working_dir, image_path)
-    FileUtils.mkdir_p(new_input_path)
-    args = $input_path.split(":")
-    host = args[0]
-    src_path = args[1] || args[0]
-    # Grab full day if we are not pulling in a specific time range or the time gap is more than or equal to a day in seconds.
-    if !$do_incremental_update || (Time.now - Time.parse($start_time["full"]) >= 86400)
-      $start_time["hour"] = 0
-      $start_time["minute"] = 0
-      $end_time["hour"] = 23
-      $end_time["minute"] = 59
-      $end_time["sec"] = 59
-    end
-    if $image_store_v2
-      year_month_day = $current_day.split("-")
-      src_path = File.join(src_path, year_month_day[0], year_month_day[1])
-    end
-    puts "[#{Time.now}] Rsycning images from #{src_path}"
-    img_folder = $is_monthly ? "" : "/#{$current_day}"
-    if $file_names_include_dates
-      start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
-      end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
-      start_date_in_sec = Time.zone.parse(start_date).to_i
-      end_date_in_sec = Time.zone.parse(end_date).to_i
-      file_list_command = "find #{src_path}/#{img_folder} -type d \\( -path #{src_path}#{img_folder}/latest_stitch -o -path #{src_path}#{img_folder}/*-tmp \\) -prune -o -name '*.[jJpP][pPnN][gG]' | perl -ne 'print if (m!.*/(\\d+)! and $1 > #{start_date_in_sec} and $1 <= #{end_date_in_sec})'"
-    else
-      file_list_command = "find #{src_path}/#{img_folder} -type d \\( -path #{src_path}#{img_folder}/latest_stitch -o -path #{src_path}#{img_folder}/*-tmp \\) -prune -o -name '*.[jJpP][pPnN][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
-    end
-    subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
-    puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
-    if $symlink_input
-      if $do_incremental_update or $subsample_input
-        file_list = `#{file_list_command} #{subsample_command}`
-        file_list = file_list.split("\n")
-        file_list.each do |file|
-          system("ln -s #{file} #{new_input_path}/#{File.basename(file)}")
+    camera_paths = $multi_camera_list ? $multi_camera_list : [$input_path]
+    camera_paths.each_with_index do |camera_path, idx|
+      puts "[#{Time.now}] Rsycning images from #{camera_path}/#{$current_day}"
+      image_path = $skip_stitch ? "0100-original-images" : "050-raw-images"
+      new_input_path = File.join($working_dir, image_path, idx.to_s)
+      FileUtils.mkdir_p(new_input_path)
+      args = camera_path.split(":")
+      host = args[0]
+      src_path = args[1] || args[0]
+      # Grab full day if we are not pulling in a specific time range or the time gap is more than or equal to a day in seconds.
+      if !$do_incremental_update || (Time.now - Time.parse($start_time["full"]) >= 86400)
+        $start_time["hour"] = 0
+        $start_time["minute"] = 0
+        $start_time['sec'] = 0
+        $end_time["hour"] = 23
+        $end_time["minute"] = 59
+        $end_time["sec"] = 59
+      end
+      if $image_store_v2
+        year_month_day = $current_day.split("-")
+        src_path = File.join(src_path, year_month_day[0], year_month_day[1])
+      end
+      img_folder = $is_monthly ? "" : "/#{$current_day}"
+      if $file_names_include_dates
+        start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
+        end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
+        start_date_in_sec = Time.zone.parse(start_date).to_i
+        end_date_in_sec = Time.zone.parse(end_date).to_i
+        file_list_command = "find #{src_path}/#{img_folder} -type d \\( -path #{src_path}#{img_folder}/latest_stitch -o -path #{src_path}#{img_folder}/*-tmp \\) -prune -o -name '*.[jJpP][pPnN][gG]' | perl -ne 'print if (m!.*/(\\d+)! and $1 > #{start_date_in_sec} and $1 <= #{end_date_in_sec})'"
+      else
+        file_list_command = "find #{src_path}/#{img_folder} -type d \\( -path #{src_path}#{img_folder}/latest_stitch -o -path #{src_path}#{img_folder}/*-tmp \\) -prune -o -name '*.[jJpP][pPnN][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
+      end
+      subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
+      puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
+      if $symlink_input
+        if $do_incremental_update or $subsample_input
+          file_list = `#{file_list_command} #{subsample_command}`
+          file_list = file_list.split("\n")
+          file_list.each do |file|
+            system("ln -s #{file} #{new_input_path}/#{File.basename(file)}")
+          end
+        else
+          system("ln -s #{camera_path}/#{$current_day} #{new_input_path}")
         end
-      else
-        system("ln -s #{$input_path}/#{$current_day} #{new_input_path}")
+      else #rsync
+        if $do_incremental_update or $subsample_input
+          system("ssh #{host} \"#{file_list_command} -printf '%f\n' #{subsample_command} > /tmp/#{$camera_location}-files.txt\"")
+          system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}")
+        else
+          system("rsync -a #{camera_path}/#{$current_day}/*.[jJpP][pPnN][gG] #{new_input_path}")
+        end
       end
-    else #rsync
-      if $do_incremental_update or $subsample_input
-        system("ssh #{host} \"#{file_list_command} -printf '%f\n' #{subsample_command} > /tmp/#{$camera_location}-files.txt\"")
-        system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{$input_path}/#{$current_day}/ #{new_input_path}")
-      else
-        system("rsync -a #{$input_path}/#{$current_day}/*.[jJpP][pPnN][gG] #{new_input_path}")
-      end
+      # We need to reference files locally now that we have rsynced everything over
+      $input_path = $multi_camera_list ? File.dirname(new_input_path) : new_input_path
+      FileUtils.touch(File.join($input_path, "DONE"))
+      puts "[#{Time.now}] Finished rsyncing input images."
     end
-    # We need to reference files locally now that we have rsynced everything over
-    $input_path = new_input_path
-    FileUtils.touch(File.join($input_path, "DONE"))
-    puts "[#{Time.now}] Finished rsyncing input images."
-
     remove_corrupted_images unless $RUNNING_WINDOWS or $skip_img_validation
 
     if $skip_stitch
@@ -453,13 +464,73 @@ class Compiler
       end
       create_tm
     else
-      organize_images
+      $multi_camera_list ? match_images : organize_images
     end
   end
 
   def remove_corrupted_images
     puts "[#{Time.now}] Checking for corrupted images."
-    system("find #{$input_path} -maxdepth 2 -name *.[jJ][pP][gG] | xargs jpeginfo -cd")
+    system("find #{$input_path} -maxdepth 3 -name *.[jJ][pP][gG] | xargs jpeginfo -cd")
+  end
+
+  def match_images
+    # TODO: Assumes images are of the format EPOCHDATE.([jJ][pP][gG]|lnk)
+    $organized_images_path = File.join($working_dir, "075-organized-raw-images")
+    count = 0
+    match_count = 0
+    puts "[#{Time.now}] Matching images..."
+
+    camera_dirs = Dir.glob("#{$input_path}/*").select { |file| File.directory? file }.sort
+    parent_path = camera_dirs.first
+
+    images = Dir.glob("#{parent_path}/*.[jJpP][pPnN][gG]").sort
+    num_images_being_processed = images.length
+    if num_images_being_processed == 0
+      puts "No images found to be processed. Aborting."
+      exit
+    elsif num_images_being_processed <= 4
+      puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
+      exit
+    end
+
+    images.each do |img|
+      count += 1
+      camera_match_count = 0
+      file_name = File.basename(img)
+      file_extension = File.extname(img)
+      date = File.basename(img, ".*")
+
+      camera_dirs.reject {|camera_dir| camera_dir == parent_path}.each do |camera_dir|
+        camera_match_count += 1 if File.exists?(File.join(camera_dir, file_name))
+      end
+
+      # Image is missing from the other cameras. We cannot process this set.
+      # TODO: Maybe have a slight threshold in the event times are slightly off, but really the cameras should be taking at exactly the same time.
+      next if camera_match_count != camera_dirs.length - 1
+
+      dir = "#{$organized_images_path}/#{'%05d' % count}"
+      FileUtils.mkdir_p(dir)
+      unless File.exists? File.expand_path(dir)
+        puts "Failed to create output directory. Please check read/write permissions on the output directory."
+        return
+      end
+      # Note: Windows Vista+ does support something that is essentially a symlink, but for now we will just stick with shortcuts that have worked with all versions of Windows up to Windows 7. Probably Windows 8 too but have not tested there.
+      if $RUNNING_WINDOWS
+        # No support at this time
+      else
+        camera_dirs.each_with_index do |camera_dir, i|
+          File.symlink(File.expand_path("#{camera_dir}/#{date}#{file_extension}"), "#{dir}/#{date}_image#{i+1}#{file_extension}")
+        end
+      end
+      match_count += 1
+    end
+    puts "[#{Time.now}] Organizing complete. Matched #{match_count} out of #{count} possible frames."
+    if $skip_rotate
+      puts "Skipping image rotations."
+      stitch_images
+    else
+      rotate_images
+    end
   end
 
   def organize_images
@@ -557,30 +628,55 @@ class Compiler
       puts "Failed to create output directory for stitched images. Please check read/write permissions on the output directory."
       return
     end
-    files = Dir.glob("#{$organized_images_path}/*/*_image1.*").sort
-    Parallel.each(files, :in_threads => $num_jobs) do |img|
-      file_extension = File.extname(img)
-      next unless $valid_image_extensions.include? file_extension.downcase
-      count += 1
-      if $RUNNING_WINDOWS && file_extension == ".lnk"
-        img = Win32::Shortcut.open(img).path
-        # Get the real file extension now
+    if ($stitcher == "gigapan")
+      original_images_path = stitched_images_path
+      stitched_images_path = File.join($working_dir, "0100-unstitched")
+      File.symlink($organized_images_path, stitched_images_path)
+      files = Dir.glob("#{$organized_images_path}/*/*_image1.*").sort
+      Parallel.each(files, :in_threads => $num_jobs) do |img|
+        count += 1
+        # Note: Windows Vista+ does support something that is essentially a symlink, but for now we will just stick with shortcuts that have worked with all versions of Windows up to Windows 7. Probably Windows 8 too but have not tested there.
+        if $RUNNING_WINDOWS
+          # No support at this time
+        else
+          File.symlink(File.expand_path(img), File.join(original_images_path, File.basename(img)))
+        end
+      end
+      puts "[#{Time.now}] GigaPan Stitcher is about to stitch #{count} frames."
+      create_tm
+    else
+      files = Dir.glob("#{$organized_images_path}/*/*_image1.*").sort
+      Parallel.each(files, :in_threads => $num_jobs) do |img|
         file_extension = File.extname(img)
+        next unless $valid_image_extensions.include? file_extension.downcase
+        count += 1
+        if $RUNNING_WINDOWS && file_extension == ".lnk"
+          img = Win32::Shortcut.open(img).path
+          # Get the real file extension now
+          file_extension = File.extname(img)
+        end
+        date = File.basename(img, ".*").split("_")[0]
+        parent_path = File.dirname(img)
+        begin
+          nona_input_files_string = ""
+          enblend_input_files_string = ""
+          for i in 1..$num_images_to_stitch
+            nona_input_files_string += " #{%Q{"#{parent_path}/#{date}_image#{i}#{file_extension}"}}"
+            enblend_input_files_string += " #{date}_#{'%04d' % (i-1)}.tif"
+          end
+          system("#{$nona_path} -o #{date}_ #{%Q{"#{$master_alignment_file}"}} #{nona_input_files_string}")
+          system("#{$enblend_path} --no-optimize --compression=100 --fine-mask -o #{%Q{"#{stitched_images_path}/#{date}_full.jpg"}} #{enblend_input_files_string}")
+          Dir.glob("#{date}_*.tif").each { |f| File.delete(f) }
+          match_count += 1
+        rescue => e
+          puts e
+          # Ignore and move on
+          # TODO: Maybe do something in this case.
+        end
+        puts "[#{Time.now}] Stitching complete. Stitched #{match_count} out of #{count} possible frames."
       end
-      date = File.basename(img, ".*").split("_")[0]
-      parent_path = File.dirname(img)
-      begin
-        system("#{$nona_path} -o #{date}_ #{%Q{"#{$master_alignment_file}"}} #{%Q{"#{parent_path}/#{date}_image1#{file_extension}"}} #{%Q{"#{parent_path}/#{date}_image2#{file_extension}"}} #{%Q{"#{parent_path}/#{date}_image3#{file_extension}"}} #{%Q{"#{parent_path}/#{date}_image4#{file_extension}"}}")
-        system("#{$enblend_path} --no-optimize --compression=100 --fine-mask -o #{%Q{"#{stitched_images_path}/#{date}_full.jpg"}} #{date}_0000.tif #{date}_0001.tif #{date}_0002.tif #{date}_0003.tif")
-        Dir.glob("#{date}_*.tif").each { |f| File.delete(f) }
-        match_count += 1
-      rescue
-        # Ignore and move on
-        # TODO: Maybe do something in this case.
-      end
+      $apply_mask ? apply_pano_mask : create_tm
     end
-    puts "[#{Time.now}] Stitching complete. Stitched #{match_count} out of #{count} possible frames."
-    $apply_mask ? apply_pano_mask : create_tm
   end
 
   def apply_pano_mask
@@ -965,7 +1061,7 @@ class Compiler
   end
 
   def usage
-    puts "Usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE CAMERA_SETUP_LOCATION"
+    puts "Basic usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE CAMERA_SETUP_LOCATION"
     exit
   end
 
