@@ -448,7 +448,7 @@ class Compiler
         end
         exit
       elsif dir.length <= 2
-        puts "<= 2 images found. Because of the current inability to append <= 2 frames with the new append method, we skip processing and check again later when more images are available."
+        puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
         if $do_incremental_update and $input_date_from_file
           if Time.now.to_date != Date.parse($start_time["full"].to_s)
             puts "We still only have one image but we are now on a new day, so wrap this timemachine up. No more images are coming for the previous day."
@@ -504,9 +504,6 @@ class Compiler
     if num_images_being_processed == 0
       puts "No images found to be processed. Aborting."
       exit
-    elsif num_images_being_processed <= 4
-      puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
-      exit
     end
 
     images.each do |img|
@@ -541,6 +538,10 @@ class Compiler
       match_count += 1
     end
     puts "[#{Time.now}] Organizing complete. Matched #{match_count} out of #{count} possible frames."
+    if match_count <= 2
+      puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
+      exit
+    end
     if $skip_rotate
       puts "Skipping image rotations."
       stitch_images
@@ -559,9 +560,6 @@ class Compiler
     num_images_being_processed = images.length
     if num_images_being_processed == 0
       puts "No images found to be processed. Aborting."
-      exit
-    elsif num_images_being_processed <= 4
-      puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
       exit
     end
     images.each do |img|
@@ -597,6 +595,10 @@ class Compiler
       match_count += 1
     end
     puts "[#{Time.now}] Organizing complete. Matched #{match_count} out of #{count} possible frames."
+    if match_count <= 2
+      puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
+      exit
+    end
     if $skip_rotate
       puts "Skipping image rotations."
       stitch_images
