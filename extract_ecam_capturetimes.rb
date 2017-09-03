@@ -7,7 +7,7 @@ capture_times = []
 dir = ARGV[0].dup
 time_diff = 0
 
-print_seconds = false
+print_seconds = true
 
 path_to_tm_json = ARGV[1]
 
@@ -37,7 +37,7 @@ files.each do |img_path|
  date = file.split("_")[0].to_i
  date += time_diff
  extra = print_seconds ? ":%S" : ""
- capture_times << Time.zone.at(date).to_datetime.strftime("%m/%d/%Y %I:%M#{extra} %p")
+ capture_times << Time.zone.at(date).to_datetime.strftime("%Y-%m-%d %H:%M:%S")
 end
 
 json = open(path_to_tm_json) {|fh| JSON.load(fh)}

@@ -1,13 +1,14 @@
 require "rexml/document"
 require "json"
 require "time"
+require "date"
 require "active_support/core_ext"
 
 capture_times = []
 dir = ARGV[0].dup
 time_diff = 0
 
-print_seconds = false
+print_seconds = true
 
 path_to_tm_json = ARGV[1]
 
@@ -33,11 +34,8 @@ path = File.expand_path('**/*.[jJpP][pPnN][gG]', dir)
 files = Dir.glob(path).sort
 
 files.each do |img_path|
- file = File.basename(img_path)
- date = file.split("_")[0].to_i
- date += time_diff
- extra = print_seconds ? ":%S" : ""
- capture_times << Time.zone.at(date).to_datetime.strftime("%m/%d/%Y %I:%M#{extra} %p")
+ date = File.basename(img_path)
+ capture_times << DateTime.parse(date).strftime("%Y-%m-%d %H:%M:%S") + " UTC"
 end
 
 json = open(path_to_tm_json) {|fh| JSON.load(fh)}

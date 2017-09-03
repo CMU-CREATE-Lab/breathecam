@@ -177,11 +177,6 @@ class Compiler
       end
     end
 
-    if File.exists?(File.join($working_dir, "WIP"))
-      puts "[#{Time.now}] A file called 'WIP' was detected in '#{$working_dir}', which indicates that this working directory is already in the middle of processing. Exiting new process."
-      exit
-    end
-
     $timemachine_output_path = $rsync_output || $rsync_location_json ? $working_dir : $output_path
 
     $do_incremental_update = true if defined?($incremental_update_interval)
@@ -196,6 +191,18 @@ class Compiler
     $current_day ||= ($do_incremental_update ? Date.today.to_s : (Date.today - 1)).to_s
 
     $num_jobs ||= $default_num_jobs
+
+    if File.exists?(File.join($working_dir, "WIP2")) and File.exists?(File.join($working_dir, "WIP"))
+      tm_name = $current_day.blank? ? $camera_location : ($is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day)
+      FileUtils.rm_rf("#{$timemachine_output_path}/#{tm_name}-#{$incremental_update_interval}m.timemachine")
+      FileUtils.rm_rf("#{$timemachine_output_path}/#{tm_name}.timemachine")
+      FileUtils.rm(File.join($working_dir, "WIP"))
+      FileUtils.rm(File.join($working_dir, "WIP2"))
+      puts "[#{Time.now}] A file called 'WIP2' was detected in '#{$working_dir}', which means that inline appending had not completed successfully. There is no way to recover from this so we must delete the entire #{tm_name}.timemachine directory and move on."
+    elsif File.exists?(File.join($working_dir, "WIP"))
+      puts "[#{Time.now}] A file called 'WIP' was detected in '#{$working_dir}', which indicates that this working directory is already in the middle of processing. Exiting new process."
+      exit
+    end
 
     puts "Starting process."
 
@@ -220,6 +227,7 @@ class Compiler
     if $do_incremental_update
       if $input_date_from_file
         file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
+        tmp_file = file + ".tmp"
         if File.exists?(file)
           time_chunk_in_seconds = (60 * $incremental_update_interval)
           last_pull_date = Time.zone.parse(File.open(file, &:readline))
@@ -258,7 +266,8 @@ class Compiler
         else
           calculate_rsync_input_range
         end
-        File.open(file, 'w') {|f| f.write($end_time["full"])}
+        File.open(tmp_file, 'w') {|f| f.write($end_time["full"])}
+        File.rename(tmp_file, file)
       else
         calculate_rsync_input_range
       end
@@ -383,9 +392,9 @@ class Compiler
         end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
         start_date_in_sec = Time.zone.parse(start_date).to_i
         end_date_in_sec = Time.zone.parse(end_date).to_i
-        file_list_command = "find #{src_path}/#{img_folder} -type d \\( -path #{src_path}#{img_folder}/latest_stitch -o -path #{src_path}#{img_folder}/*-tmp \\) -prune -o -name '*.[jJpP][pPnN][gG]' | perl -ne 'print if (m!.*/(\\d+)! and $1 > #{start_date_in_sec} and $1 <= #{end_date_in_sec})'"
+        file_list_command = "find #{src_path}/#{img_folder} -maxdepth 1 -type f | perl -ne 'print if (m!.*/(\\d+)*.[jJpP][pPnN][gG]! and $1 > #{start_date_in_sec} and $1 <= #{end_date_in_sec})'"
       else
-        file_list_command = "find #{src_path}/#{img_folder} -type d \\( -path #{src_path}#{img_folder}/latest_stitch -o -path #{src_path}#{img_folder}/*-tmp \\) -prune -o -name '*.[jJpP][pPnN][gG]' -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
+        file_list_command = "find #{src_path}/#{img_folder}/*.[jJpP][pPnN][gG] -maxdepth 1 -type f -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
       end
       subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
       puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
@@ -417,6 +426,7 @@ class Compiler
     if $skip_stitch
       dir = Dir.glob("#{$input_path}/*.[jJpP][pPnN][gG]") + Dir.glob("#{$input_path}/*/*.[jJpP][pPnN][gG]")
       file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt") if $do_incremental_update and $input_date_from_file
+      tmp_file = file + ".tmp"
       if dir.empty?
         puts "No images found to be processed. Aborting."
         if $file_names_include_dates and !$checked_current_time
@@ -431,17 +441,20 @@ class Compiler
           clear_working_dir
           get_source_images
         elsif $do_incremental_update and $input_date_from_file and !$file_names_include_dates
-          File.open(file, 'w') {|f| f.write(Time.zone.now)}
+          File.open(tmp_file, 'w') {|f| f.write(Time.zone.now)}
+          File.rename(tmp_file, file)
         end
         exit
-      elsif dir.length == 1
-        puts "Only 1 image found. Because of the current inability to append a single frame with the new append method, we skip processing and check again later when more images are available."
+      elsif dir.length <= 2
+        puts "<= 2 images found. Because of the current inability to append <= 2 frames with the new append method, we skip processing and check again later when more images are available."
         if $do_incremental_update and $input_date_from_file
           if Time.now.to_date != Date.parse($start_time["full"].to_s)
             puts "We still only have one image but we are now on a new day, so wrap this timemachine up. No more images are coming for the previous day."
-            File.open(file, 'w') {|f| f.write($end_time["full"])}
+            File.open(tmp_file, 'w') {|f| f.write($end_time["full"])}
+            File.rename(tmp_file, file)
           else
-            File.open(file, 'w') {|f| f.write($start_time["full"])}
+            File.open(tmp_file, 'w') {|f| f.write($start_time["full"])}
+            File.rename(tmp_file, file)
           end
         end
         exit
@@ -459,7 +472,8 @@ class Compiler
               new_date = Time.zone.at(last_pulled_time.to_i)
             end
           end
-          File.open(file, 'w') {|f| f.write(new_date.to_s)}
+          File.open(tmp_file, 'w') {|f| f.write(new_date.to_s)}
+          File.rename(tmp_file, file)
         end
       end
       create_tm
@@ -505,7 +519,7 @@ class Compiler
       end
 
       # Image is missing from the other cameras. We cannot process this set.
-      # TODO: Maybe have a slight threshold in the event times are slightly off, but really the cameras should be taking at exactly the same time.
+      # TODO: Maybe have a threshold in the event times are slightly off, but really the cameras should be taking at exactly the same time.
       next if camera_match_count != camera_dirs.length - 1
 
       dir = "#{$organized_images_path}/#{'%05d' % count}"
@@ -732,6 +746,7 @@ class Compiler
       json = open(path_to_json) {|fh| JSON.load(fh)}
     else
       json["location"] = $camera_location
+      json["split_type"] = $is_monthly ? "monthly" : "daily"
       json["datasets"] = {}
     end
     new_latest = $current_day
@@ -1061,7 +1076,7 @@ class Compiler
   end
 
   def usage
-    puts "Basic usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE CAMERA_SETUP_LOCATION"
+    puts "Basic usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE CAMERA_NAME"
     exit
   end
 
