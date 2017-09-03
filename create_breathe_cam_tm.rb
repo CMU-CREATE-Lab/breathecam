@@ -366,7 +366,7 @@ class Compiler
   def get_source_images
     camera_paths = $multi_camera_list ? $multi_camera_list : [$input_path]
     camera_paths.each_with_index do |camera_path, idx|
-      puts "[#{Time.now}] Rsycning images from #{camera_path}/#{$current_day}"
+      puts "[#{Time.now}] Getting source images from #{camera_path}/#{$current_day}"
       image_path = $skip_stitch ? "0100-original-images" : "050-raw-images"
       new_input_path = File.join($working_dir, image_path, idx.to_s)
       FileUtils.mkdir_p(new_input_path)
@@ -399,6 +399,7 @@ class Compiler
       subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
       puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
       if $symlink_input
+        puts "[#{Time.now}] symlinking source images"
         if $do_incremental_update or $subsample_input
           file_list = `#{file_list_command} #{subsample_command}`
           file_list = file_list.split("\n")
@@ -409,6 +410,7 @@ class Compiler
           system("ln -s #{camera_path}/#{$current_day} #{new_input_path}")
         end
       else #rsync
+        puts "[#{Time.now}] rsyncing source images"
         if $do_incremental_update or $subsample_input
           system("ssh #{host} \"#{file_list_command} -printf '%f\n' #{subsample_command} > /tmp/#{$camera_location}-files.txt\"")
           system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}")
