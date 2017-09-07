@@ -20,10 +20,13 @@ $jpegtran_path = $RUNNING_WINDOWS ? "jpegtran.exe" : "jpegtran"
 $nona_path = $RUNNING_WINDOWS ? "nona.exe" : "nona"
 $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "enblend"
 
+# Imagemagick
+$imagemagick_path = $RUNNING_WINDOWS ? "convert.exe" : "convert"
+
 # Masking
 $masker_path = "MaskedGaussian"
 
-$valid_image_extensions = [".jpg", ".JPG", ".lnk"]
+$valid_image_extensions = [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".lnk"]
 $default_num_jobs = 4
 $rsync_input = false
 $rsync_output = false
@@ -49,6 +52,8 @@ $is_monthly = false
 $skip_img_validation = false
 $num_images_to_stitch = 4
 $stitcher = "hugin"
+# Default to epoch time
+$file_names_date_format = "%s"
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -147,6 +152,8 @@ class Compiler
         $image_store_v2 = true
       elsif arg == "--file-names-include-dates"
         $file_names_include_dates = true
+      elsif arg == "--file-names-date-format"
+        $file_names_date_format = ARGV.shift
       elsif arg == "--is-monthly"
         $is_monthly = true
       elsif arg == "--skip-img-validation"
@@ -192,14 +199,7 @@ class Compiler
 
     $num_jobs ||= $default_num_jobs
 
-    if File.exists?(File.join($working_dir, "WIP2")) and File.exists?(File.join($working_dir, "WIP"))
-      tm_name = $current_day.blank? ? $camera_location : ($is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day)
-      FileUtils.rm_rf("#{$timemachine_output_path}/#{tm_name}-#{$incremental_update_interval}m.timemachine")
-      FileUtils.rm_rf("#{$timemachine_output_path}/#{tm_name}.timemachine")
-      FileUtils.rm(File.join($working_dir, "WIP"))
-      FileUtils.rm(File.join($working_dir, "WIP2"))
-      puts "[#{Time.now}] A file called 'WIP2' was detected in '#{$working_dir}', which means that inline appending had not completed successfully. There is no way to recover from this so we must delete the entire #{tm_name}.timemachine directory and move on."
-    elsif File.exists?(File.join($working_dir, "WIP"))
+    if File.exists?(File.join($working_dir, "WIP"))
       puts "[#{Time.now}] A file called 'WIP' was detected in '#{$working_dir}', which indicates that this working directory is already in the middle of processing. Exiting new process."
       exit
     end
@@ -372,7 +372,10 @@ class Compiler
       FileUtils.mkdir_p(new_input_path)
       args = camera_path.split(":")
       host = args[0]
+      # Root camera image path
       src_path = args[1] || args[0]
+      # Camera date path
+      img_folder = "/#{$current_day}"
       # Grab full day if we are not pulling in a specific time range or the time gap is more than or equal to a day in seconds.
       if !$do_incremental_update || (Time.now - Time.parse($start_time["full"]) >= 86400)
         $start_time["hour"] = 0
@@ -384,49 +387,56 @@ class Compiler
       end
       if $image_store_v2
         year_month_day = $current_day.split("-")
-        src_path = File.join(src_path, year_month_day[0], year_month_day[1])
+        # YYYY/MM
+        img_folder = File.join(year_month_day[0], year_month_day[1])
       end
-      img_folder = $is_monthly ? "" : "/#{$current_day}"
       if $file_names_include_dates
         start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
         end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
-        start_date_in_sec = Time.zone.parse(start_date).to_i
-        end_date_in_sec = Time.zone.parse(end_date).to_i
-        file_list_command = "find #{src_path}/#{img_folder} -maxdepth 1 -type f | perl -ne 'print if (m!.*/(\\d+)*.[jJpP][pPnN][gG]! and $1 > #{start_date_in_sec} and $1 <= #{end_date_in_sec})'"
+        start_date_formatted = Time.zone.parse(start_date).strftime($file_names_date_format)
+        end_date_formatted = Time.zone.parse(end_date).strftime($file_names_date_format)
+        file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 > #{start_date_formatted} and $1 <= #{end_date_formatted})'"
       else
-        file_list_command = "find #{src_path}/#{img_folder}/*.[jJpP][pPnN][gG] -maxdepth 1 -type f -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -print"
+        file_list_command = "bash -O extglob -c \"find #{src_path}/#{img_folder}/*.[jJpP][pPnN]*(e)*(E)[gG] -maxdepth 1 -type f -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n'\""
       end
       subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
       puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
       if $symlink_input
-        puts "[#{Time.now}] symlinking source images"
+        puts "[#{Time.now}] Symlinking source images."
         if $do_incremental_update or $subsample_input
           file_list = `#{file_list_command} #{subsample_command}`
           file_list = file_list.split("\n")
           file_list.each do |file|
-            system("ln -s #{file} #{new_input_path}/#{File.basename(file)}")
+            system("ln -s #{src_path}/#{img_folder}/#{file} #{new_input_path}/#{File.basename(file)}")
           end
         else
-          system("ln -s #{camera_path}/#{$current_day} #{new_input_path}")
+          system("ln -s #{camera_path}/ #{new_input_path}")
         end
-      else #rsync
-        puts "[#{Time.now}] rsyncing source images"
+      else
+        puts "[#{Time.now}] Rsyncing source images."
         if $do_incremental_update or $subsample_input
-          system("ssh #{host} \"#{file_list_command} -printf '%f\n' #{subsample_command} > /tmp/#{$camera_location}-files.txt\"")
+          # Writing to a file to prevent extensive quoting and commandline escaping madness
+          # Need to escape $ or it will be expanded by echo below
+          # Also need to escape any double quotes since echo will be calling this command string
+          commands_to_run_remotely = "#{file_list_command} #{subsample_command} > /tmp/#{$camera_location}-files.txt".gsub("$","\\$").gsub('"','\"')
+          commands_file = "/tmp/#{$camera_location}-ssh.sh"
+          system("echo \"#{commands_to_run_remotely}\" > #{commands_file}")
+          system("cat #{commands_file} | ssh -T #{host} > /dev/null")
+          # Cannot get files-from to use absolute paths (hence the need for -printf in the file_list_command) with remote transfers...Clearly missing something important in how this works.
           system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}")
         else
-          system("rsync -a #{camera_path}/#{$current_day}/*.[jJpP][pPnN][gG] #{new_input_path}")
+          system("rsync -a #{camera_path}/*.[jJpP][pPnN]*(e)*(E)[gG]] #{new_input_path}")
         end
       end
       # We need to reference files locally now that we have rsynced everything over
       $input_path = $multi_camera_list ? File.dirname(new_input_path) : new_input_path
       FileUtils.touch(File.join($input_path, "DONE"))
-      puts "[#{Time.now}] Finished rsyncing input images."
+      puts "[#{Time.now}] Finished getting source images."
     end
     remove_corrupted_images unless $RUNNING_WINDOWS or $skip_img_validation
 
     if $skip_stitch
-      dir = Dir.glob("#{$input_path}/*.[jJpP][pPnN][gG]") + Dir.glob("#{$input_path}/*/*.[jJpP][pPnN][gG]")
+      dir = Dir.glob("#{$input_path}/**/*{#{$valid_image_extensions.join(',')}}")
       file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt") if $do_incremental_update and $input_date_from_file
       tmp_file = file + ".tmp"
       if dir.empty?
@@ -462,7 +472,7 @@ class Compiler
         exit
       elsif $file_names_include_dates
         if $do_incremental_update and $input_date_from_file
-          last_pulled_image = Dir.glob("#{$input_path}/*.[jJpP][pPnN][gG]").sort.last
+          last_pulled_image = Dir.glob("#{$input_path}/*{#{$valid_image_extensions.join(',')}}").sort.last
           if Time.now.to_date > Date.parse($start_time["full"].to_s)
              tmp = (Date.parse($current_day) + 1).to_s
              new_date = "#{tmp} 00:00:00"
@@ -486,7 +496,7 @@ class Compiler
 
   def remove_corrupted_images
     puts "[#{Time.now}] Checking for corrupted images."
-    system("find #{$input_path} -maxdepth 3 -name *.[jJ][pP][gG] | xargs jpeginfo -cd")
+    system("find #{$input_path} -maxdepth 3 -name '*.[jJ][pP][gG]' | xargs jpeginfo -cd")
   end
 
   def match_images
@@ -499,7 +509,7 @@ class Compiler
     camera_dirs = Dir.glob("#{$input_path}/*").select { |file| File.directory? file }.sort
     parent_path = camera_dirs.first
 
-    images = Dir.glob("#{parent_path}/*.[jJpP][pPnN][gG]").sort
+    images = Dir.glob("#{parent_path}/*{#{$valid_image_extensions.join(',')}}").sort
     num_images_being_processed = images.length
     if num_images_being_processed == 0
       puts "No images found to be processed. Aborting."
@@ -556,7 +566,7 @@ class Compiler
     count = 0
     match_count = 0
     puts "[#{Time.now}] Organizing images..."
-    images = Dir.glob("#{$input_path}/*_image1.[jJpP][pPnN][gG]").sort
+    images = Dir.glob("#{$input_path}/*_image1{#{$valid_image_extensions.join(',')}}").sort
     num_images_being_processed = images.length
     if num_images_being_processed == 0
       puts "No images found to be processed. Aborting."
@@ -608,6 +618,7 @@ class Compiler
   end
 
   def rotate_images
+    # TODO: Allow user to pass in rotate amount
     rot_amt = 180
     count = 0
     match_count = 0
@@ -623,7 +634,11 @@ class Compiler
         file_extension = File.extname(img)
       end
       begin
-        system("#{$jpegtran_path} -copy all -rotate #{rot_amt} -optimize -outfile  #{%Q{"#{img}"}} #{%Q{"#{img}"}}")
+        if file_extension.downcase.include?(".jp")
+          system("#{$jpegtran_path} -copy all -rotate #{rot_amt} -optimize -outfile #{%Q{"#{img}"}} #{%Q{"#{img}"}}")
+        else
+          system("#{$imagemagick_path} #{%Q{"#{img}"}} -rotate #{rot_amt} #{%Q{"#{img}"}}")
+        end
         match_count += 1
       rescue
         # Ignore and move on
