@@ -152,7 +152,7 @@ class Compiler
         $image_store_v2 = true
       elsif arg == "--file-names-include-dates"
         $file_names_include_dates = true
-      elsif arg == "--file-names-date-format"
+      elsif arg == "-file-names-date-format"
         $file_names_date_format = ARGV.shift
       elsif arg == "--is-monthly"
         $is_monthly = true
