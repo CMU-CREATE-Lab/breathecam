@@ -4,13 +4,24 @@ ADMIN="pdille@cmucreatelab.org"
 file="/workspace/*tmc/WIP2"
 file2="/workspace/*tmc/WIP"
 
-echo "Subject: Reboot detected on $(hostname) [eom]" | /usr/sbin/sendmail $ADMIN
-
 if ls $file >/dev/null 2>&1;
 then
-  echo "Breathecam script was stopped in a spot that requires non-trivial work to recover."
+  echo "Breathecam script failed during inline video appending. There is no way to recover from this so we must delete the relevant directories."
+  for camera_dir in $file; do
+    partial_tm_path=${camera_dir:0:-4}*-*m.timemachine
+    for partial_tm in $partial_tm_path; do
+      echo "$partial_tm"
+      rm -rf $partial_tm
+      tm_path=${partial_tm%-*}.timemachine
+      echo "$tm_path"
+      rm -rf $tm_path
+    done
+  done
+  rm $file $file2
 else
   rm $file2
 fi
+
+echo "Subject: Reboot detected on $(hostname) [eom]" | /usr/sbin/sendmail $ADMIN
 
 exit 0
