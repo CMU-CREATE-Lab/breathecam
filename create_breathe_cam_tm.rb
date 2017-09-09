@@ -251,6 +251,7 @@ class Compiler
           $start_time["minute"] = last_pull_date.min
           $start_time["sec"] = last_pull_date.sec
           $start_time["full"] = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{$start_time['sec']}"
+          $original_last_pull_start_time = $start_time["full"]
           new_last_pull_date = last_pull_date + time_chunk_in_seconds
           $end_time["hour"] = new_last_pull_date.hour
           $end_time["minute"] = new_last_pull_date.min
@@ -377,7 +378,7 @@ class Compiler
       # Camera date path
       img_folder = "/#{$current_day}"
       # Grab full day if we are not pulling in a specific time range or the time gap is more than or equal to a day in seconds.
-      if !$do_incremental_update || (Time.now - Time.parse($start_time["full"]) >= 86400)
+      if !$do_incremental_update || (($start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0) && Time.now - Time.parse($start_time["full"]) >= 86400)
         $start_time["hour"] = 0
         $start_time["minute"] = 0
         $start_time['sec'] = 0
@@ -393,8 +394,8 @@ class Compiler
       if $file_names_include_dates
         start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
         end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
-        start_date_formatted = Time.zone.parse(start_date).strftime($file_names_date_format)
-        end_date_formatted = Time.zone.parse(end_date).strftime($file_names_date_format)
+        start_date_formatted = Time.parse(start_date).strftime($file_names_date_format)
+        end_date_formatted = Time.parse(end_date).strftime($file_names_date_format)
         file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 > #{start_date_formatted} and $1 <= #{end_date_formatted})'"
       else
         file_list_command = "bash -O extglob -c \"find #{src_path}/#{img_folder}/*.[jJpP][pPnN]*(e)*(E)[gG] -maxdepth 1 -type f -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n'\""
@@ -454,6 +455,10 @@ class Compiler
           get_source_images
         elsif $do_incremental_update and $input_date_from_file and !$file_names_include_dates
           File.open(tmp_file, 'w') {|f| f.write(Time.zone.now)}
+          File.rename(tmp_file, file)
+        elsif $file_names_include_dates
+          new_date = $original_last_pull_start_time ? $original_last_pull_start_time : $start_time["full"]
+          File.open(tmp_file, 'w') {|f| f.write(new_date)}
           File.rename(tmp_file, file)
         end
         exit
