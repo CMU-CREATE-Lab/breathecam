@@ -389,14 +389,16 @@ class Compiler
       if $image_store_v2
         year_month_day = $current_day.split("-")
         # YYYY/MM
-        img_folder = File.join(year_month_day[0], year_month_day[1])
+        img_folder = $is_monthly ? File.join(year_month_day[0], year_month_day[1]) : File.join(year_month_day[0], year_month_day[1], $current_day)
       end
       if $file_names_include_dates
         start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
         end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
         start_date_formatted = Time.parse(start_date).strftime($file_names_date_format)
         end_date_formatted = Time.parse(end_date).strftime($file_names_date_format)
-        file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 > #{start_date_formatted} and $1 <= #{end_date_formatted})'"
+        logic_operator1 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? ">=" : ">"
+        logic_operator2 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? "<" : "<="
+        file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 #{logic_operator1} #{start_date_formatted} and $1 #{logic_operator2} #{end_date_formatted})'"
       else
         file_list_command = "bash -O extglob -c \"find #{src_path}/#{img_folder}/*.[jJpP][pPnN]*(e)*(E)[gG] -maxdepth 1 -type f -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n'\""
       end
