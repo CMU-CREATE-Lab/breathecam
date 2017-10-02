@@ -23,6 +23,12 @@ $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "enblend"
 # Imagemagick
 $imagemagick_path = $RUNNING_WINDOWS ? "convert.exe" : "convert"
 
+# ffmpeg
+$ffmpeg_path = $RUNNING_WINDOWS ? "ffmpeg.exe" : "ffmpeg"
+
+# qtfaststart
+$qtfaststart_path = $RUNNING_WINDOWS ? "qtfaststart.exe" : "qtfaststart"
+
 # Masking
 $masker_path = "MaskedGaussian"
 
@@ -106,6 +112,7 @@ class Compiler
       elsif arg == "-current-day"
         $current_day = ARGV.shift
       elsif arg == "-incremental-update-interval"
+        # In minutes.
         # Force interval to be a multiple of 10.
         # This is needed because we add a keyframe every 10 frames (breathecam specific)
         # and thus do not need to worry about keyframes when appending if we keep it this way.
@@ -163,6 +170,11 @@ class Compiler
         $num_images_to_stitch = $multi_camera_list.length
       elsif arg == "-stitcher"
         $stitcher = ARGV.shift
+      elsif arg == "--create-top-video-only"
+        $create_top_video_only = true
+      elsif arg == "-image-capture-interval"
+        # In seconds
+        $image_capture_interval = ARGV.shift.to_i
       end
     end
 
@@ -394,8 +406,8 @@ class Compiler
       if $file_names_include_dates
         start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
         end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
-        start_date_formatted = Time.parse(start_date).strftime($file_names_date_format)
-        end_date_formatted = Time.parse(end_date).strftime($file_names_date_format)
+        start_date_formatted = Time.zone.parse(start_date).utc.strftime($file_names_date_format)
+        end_date_formatted = Time.zone.parse(end_date).utc.strftime($file_names_date_format)
         logic_operator1 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? ">=" : ">"
         logic_operator2 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? "<" : "<="
         file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 #{logic_operator1} #{start_date_formatted} and $1 #{logic_operator2} #{end_date_formatted})'"
@@ -668,11 +680,33 @@ class Compiler
       puts "Failed to create output directory for stitched images. Please check read/write permissions on the output directory."
       return
     end
-    if ($stitcher == "gigapan")
+    files = Dir.glob("#{$organized_images_path}/*/*_image1.*").sort
+    if ($stitcher == "concatenate")
+      # TODO: Only appends horizontally
+      Parallel.each(files, :in_threads => $num_jobs) do |img|
+        count += 1
+        date = File.basename(img, ".*").split("_")[0]
+        parent_path = File.dirname(img)
+        file_extension = File.extname(img)
+        begin
+          concat_input_files_string = ""
+          for i in 1..$num_images_to_stitch
+            concat_input_files_string += " #{%Q{"#{parent_path}/#{date}_image#{i}#{file_extension}"}}"
+          end
+          system("#{$imagemagick_path} +append #{concat_input_files_string} #{%Q{"#{stitched_images_path}/#{date}_full.jpg"}}")
+          match_count += 1
+        rescue => e
+          puts e
+          # Ignore and move on
+          # TODO: Maybe do something in this case.
+        end
+      end
+      puts "[#{Time.now}] Concatenating complete. Concatenated #{match_count} out of #{count} possible frames."
+      create_tm
+    elsif ($stitcher == "gigapan")
       original_images_path = stitched_images_path
       stitched_images_path = File.join($working_dir, "0100-unstitched")
       File.symlink($organized_images_path, stitched_images_path)
-      files = Dir.glob("#{$organized_images_path}/*/*_image1.*").sort
       Parallel.each(files, :in_threads => $num_jobs) do |img|
         count += 1
         # Note: Windows Vista+ does support something that is essentially a symlink, but for now we will just stick with shortcuts that have worked with all versions of Windows up to Windows 7. Probably Windows 8 too but have not tested there.
@@ -685,7 +719,6 @@ class Compiler
       puts "[#{Time.now}] GigaPan Stitcher is about to stitch #{count} frames."
       create_tm
     else
-      files = Dir.glob("#{$organized_images_path}/*/*_image1.*").sort
       Parallel.each(files, :in_threads => $num_jobs) do |img|
         file_extension = File.extname(img)
         next unless $valid_image_extensions.include? file_extension.downcase
@@ -713,8 +746,8 @@ class Compiler
           # Ignore and move on
           # TODO: Maybe do something in this case.
         end
-        puts "[#{Time.now}] Stitching complete. Stitched #{match_count} out of #{count} possible frames."
       end
+      puts "[#{Time.now}] Stitching complete. Stitched #{match_count} out of #{count} possible frames."
       $apply_mask ? apply_pano_mask : create_tm
     end
   end
@@ -735,31 +768,105 @@ class Compiler
     create_tm
   end
 
+  def create_top_video
+    output_video_path = File.join($working_dir, "0400-output-video")
+    input_images_path = File.join($working_dir, "0100-original-images") unless $organized_images_path
+    path_to_definition_file = "#{$working_dir}/definition.tmc"
+    json = open(path_to_definition_file) {|fh| JSON.load(fh)}
+    fps = json["videosets"][0]["fps"]
+    crf = json["videosets"][0]["quality"]
+    video_type = json["videosets"][0]["type"]
+    video_dimensions = json["videosets"][0]["size"].join("x")
+    top_video_length_in_sec = json["top_video_length_in_sec"]
+    capture_time_parser = json["source"]["capture_time_parser"]
+    path_to_tm_file = "#{output_video_path}/#{$camera_location}.json"
+    path_to_final_tm_file = "#{output_video_path}/#{$camera_location}.final.json"
+    path_to_tm_js_file = "#{output_video_path}/#{$camera_location}.js"
+    tm_json = open(path_to_tm_file) {|fh| JSON.load(fh)}
+    num_current_frames = tm_json["capture-times"].length
+    if video_type == "webm"
+      codec = "libvpx"
+      output_extension = "webm"
+    else
+      codec = "libx264 -profile:v baseline"
+      output_extension = "mp4"
+    end
+    max_frames = (top_video_length_in_sec / 60) * (60 / $image_capture_interval)
+    num_new_images = Dir.glob("#{input_images_path}/*/*{#{$valid_image_extensions.join(',')}}").length
+    frame_diff = (num_current_frames + num_new_images) - max_frames
+
+    ffmpeg_output_command = "-s #{video_dimensions} -c:v #{codec} -preset veryslow -pix_fmt yuv420p -crf #{crf} -bf 0 -g 10 -threads 8"
+
+    system("#{$ffmpeg_path} -framerate #{fps} -pattern_type glob -i '#{input_images_path}/*/*.jpg' #{ffmpeg_output_command} #{output_video_path}/0-1.#{output_extension}")
+
+    capture_times = tm_json["capture-times"]
+    system("ruby #{capture_time_parser} #{input_images_path}/*/ #{path_to_tm_file}")
+    new_tm_json = open(path_to_tm_file) {|fh| JSON.load(fh)}
+    new_capture_times = new_tm_json["capture-times"]
+    new_tm_json["capture-times"] = capture_times + new_capture_times
+
+    if frame_diff > 0
+      seconds_to_chop = frame_diff.to_f / fps.to_f
+      concat_str = "file '#{output_video_path}/0-0.#{output_extension}'\nfile '#{output_video_path}/0-1.#{output_extension}'"
+      system("echo \"#{concat_str}\" > /tmp/#{$camera_location}.concat.txt")
+      system("#{$ffmpeg_path} -i #{output_video_path}/0.#{output_extension} -ss #{seconds_to_chop} #{ffmpeg_output_command} #{output_video_path}/0-0.#{output_extension}")
+      system("#{$ffmpeg_path} -auto_convert 1 -f concat -safe 0 -i /tmp/#{$camera_location}.concat.txt #{ffmpeg_output_command} #{output_video_path}/0-new.#{output_extension}")
+      new_tm_json["capture-times"].shift(frame_diff)
+    else
+      if File.exists?("#{output_video_path}/0.#{output_extension}")
+        concat_str = "file '#{output_video_path}/0.#{output_extension}'\nfile '#{output_video_path}/0-1.#{output_extension}'"
+        system("echo \"#{concat_str}\" > /tmp/#{$camera_location}.concat.txt")
+        system("#{$ffmpeg_path} -auto_convert 1 -f concat -safe 0 -i /tmp/#{$camera_location}.concat.txt #{ffmpeg_output_command} #{output_video_path}/0-new.#{output_extension}")
+      else
+        FileUtils.mv("#{output_video_path}/0-1.#{output_extension}", "#{output_video_path}/0-new.#{output_extension}", :force => true)
+      end
+    end
+
+    system("#{$qtfaststart_path} #{output_video_path}/0-new.#{output_extension}")
+    FileUtils.mv("#{output_video_path}/0-new.#{output_extension}", "#{output_video_path}/0.#{output_extension}", :force => true)
+
+    tmp_file = path_to_tm_file + ".tmp"
+    tmp_file2 = path_to_tm_js_file + ".tmp"
+    open(tmp_file, "w") {|fh| fh.puts(JSON.generate(new_tm_json))}
+    open(tmp_file2, "w") {|fh| fh.puts("cached_breathecam=" + JSON.generate(new_tm_json) + ";")}
+    File.rename(tmp_file, path_to_tm_file)
+    File.rename(tmp_file2, path_to_tm_js_file)
+
+    FileUtils.cp_r(path_to_tm_file, path_to_final_tm_file, :remove_destination => true)
+
+    FileUtils.rm_f(File.join(output_video_path, "0-0.#{output_extension}"))
+    FileUtils.rm_f(File.join(output_video_path, "0-1.#{output_extension}"))
+  end
+
   def create_tm
     # Image directory is ready now that we are at this step
     FileUtils.touch(File.join($working_dir, "0100-original-images", "DONE"))
-    puts "[#{Time.now}] Creating Time Machine..."
-    tm_name = $current_day.blank? ? $camera_location : ($is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day)
-    $timemachine_output_dir = $create_videoset_segment_directory ? "#{tm_name}-#{$incremental_update_interval}m.timemachine" : "#{tm_name}.timemachine"
-    # If the *.timemachine directory already exists, remove it since ct.rb will most likely become confused and not make new video tiles
-    FileUtils.rm_rf("#{$timemachine_output_path}/#{$timemachine_output_dir}")
-    $timemachine_master_output_dir = "#{tm_name}.timemachine"
-    extra_flags = ""
-    extra_flags += "--skip-trailer " if $skip_trailer
-    extra_flags += "--skip-leader " if $skip_leader
-    extra_flags += "--skip-videos --preserve-source-tiles " if $skip_videos
-    extra_flags += "--sort-by-exif-dates " if $sort_by_exif_dates
-    # TODO: Assumes Ruby is installed and ct.rb is in the PATH
-    Dir.chdir($working_dir) do
-      puts "ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}"
-      system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}") or raise "[#{Time.now}] Error encountered processing Time Machine. Exiting."
+    if $create_top_video_only
+      create_top_video
+    else
+      puts "[#{Time.now}] Creating Time Machine..."
+      tm_name = $current_day.blank? ? $camera_location : ($is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day)
+      $timemachine_output_dir = $create_videoset_segment_directory ? "#{tm_name}-#{$incremental_update_interval}m.timemachine" : "#{tm_name}.timemachine"
+      # If the *.timemachine directory already exists, remove it since ct.rb will most likely become confused and not make new video tiles
+      FileUtils.rm_rf("#{$timemachine_output_path}/#{$timemachine_output_dir}")
+      $timemachine_master_output_dir = "#{tm_name}.timemachine"
+      extra_flags = ""
+      extra_flags += "--skip-trailer " if $skip_trailer
+      extra_flags += "--skip-leader " if $skip_leader
+      extra_flags += "--skip-videos --preserve-source-tiles " if $skip_videos
+      extra_flags += "--sort-by-exif-dates " if $sort_by_exif_dates
+      # TODO: Assumes Ruby is installed and ct.rb is in the PATH
+      Dir.chdir($working_dir) do
+        puts "ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}"
+        system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}") or raise "[#{Time.now}] Error encountered processing Time Machine. Exiting."
+      end
+      puts "[#{Time.now}] Time Machine created."
+      add_entry_to_json
+      rsync_output_files if $rsync_output and $run_append_externally
+      append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
+      rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
+      rsync_location_json if $rsync_location_json
     end
-    puts "[#{Time.now}] Time Machine created."
-    add_entry_to_json
-    rsync_output_files if $rsync_output and $run_append_externally
-    append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
-    rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
-    rsync_location_json if $rsync_location_json
     trim_ssd if $ssd_mount
     completed_process
   end
@@ -771,7 +878,7 @@ class Compiler
     if File.exists?(path_to_json)
       json = open(path_to_json) {|fh| JSON.load(fh)}
     else
-      json["location"] = $camera_location
+      json["location"] = camera_name_remap($camera_location)
       json["split_type"] = $is_monthly ? "monthly" : "daily"
       json["datasets"] = {}
     end
