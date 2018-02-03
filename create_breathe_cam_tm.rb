@@ -53,7 +53,7 @@ $start_time = {}
 $end_time = {}
 $append_inplace = false
 $future_appending_frames = 17000
-$checked_current_time = false
+$check_current_time = false
 $is_monthly = false
 $skip_img_validation = false
 $num_images_to_stitch = 4
@@ -113,10 +113,7 @@ class Compiler
         $current_day = ARGV.shift
       elsif arg == "-incremental-update-interval"
         # In minutes.
-        # Force interval to be a multiple of 10.
-        # This is needed because we add a keyframe every 10 frames (breathecam specific)
-        # and thus do not need to worry about keyframes when appending if we keep it this way.
-        $incremental_update_interval = (ARGV.shift.to_f / 10.0).ceil * 10
+        $incremental_update_interval = ARGV.shift.to_i
       elsif arg == "--skip-rotate"
         $skip_rotate = true
       elsif arg == "--run-append-externally"
@@ -198,18 +195,14 @@ class Compiler
 
     $timemachine_output_path = $rsync_output || $rsync_location_json ? $working_dir : $output_path
 
-    $do_incremental_update = true if defined?($incremental_update_interval)
+    # If the user specifies a chunk of time to process or we are reading a start time from a file (which we treat as a chunk of time, as opposed to a full day, though it may be that), set to true.
+    $do_incremental_update = true if defined?($incremental_update_interval) or $input_date_from_file
 
     if $current_day && $do_incremental_update
       puts "Specifying a day AND doing incremental appending is not supported. You can only do incremental appending from the actual day of running the script. \n So, either just specify a day OR specify incremental updating."
       exit
     end
 
-    # If a date to process was not specified, then choose today if we are doing
-    # incremental updates, otherwise do the previous day (since we have all images for that)
-    $current_day ||= ($do_incremental_update ? Date.today.to_s : (Date.today - 1)).to_s
-
-    $num_jobs ||= $default_num_jobs
 
     if File.exists?(File.join($working_dir, "WIP"))
       puts "[#{Time.now}] A file called 'WIP' was detected in '#{$working_dir}', which indicates that this working directory is already in the middle of processing. Exiting new process."
@@ -228,65 +221,16 @@ class Compiler
 
     # Set time zone based on definition file
     Time.zone = $time_zone || "Eastern Time (US & Canada)"
+    # Current time of running the script
+    $current_time_of_run = Time.zone.now
+    # Default to 10 minutes if no update chunk interval given
+    $incremental_update_interval ||= 10
+    # Number of processess to run in parallel
+    $num_jobs ||= $default_num_jobs
 
-    $current_time = Time.zone.now
-
-    $end_time["full"] = $current_time
-    $end_time["hour"] = $current_time.strftime("%H").to_i
-    $end_time["minute"] = $current_time.strftime("%M").to_i
-    $end_time["sec"] = 0
-
-    if $do_incremental_update
-      if $input_date_from_file
-        file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
-        tmp_file = file + ".tmp"
-        if File.exists?(file)
-          time_chunk_in_seconds = (60 * $incremental_update_interval)
-          last_pull_date = Time.zone.parse(File.open(file, &:readline))
-          time_diff = (Time.zone.now - last_pull_date).floor
-          puts "[#{Time.now}] Time drift: #{time_diff} vs #{time_chunk_in_seconds}"
-          if (time_diff < 0)
-            puts "[#{Time.now}] Last pull date is greater than the current time. Exiting process."
-            exit
-          end
-          current_day_obj = Date.parse(last_pull_date.to_s)
-          $current_day = current_day_obj.to_s
-          if (time_diff > time_chunk_in_seconds)
-            num_minutes = (time_diff / 60)
-            time_chunk_in_seconds = time_diff
-            puts "[#{Time.now}] Gap greater than #{$incremental_update_interval} minutes. Now processing a #{num_minutes} minute chunk."
-          elsif (time_diff < time_chunk_in_seconds and Time.now.day == current_day_obj.day)
-            puts "[#{Time.now}] Gap less than #{$incremental_update_interval} minutes, which is less than the minimum segment. Exiting process."
-            exit
-          end
-          $start_time["hour"] = last_pull_date.hour
-          $start_time["minute"] = last_pull_date.min
-          $start_time["sec"] = last_pull_date.sec
-          $start_time["full"] = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{$start_time['sec']}"
-          $original_last_pull_start_time = $start_time["full"]
-          new_last_pull_date = last_pull_date + time_chunk_in_seconds
-          $end_time["hour"] = new_last_pull_date.hour
-          $end_time["minute"] = new_last_pull_date.min
-          $end_time["sec"] = "00"
-          $end_time["full"] = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{$end_time['sec']}"
-          if (($start_time["hour"] > $end_time["hour"]) || time_diff >= 86400)
-            $end_time["hour"] = 23
-            $end_time["minute"] = 59
-            $end_time["sec"] = 59
-            new_day = Date.parse($current_day) + 1
-            $end_time["full"] = "#{new_day} 00:00:00"
-          end
-        else
-          calculate_rsync_input_range
-        end
-        File.open(tmp_file, 'w') {|f| f.write($end_time["full"])}
-        File.rename(tmp_file, file)
-      else
-        calculate_rsync_input_range
-      end
-    end
+    calculate_rsync_input_range
     clear_working_dir
-    $rsync_input || $symlink_input ? get_source_images : organize_images
+    $rsync_input || $symlink_input ? get_source_images : $skip_stitch ? create_tm : organize_images
   end
 
   def create_definition_file
@@ -322,39 +266,77 @@ class Compiler
   end
 
   def calculate_rsync_input_range
-    puts "[#{Time.now}] Calculating rsync input range."
-    $start_time["hour"] = $end_time["hour"]
-    $start_time["minute"] = $end_time["minute"] - $incremental_update_interval
-    $start_time["sec"] = "00"
-    if $start_time["minute"] < 0
-      hour_diff = ($start_time["minute"].abs / 60.0).ceil
-      $start_time["hour"] = $end_time["hour"] - hour_diff
-      # Handle daylight savings
-      $start_time["hour"] += 1 if not $current_time.dst? and ($current_time - $incremental_update_interval * 60).dst?
-      $start_time["minute"] = (60 * hour_diff) - $start_time["minute"].abs
-      if $start_time["hour"] < 0
-        video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
-        day_diff = ($start_time["hour"] / 24.0).abs.ceil
-        tmp_current_day = Date.parse($current_day)
-        tmp_current_day -= day_diff
-        tmp_current_day = tmp_current_day.strftime("%Y-%m-%d")
-        # If we need to backtrack the day.
-        if video_sets.last.include?(tmp_current_day)
-          $current_day = tmp_current_day
-          $start_time["hour"] = 24 - hour_diff
-          $end_time["hour"] = 23
-          $end_time["minute"] = 59
-          $end_time["sec"] = 59
+    time_chunk_in_seconds = 60 * $incremental_update_interval
+
+    if $input_date_from_file
+      file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
+      if $check_current_time
+        # Current day is now the day of running the script
+        $current_day = $current_time_of_run.to_date.to_s
+        tmp_start_time = $current_time_of_run.beginning_of_day
+        tmp_end_time = $current_time_of_run
+      else
+        if File.exists?(file)
+          last_pull_time = Time.zone.parse(File.open(file, &:readline))
+          # We may be running this script once a minute so make sure we only process a specified chunk of time
+          time_diff = ($current_time_of_run - last_pull_time).floor
+          if time_diff < time_chunk_in_seconds
+            puts "[#{Time.now}] Gap less than #{$incremental_update_interval} minutes, which is less than the minimum segment. Exiting process."
+            exit
+          end
+          # Current day is now based on the day in the last pull file
+          $current_day = last_pull_time.to_date.to_s
+          tmp_start_time = last_pull_time
+          tmp_end_time = last_pull_time + time_chunk_in_seconds
         else
-          # We just started incremental updating (with no other set from the current date)
-          # and the update interval lands us on the current time. So, start and end times match
-          # and in the end we will not be pulling images until the next interval.
-          $start_time["hour"] = $end_time["hour"]
-          $start_time["minute"] = $end_time["minute"]
+          # Current day is now the day of running the script
+          $current_day = $current_time_of_run.to_date.to_s
+          tmp_start_time = $current_time_of_run - time_chunk_in_seconds
+          tmp_end_time = $current_time_of_run
         end
       end
+    elsif $current_day
+      # Process a full day, based on a date string passed in
+      current_time_obj = Time.parse($current_day)
+      tmp_start_time = current_time_obj.beginning_of_day
+      tmp_end_time = current_time_obj.end_of_day
+    else
+      # Process part of the current day based on a chunk of time in minutes in the past from the current time of running the script
+      $current_day = $current_time_of_run.to_date.to_s
+      tmp_start_time = $current_time_of_run - time_chunk_in_seconds
+      tmp_end_time = $current_time_of_run
     end
-    $start_time["full"] = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{$start_time['sec']}"
+
+    # $current_day may have changed from above
+    current_time_obj = Time.parse($current_day)
+
+    # Ensure start time is of the same day
+    tmp_start_time = current_time_obj.beginning_of_day if tmp_start_time.to_date.to_s < $current_day.to_s
+    # If end time goes past the current day, wrap around to start of next day from the what is presently set as $current_day
+    if tmp_end_time.to_date.to_s > $current_day.to_s
+      current_time_obj += 1.day
+      tmp_end_time = current_time_obj.beginning_of_day
+    end
+    # Make sure we don't go past the current time of running, since images don't exist past that point
+    tmp_end_time = $current_time_of_run if tmp_end_time > $current_time_of_run
+
+    $start_time["hour"] = tmp_start_time.strftime("%H").to_i
+    $start_time["minute"] = tmp_start_time.strftime("%M").to_i
+    $start_time["sec"] = tmp_start_time.strftime("%S").to_i
+    $start_time["full"] = "#{tmp_start_time.to_date} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
+
+    $end_time["hour"] = tmp_end_time.strftime("%H").to_i
+    $end_time["minute"] = tmp_end_time.strftime("%M").to_i
+    $end_time["sec"] = tmp_end_time.strftime("%S").to_i
+    $end_time["full"] = "#{tmp_end_time.to_date} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
+
+    $original_last_pull_start_time = $start_time["full"]
+
+    if $input_date_from_file
+      tmp_file = file + ".tmp"
+      File.open(tmp_file, 'w') {|f| f.write($end_time["full"])}
+      File.rename(tmp_file, file)
+    end
   end
 
   def clear_working_dir
@@ -389,25 +371,14 @@ class Compiler
       src_path = args[1] || args[0]
       # Camera date path
       img_folder = "/#{$current_day}"
-      # Grab full day if we are not pulling in a specific time range or the time gap is more than or equal to a day in seconds.
-      if !$do_incremental_update || (($start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0) && Time.now - Time.parse($start_time["full"]) >= 86400)
-        $start_time["hour"] = 0
-        $start_time["minute"] = 0
-        $start_time['sec'] = 0
-        $end_time["hour"] = 23
-        $end_time["minute"] = 59
-        $end_time["sec"] = 59
-      end
       if $image_store_v2
         year_month_day = $current_day.split("-")
         # YYYY/MM
         img_folder = $is_monthly ? File.join(year_month_day[0], year_month_day[1]) : File.join(year_month_day[0], year_month_day[1], $current_day)
       end
       if $file_names_include_dates
-        start_date = "#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
-        end_date = "#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
-        start_date_formatted = Time.zone.parse(start_date).utc.strftime($file_names_date_format)
-        end_date_formatted = Time.zone.parse(end_date).utc.strftime($file_names_date_format)
+        start_date_formatted = Time.zone.parse($start_time['full']).utc.strftime($file_names_date_format)
+        end_date_formatted = Time.zone.parse($end_time['full']).utc.strftime($file_names_date_format)
         logic_operator1 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? ">=" : ">"
         logic_operator2 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? "<" : "<="
         file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 #{logic_operator1} #{start_date_formatted} and $1 #{logic_operator2} #{end_date_formatted})'"
@@ -425,7 +396,7 @@ class Compiler
             system("ln -s #{src_path}/#{img_folder}/#{file} #{new_input_path}/#{File.basename(file)}")
           end
         else
-          system("ln -s #{camera_path}/ #{new_input_path}")
+          system("ln -s #{src_path}/#{img_folder}/* #{new_input_path}")
         end
       else
         puts "[#{Time.now}] Rsyncing source images."
@@ -438,9 +409,9 @@ class Compiler
           system("echo \"#{commands_to_run_remotely}\" > #{commands_file}")
           system("cat #{commands_file} | ssh -T #{host} > /dev/null")
           # Cannot get files-from to use absolute paths (hence the need for -printf in the file_list_command) with remote transfers...Clearly missing something important in how this works.
-          system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}")
+          system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}/")
         else
-          system("rsync -a #{camera_path}/*.[jJpP][pPnN]*(e)*(E)[gG]] #{new_input_path}")
+          system("bash -c \"rsync -av --include='*.'{jpg,jpeg,JPG,JPEG,png,PNG} --exclude='*' #{camera_path}/#{$current_day}/ #{new_input_path}/\"")
         end
       end
       # We need to reference files locally now that we have rsynced everything over
@@ -450,65 +421,32 @@ class Compiler
     end
     remove_corrupted_images unless $RUNNING_WINDOWS or $skip_img_validation
 
-    if $skip_stitch
-      dir = Dir.glob("#{$input_path}/**/*{#{$valid_image_extensions.join(',')}}")
-      file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt") if $do_incremental_update and $input_date_from_file
-      tmp_file = file + ".tmp"
-      if dir.empty?
-        puts "No images found to be processed. Aborting."
-        if $file_names_include_dates and !$checked_current_time
-          puts "Look at current time for possible images."
-          $checked_current_time = true
-          $current_time = Time.zone.now
-          $end_time["full"] = $current_time
-          $end_time["hour"] = $current_time.strftime("%H").to_i
-          $end_time["minute"] = $current_time.strftime("%M").to_i
-          $end_time["sec"] = 0
+    # Check if we have enough images to do anything
+    dir = Dir.glob("#{$input_path}/**/*{#{$valid_image_extensions.join(',')}}")
+    if dir.length <= 2
+      puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check later when more images are hopefully available."
+      if $input_date_from_file
+        if dir.empty? and !$check_current_time and ($current_time_of_run.to_i - Time.parse($start_time["full"]).to_i > 1.day.to_i)
+          # We are most likely doing a backlog. No images found for this time chunk, so wait until next run based on a new time chunk.
+        elsif !$check_current_time and $current_time_of_run.to_date.to_s > Date.parse($start_time["full"]).to_s
+          $check_current_time = true
           calculate_rsync_input_range
           clear_working_dir
           get_source_images
-        elsif $do_incremental_update and $input_date_from_file and !$file_names_include_dates
-          File.open(tmp_file, 'w') {|f| f.write(Time.zone.now)}
-          File.rename(tmp_file, file)
-        elsif $file_names_include_dates
-          new_date = $original_last_pull_start_time ? $original_last_pull_start_time : $start_time["full"]
-          File.open(tmp_file, 'w') {|f| f.write(new_date)}
-          File.rename(tmp_file, file)
-        end
-        exit
-      elsif dir.length <= 2
-        puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
-        if $do_incremental_update and $input_date_from_file
-          if Time.now.to_date != Date.parse($start_time["full"].to_s)
-            puts "We still only have one image but we are now on a new day, so wrap this timemachine up. No more images are coming for the previous day."
-            File.open(tmp_file, 'w') {|f| f.write($end_time["full"])}
-            File.rename(tmp_file, file)
-          else
-            File.open(tmp_file, 'w') {|f| f.write($start_time["full"])}
-            File.rename(tmp_file, file)
-          end
-        end
-        exit
-      elsif $file_names_include_dates
-        if $do_incremental_update and $input_date_from_file
-          last_pulled_image = Dir.glob("#{$input_path}/*{#{$valid_image_extensions.join(',')}}").sort.last
-          if Time.now.to_date > Date.parse($start_time["full"].to_s)
-             tmp = (Date.parse($current_day) + 1).to_s
-             new_date = "#{tmp} 00:00:00"
-          else
-            last_pulled_time = File.basename(last_pulled_image, File.extname(last_pulled_image))
-            if last_pulled_time.length == 14
-              new_date = Time.zone.parse(last_pulled_time)
-            else
-              new_date = Time.zone.at(last_pulled_time.to_i)
-            end
-          end
-          File.open(tmp_file, 'w') {|f| f.write(new_date.to_s)}
+        else
+          file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
+          tmp_file = file + ".tmp"
+          File.open(tmp_file, 'w') {|f| f.write($original_last_pull_start_time)}
           File.rename(tmp_file, file)
         end
       end
+      exit
+    end
+    # We have a directory of images ready to turn into videos.
+    if $skip_stitch
       create_tm
     else
+      # We need to match/organize images for stitching. Video creation comes after that.
       $multi_camera_list ? match_images : organize_images
     end
   end
@@ -529,12 +467,11 @@ class Compiler
     parent_path = camera_dirs.first
 
     images = Dir.glob("#{parent_path}/*{#{$valid_image_extensions.join(',')}}").sort
-    num_images_being_processed = images.length
-    if num_images_being_processed == 0
+    # We should already have some images by this point but we check again just incase
+    if images.length == 0
       puts "No images found to be processed. Aborting."
       exit
     end
-
     images.each do |img|
       count += 1
       camera_match_count = 0
@@ -586,8 +523,8 @@ class Compiler
     match_count = 0
     puts "[#{Time.now}] Organizing images..."
     images = Dir.glob("#{$input_path}/*_image1{#{$valid_image_extensions.join(',')}}").sort
-    num_images_being_processed = images.length
-    if num_images_being_processed == 0
+    # We should already have some images by this point but we check again just incase
+    if images.length == 0
       puts "No images found to be processed. Aborting."
       exit
     end
