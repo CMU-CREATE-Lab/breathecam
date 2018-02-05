@@ -411,7 +411,7 @@ class Compiler
           # Cannot get files-from to use absolute paths (hence the need for -printf in the file_list_command) with remote transfers...Clearly missing something important in how this works.
           system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}/")
         else
-          system("bash -c \"rsync -av --include='*.'{jpg,jpeg,JPG,JPEG,png,PNG} --exclude='*' #{camera_path}/#{$current_day}/ #{new_input_path}/\"")
+          system("bash -c \"rsync -av --include='*.'{#{$valid_image_extensions.join(',')}} --exclude='*' #{camera_path}/#{$current_day}/ #{new_input_path}/\"")
         end
       end
       # We need to reference files locally now that we have rsynced everything over
