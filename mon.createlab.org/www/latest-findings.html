@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Mon Valley Camera - Latest Findings</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/infinity.css">
+    <style>
+      .comment-field {
+        text-align: center;
+        padding-left: 25%;
+        padding-right: 25%;
+        font-size: 13px;
+        padding-top: 4px;
+      }
+    </style>
+    <script src="assets/javascripts/jquery-3.3.1.min.js"></script>
+    <script src="assets/javascripts/jquery.documentsize.min.js"></script>
+    <script src="assets/javascripts/infinity.min.js"></script>
+    <script src="assets/javascripts/jquery.isinview.min.js"></script>
+    <script>
+      "use strict";
+
+      var listView;
+      var mediaList;
+      var numDisplayed = 0;
+      var numToDisplay;
+      var updateScheduled = false;
+
+      $(document).ready(function() {
+        init();
+      });
+
+      function init() {
+        $.ajax({
+          url: "https://breathecam.cmucreatelab.org/camera_findings",
+          dataType: "json",
+        }).done(function(data) {
+          mediaList = data;
+          numToDisplay = mediaList.length;
+          var mainList = $('#list-view');
+          listView = new infinity.ListView(mainList, {
+            lazy: function() {
+              $(this).find('.video, .image').each(function() {
+                var $ref = $(this);
+                $ref.attr('src', $ref.attr('data-url'));
+              });
+            }
+          });
+          mainList.data('listView', listView);
+          load(5);
+        });
+
+        $(document).on('scroll', function() {
+          if (!updateScheduled) {
+            setTimeout(function() {
+              var $spinner = $(".spinner");
+              if ($spinner.isInView(window, {partially: true})) {
+                load(5);
+              }
+              updateScheduled = false;
+            }, 500);
+            updateScheduled = true;
+          }
+          $('video').each(function(){
+            var video = $(this)[0];
+            if ($(video).isInView(window, {partially: true})) {
+              if (!$(video).data('was-user-paused') && video.paused && video.readyState >= 1) {
+                video.playPromise = video.play();
+              }
+            } else {
+              if (video.played.length && !video.paused) {
+                handleVideoPromise(video, "pause");
+              }
+            }
+          });
+        });
+      }
+
+      function load(num) {
+        var mainList = $('#list-view');
+        var html;
+        for (var i = 0; i < num && numDisplayed < numToDisplay; i++) {
+          // latest entry is at the end of mediaList;
+          var mediaListIdx = numToDisplay - numDisplayed - 1;
+          if (mediaList[mediaListIdx].media_format == "mp4" || mediaList[mediaListIdx].media_format == "webm") {
+            html='<div style="height: 600px; font-size: 20px;"><video controls loop playsinline muted autoplay class="video" data-url="' + mediaList[mediaListIdx].media_path + '" style="max-width: 800px"></video><div style="font-weight: bold">' + mediaList[mediaListIdx].camera_name + ' on ' + mediaList[mediaListIdx].begin_time.substring(0,10) + '</div><div class="comment-field">' + mediaList[mediaListIdx].comment +'</div><div>';
+          } else {
+            html='<div style="height: 600px; font-size: 20px;"><img class="image" data-url="' + mediaList[mediaListIdx].media_path + '" style="max-width: 800px"></img><div style="font-weight: bold">' + mediaList[mediaListIdx].camera_name + ' on ' + mediaList[mediaListIdx].begin_time.substring(0,10) + '</div><div class="comment-field">' + mediaList[mediaListIdx].comment +'</div><div>';
+          }
+          numDisplayed++;
+          mainList.data('listView').append(html);
+        }
+        if (numDisplayed == numToDisplay) {
+          $(".spinner").hide();
+        }
+        $("video").off("pause").on("pause", function(e) {
+          if ($(this).isInView(window, {partially: true})) {
+            $(this).data("was-user-paused", true);
+          }
+        });
+        $("video").off("play").on("play", function(e) {
+          $(this).data("was-user-paused", false);
+        });
+      }
+
+      function handleVideoPromise(video, actionType) {
+        if (video.playPromise !== undefined) {
+          video.playPromise.then(function (_) {
+            if (!video) return;
+            if (actionType == "pause" && video.readyState >= 1) {
+              video.pause();
+            }
+            video.playPromise = undefined;
+          }).catch(function (error) {
+            console.log(error);
+          });
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="main-container">
+      <div id='list-view'></div>
+      <img style="height: 381px" src="assets/images/loading.gif" class="spinner" alt="Loading...">
+    </div>
+  </body>
+</html>
