@@ -212,6 +212,7 @@ class Compiler
     puts "Starting process."
 
     at_exit do
+      puts "Process exited."
       FileUtils.rm(File.join($working_dir, "WIP"))
     end
 
@@ -341,17 +342,16 @@ class Compiler
 
   def clear_working_dir
     puts "[#{Time.now}] Removing previous working files..."
-    # HAL cluster specific:
-    # These directories are already set to symlinks with an ssd on HAL#,
-    # so we just clear the old contents and start fresh.
+    # Delete the contents of the directories, not the directories themselves since they may be symlinked.
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/050-raw-images/*"))
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/075-organized-raw-images/*"))
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0100-original-images/*"))
     FileUtils.rm_rf("#{$working_dir}/0100-unstitched")
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0200-tiles/*"))
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0300-tilestacks/*"))
-    video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
     check_date = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day
+    FileUtils.rm_rf(Dir.glob("#{$timemachine_output_path}/#{check_date}-*m.timemachine"));
+    video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
     if $do_incremental_update and !video_sets.empty? and video_sets.last.include?(check_date)
       $create_videoset_segment_directory = true
     end
