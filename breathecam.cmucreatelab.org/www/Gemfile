@@ -2,11 +2,17 @@ source 'https://rubygems.org'
 
 gem 'rails', '3.2.22.5'
 
+gem 'rake', '~> 12.2.1'
+
+# Last version that works with ruby 1.9.3
+gem 'rack-cache', '1.7.1'
+
+gem 'sass', '~> 3.4.25'
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
-
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -24,20 +30,8 @@ gem 'therubyracer', :platforms => :ruby
 
 gem 'jquery-rails'
 
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
-
-# To use Jbuilder templates for JSON
-# gem 'jbuilder'
-
-# Use unicorn as the app server
-# gem 'unicorn'
-
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-# gem 'debugger'
+#gem 'nokogiri'
+gem 'rb-readline'
 
 # webrick is a standard ruby library, but using it in gem form
 # stops the following message from displaying in the console

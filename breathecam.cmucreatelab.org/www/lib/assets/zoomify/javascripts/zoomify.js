@@ -88,8 +88,8 @@
         }
       }
 
-      if (new_zoom <= 4) {
-        if (new_zoom < 4) {
+      if (new_zoom <= 2) {
+        if (new_zoom < 2) {
           return;
         }
       }
@@ -187,14 +187,16 @@
       //--------------------------------------------------
       // Boundary check
 
-      var max_left = (div_half_width - img_zoom_width),
-        max_top = (div_half_height - img_zoom_height);
+      var max_left = (200 - img_zoom_width),
+        max_top = (200 - img_zoom_height),
+        max_right = (div_half_width * 2 - 200),
+        max_bottom = (div_half_height * 2 - 200);
 
-      if (img_current_left > div_half_width) {
-        img_current_left = div_half_width;
+      if (img_current_left > max_right) {
+        img_current_left = max_right;
       }
-      if (img_current_top > div_half_height) {
-        img_current_top = div_half_height;
+      if (img_current_top > max_bottom) {
+        img_current_top = max_bottom;
       }
       if (img_current_left < max_left) {
         img_current_left = max_left;

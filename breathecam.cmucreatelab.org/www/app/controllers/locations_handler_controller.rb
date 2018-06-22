@@ -81,13 +81,13 @@ class LocationsHandlerController < ApplicationController
 
   def receive_data
     isValidRequest = false
-    logOutputFile = ""
+    ##logOutputFile = ""
     locationsOutputFile = Rails.root.join('public', "locations.json")
     # Location lookup table. We check this when pulling images to get the correct IP.
     locations = File.file?(locationsOutputFile) ? open(locationsOutputFile) {|fh| JSON.load(fh)} : {}
     # What params we want in the location lookup table.
     logExcludeList = ["id", "uuid", "ip", "port"]
-    logKeys = []
+    ##logKeys = []
 
     bodyContent = request.body.read
 
@@ -103,7 +103,7 @@ class LocationsHandlerController < ApplicationController
         if (i == 0)
           locationName = tmpParamArray[1]
           locations[locationName] = locations[locationName] || {}
-          logOutputFile = Rails.root.join('public', "#{locationName}.log")
+          ##logOutputFile = Rails.root.join('public', "#{locationName}.log")
         else
           key = tmpParamArray[0]
           value = tmpParamArray[1]
@@ -119,9 +119,9 @@ class LocationsHandlerController < ApplicationController
           end
           if (logExcludeList.include?(key))
             locations[locationName][key] = value
-          else
-            logKeys << key
-            logMsg += "\t" + value
+          ##else
+          ##  logKeys << key
+          ##  logMsg += "\t" + value
           end
         end
       end
@@ -129,15 +129,19 @@ class LocationsHandlerController < ApplicationController
       locations[locationName]["ip"] = request.remote_ip.to_s
 
       if isValidRequest
-        unless File.file?(logOutputFile)
-          logHeader = "DATE \t"
-          logKeys.each do |key|
-            logHeader << key.upcase + "\t"
-          end
-          open(logOutputFile, "w") {|fh| fh.puts(logHeader)}
+        ##unless File.file?(logOutputFile)
+        ##  logHeader = "DATE \t"
+        ##  logKeys.each do |key|
+        ##    logHeader << key.upcase + "\t"
+        ##  end
+        ##  open(logOutputFile, "w") {|fh| fh.puts(logHeader)}
+        ##end
+        camera_status = CameraStatus.find_or_create_by_camera_name(locationName.split("_").last) do |cs|
+          cs.camera_type = 'ecam'
         end
+        camera_status.update_attributes(:last_ping => DateTime.now)
         open(locationsOutputFile, "w") {|fh| fh.puts(JSON.generate(locations),"")}
-        open(logOutputFile, "a") {|fh| fh.puts(logMsg)}
+        ##open(logOutputFile, "a") {|fh| fh.puts(logMsg)}
       end
     end
 

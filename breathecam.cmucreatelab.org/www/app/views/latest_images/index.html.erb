@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>E-Cam Latest Images</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+      var images = <%= raw(@images) %>
+      var curr_indicies = [];
+      for (var i = 0; i < images.length; i++) {
+        curr_indicies.push(images[i].length - 1);
+      }
+      function change_image(direction) {
+        var imageElements = $("tr:nth-child(2)").find("td > img");
+        imageElements.each(function(idx) {
+          var curr_idx = curr_indicies[idx];
+          curr_idx = direction == "left" ? curr_idx - 1 : curr_idx + 1;
+          if (curr_idx >= images[idx].length) {
+            curr_indicies[idx] = images[idx].length - 1;
+            return;
+          } else if (curr_idx < 0) {
+            curr_indicies[idx] = 0;
+            return;
+          }
+          curr_indicies[idx] = curr_idx;
+          this.src = this.src.replace(/[0-9]{10}.jpg/, images[idx][curr_idx]);
+          var epochTime = parseInt(images[idx][curr_idx].substr(0,10)) * 1000;
+          $("#date-" + idx).text(String(new Date(epochTime)).substr(4,20));
+        });
+      }
+    </script>
+  <head>
+  <body>
+      <%= raw @html %>
+      <br>
+      <div><button onclick=change_image("left")>Prev</button> | <button onclick=change_image("right")>Next</button>
+  </body>
+</html>

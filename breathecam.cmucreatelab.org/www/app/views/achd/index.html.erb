@@ -676,7 +676,7 @@
 
     var UTIL = org.gigapan.Util;
 
-    var ESDR_API_ROOT_URL = 'http://esdr.cmucreatelab.org/api/v1';
+    var ESDR_API_ROOT_URL = 'https://esdr.cmucreatelab.org/api/v1';
 
     var achdData = {
       "walnuttowers1" : {
@@ -1482,6 +1482,7 @@
     }
 
     function setupTimelapse(initialDataset, startingDate) {
+      initialDataset = initialDataset.replace("http:", "https:");
       var settings = {
         url: initialDataset,
         disableTourLooping: true,
@@ -1556,6 +1557,7 @@
                 changeLocation(currentLocation, newDate, newView, newTime, true);
               } else {
                 updateCalendarAndToggleUI(newDate);
+                newDataset = newDataset.replace("http:", "https:");
                 timelapse.loadTimelapse(newDataset, newView, newTime, false, null, function() {
                   changeSensorValues();
                   addTimeLineSliderListeners();
@@ -1680,6 +1682,7 @@
           if (doLoad) {
             if (timelapse && startingDataset) {
               newTime = parseFloat(newTime);
+              startingDataset = startingDataset.replace("http:", "https:");
               timelapse.loadTimelapse(startingDataset, newView, newTime, false, newTimeAsDateObj, function() {
                 filter();
                 addTimeLineSliderListeners();
@@ -1744,6 +1747,7 @@
       var path = cached_breathecam.datasets[date];
       if (timelapse && path) {
         currentDate = date;
+        path = path.replace("http:", "https:");
         timelapse.loadTimelapse(path, null, null, true, null, function() {
           filter();
           getACHDData(date);

@@ -11,13 +11,33 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150730125944) do
+ActiveRecord::Schema.define(:version => 20180613134412) do
+
+  create_table "camera_findings", :force => true do |t|
+    t.string   "camera_id"
+    t.string   "camera_name"
+    t.text     "timemachine_path"
+    t.text     "media_path"
+    t.string   "media_format"
+    t.integer  "media_width"
+    t.integer  "media_height"
+    t.text     "comment"
+    t.datetime "begin_time"
+    t.datetime "end_time"
+    t.integer  "start_frame"
+    t.integer  "num_frames"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  add_index "camera_findings", ["media_format"], :name => "index_camera_findings_on_media_format"
 
   create_table "camera_statuses", :force => true do |t|
     t.string   "camera_name"
     t.string   "camera_type"
     t.datetime "last_upload_time"
     t.datetime "last_image_time"
+    t.datetime "last_ping"
   end
 
 end

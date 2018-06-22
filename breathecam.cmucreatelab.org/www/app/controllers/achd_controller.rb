@@ -6,7 +6,7 @@ class AchdController < ApplicationController
 
   def index
     @location_id = params['location']
-    @root_url = "http://tiles.cmucreatelab.org/breathecam"
+    @root_url = "https://tiles.cmucreatelab.org/breathecam"
     #@root_url = "http://timemachine1.gc.cs.cmu.edu/timemachines/breathecam"
     date_today = Date.today
     img_path = "#{@root_url}/images/#{@location_id}/050-original-images/#{date_today.to_s}/latest_stitch/"

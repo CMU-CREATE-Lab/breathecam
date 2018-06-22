@@ -10,13 +10,63 @@
     table {
       width: 100%;
     }
+    table td {
+        border-top: thin solid;
+        border-bottom: thin solid;
+    }
+
+    table td:first-child {
+        border-left: thin solid;
+    }
+
+    table td:last-child {
+        border-right: thin solid;
+    }
+
+    .red {
+      color: red;
+    }
+
+    .yellow {
+      color: #c1c100;
+    }
+
+    .green {
+      color: green;
+    }
     </style>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+      $(function() {
+        var cameras = <%= raw(@camera_statuses_json) %>
+        var currentTime = (new Date()).getTime();
+        for (var i = 0; i < cameras.length; i++) {
+          var last_camera_upload_time = (new Date(cameras[i].last_upload_time)).getTime();
+          var last_camera_ping_time = (new Date(cameras[i].last_ping)).getTime();
+          var ten_minutes_in_ms = 10 * 60 * 1000;
+          var five_minutes_in_ms = 5 * 60 * 1000;
+          var one_month_in_ms = 30 * 24 * 60 * 60 * 1000;
+          if (currentTime - last_camera_ping_time > one_month_in_ms) {
+            // do nothing
+          } else if (currentTime - last_camera_upload_time > ten_minutes_in_ms && currentTime - last_camera_ping_time >= five_minutes_in_ms) {
+            $("#" + cameras[i].camera_name).addClass("red");
+          } else if (currentTime - last_camera_upload_time > ten_minutes_in_ms && currentTime - last_camera_ping_time < five_minutes_in_ms) {
+            $("#" + cameras[i].camera_name).addClass("yellow");
+          } else {
+            $("#" + cameras[i].camera_name).addClass("green");
+          }
+        }
+      });
+    </script>
+
   <head>
   <body>
-    <table>
+    <table cellpadding="3" cellspacing="0" style="border: 1px;" rules="none">
       <tr>
         <th>Camera ID</th>
         <th>Images</th>
+        <th>Latest Image</th>
         <th>Timelapse</th>
         <th>Last Upload Timestamp</th>
         <th>Last Uploaded Image Timestamp</th>
@@ -24,14 +74,45 @@
       </tr>
       <% @camera_statuses.each_with_index do |camera, i| %>
         <tr>
-          <td>
-            <%= camera.camera_name %>
+          <td id="<%= camera.camera_name %>">
+            <% if camera.camera_name == "nikonCamera2" || camera.camera_name == "nikonCamera6" %>
+              <%= "(Keith) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera5" || camera.camera_name == "nikonCamera3" || camera.camera_name == "nikonCamera15" %>
+              <%= "(Golf Course) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera21" %>
+              <%= "(Golf Course 2) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "shenango1" %>
+              <%= "(Leah) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "shenango2" %>
+              <%= "(ACHD) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera19" %>
+              <%= "(Walnut Towers) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera13" || camera.camera_name == "nikonCamera14" %>
+              <%= "(Dravosburg) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera17" %>
+              <%= "(Dravosburg 2) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera7" %>
+              <%= "(N. Braddock) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera10" %>
+              <%= "(N. Braddock) - " + camera.camera_name %>
+            <% elsif camera.camera_name == "nikonCamera4" %>
+              <%= "(West Mifflin) - " + camera.camera_name %>
+            <% else %>
+              <%= camera.camera_name %>
+            <% end %>
           </td>
           <td>
             <%= link_to("images", "http://timemachine1.gc.cs.cmu.edu/timemachine_uploads/#{camera.camera_name}/050-original-images/", :target => "_blank") %>
           </td>
           <td>
-            <%= link_to("timelapse", "/embeds/#{camera.camera_name}", :target => "_blank") %>
+            <%= link_to("latest image", "/locations/#{camera.camera_name}/latest", :target => "_blank") %>
+          </td>
+          <td>
+            <% if camera.camera_name == "nikonCamera2" || camera.camera_name == "nikonCamera3" %>
+              <%= link_to("timelapse", "/embeds/clairton1", :target => "_blank") %>
+            <% else %>
+              <%= link_to("timelapse", "/embeds/#{camera.camera_name}", :target => "_blank") %>
+            <% end %>
           </td>
           <td>
             <%= camera.last_upload_time %>
@@ -45,5 +126,29 @@
         </tr>
       <% end %>
     </table>
+    <br><br>
+    <div>Key:</div>
+    <table style="width: 600px">
+      <tr>
+        <td class="red">
+          Not pinging and not uploading. Things to check: Internet; power
+        </td>
+      </tr>
+      <tr>
+        <td class="yellow">
+          Pinging, but not uploading. Things to check: Camera is on/working
+        </td>
+      </tr>
+      <tr>
+        <td class="green">
+          Camera is happily uploading. Success!
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Camera offline for a month or more. Either it's not being used or we better get fixin!
+        </td>
+      </tr>
+  </table>
   </body>
 </html>

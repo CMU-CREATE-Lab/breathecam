@@ -5,6 +5,7 @@ class CameraStatusesController < ApplicationController
   def index
     Time.zone = "Eastern Time (US & Canada)"
     @camera_statuses = CameraStatus.order('camera_name').all
+    @camera_statuses_json = @camera_statuses.to_json
     @last_processed_times = []
     @camera_statuses.each do |cs|
       camera_name = cs.camera_name.split("_").last
