@@ -96,6 +96,9 @@
       .ui-dialog {
         text-align: left;
       }
+      #camera-findings-comment {
+        resize: vertical;
+      }
     </style>
     <script>
       "use strict"
@@ -237,7 +240,7 @@
             }
             var lastThumbnailToolRow = $(".generate-thumbnail").closest("tr");
             $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(lastThumbnailToolRow);
-            UTIL.verticalTouchScroll($("#location_toggle_container"))
+            UTIL.verticalTouchScroll($("#location_toggle_container"));
           }
         };
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
