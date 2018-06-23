@@ -113,11 +113,12 @@
         "dravosburg2" : "Irvin",
         "westmifflin1" : "Edgar Thomson"
       };
+      var UTIL = org.gigapan.Util;
       function tm_init() {
         var initialDataset = cached_breathecam.latest.path;
         var startingDate = cached_breathecam.latest.date;
         var hash = window.location.hash.slice(1);
-        hashVars = org.gigapan.Util.unpackVars(hash);
+        hashVars = UTIL.unpackVars(hash);
         var loadedTimelapse = false;
         if (hashVars) {
           if (hashVars.d) {
@@ -174,9 +175,9 @@
             window.onhashchange = null;
             $(window).on("hashchange", function() {
               var newHash = window.location.hash.slice(1);
-              var newHashVars = org.gigapan.Util.unpackVars(newHash);
+              var newHashVars = UTIL.unpackVars(newHash);
               var currentHash = timelapse.getShareView();
-              var currentHashVars = org.gigapan.Util.unpackVars(currentHash);
+              var currentHashVars = UTIL.unpackVars(currentHash);
               window.location.hash = "";
               if (!newHashVars) return;
               if ((newHashVars.d && currentHashVars.d != newHashVars.d) || (newHashVars.s && currentHashVars.s != newHashVars.s)) {
@@ -198,7 +199,7 @@
                 }
               } else {
                 // Share views
-                timelapse.loadSharedViewFromUnsafeURL(org.gigapan.Util.getUnsafeHashString());
+                timelapse.loadSharedViewFromUnsafeURL(UTIL.getUnsafeHashString());
               }
             });
             /*if (hashVars && !hashVars.t) {
@@ -236,6 +237,7 @@
             }
             var lastThumbnailToolRow = $(".generate-thumbnail").closest("tr");
             $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(lastThumbnailToolRow);
+            UTIL.verticalTouchScroll($("#location_toggle_container"))
           }
         };
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
