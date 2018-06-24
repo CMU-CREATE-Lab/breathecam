@@ -238,8 +238,8 @@
                 });
               });
             }
-            var lastThumbnailToolRow = $(".generate-thumbnail").closest("tr");
-            $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(lastThumbnailToolRow);
+            var thumbnailToolRow = $(".thumbnail-processing-time-warning").closest("tr");
+            $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(thumbnailToolRow);
             UTIL.verticalTouchScroll($("#location_toggle_container"));
           }
         };
