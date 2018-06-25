@@ -241,6 +241,11 @@
             var thumbnailToolRow = $(".thumbnail-processing-time-warning").closest("tr");
             $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(thumbnailToolRow);
             UTIL.verticalTouchScroll($("#location_toggle_container"));
+            // Elements with hover have the no-touch class and we remove it if we are on a device that supports touch, since we get an annoying effect when we swipe.
+            // This is needed mostly for iOS but perhaps other mobile browsers suffer too.
+            if ('ontouchstart' in document) {
+              $('div').removeClass('no-touch');
+            }
           }
         };
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
@@ -387,47 +392,47 @@
   <div id="location_toggle_container">
     <div id="location_toggle">
       <a class="location_thumbnail_container" data-location-id="clairton1" href="javascript:void(0)">
-        <div id="clairton1_overlay" class="location_thumbnail_overlay"></div>
+        <div id="clairton1_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/clairton1_toggle.png" class="location_thumbnail" alt="Clairton1">
         <div class="location_title">Clairton</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="walnuttowers2" href="javascript:void(0)">
-        <div id="walnuttowers2_overlay" class="location_thumbnail_overlay"></div>
+        <div id="walnuttowers2_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/walnuttowers2_toggle.png" class="location_thumbnail" alt="walnuttowers2">
         <div class="location_title">Edgar Thomson West</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="braddock1" href="javascript:void(0)">
-        <div id="braddock1_overlay" class="location_thumbnail_overlay"></div>
+        <div id="braddock1_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/braddock1_toggle.png" class="location_thumbnail" alt="braddock1">
         <div class="location_title">Edgar Thomson North</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="westmifflin1" href="javascript:void(0)">
-        <div id="westmifflin1_overlay" class="location_thumbnail_overlay"></div>
+        <div id="westmifflin1_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/westmifflin1_toggle.png" class="location_thumbnail" alt="westmifflin1">
         <div class="location_title">Edgar Thomson South</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="dravosburg2" href="javascript:void(0)">
-        <div id="dravosburg2_overlay" class="location_thumbnail_overlay"></div>
+        <div id="dravosburg2_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/dravosburg2_toggle.png" class="location_thumbnail" alt="dravosburg2">
         <div class="location_title">Irvin</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="heinz" href="javascript:void(0)">
-        <div id="heinz_overlay" class="location_thumbnail_overlay"></div>
+        <div id="heinz_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/heinz_toggle.png" class="location_thumbnail" alt="Heinz">
         <div class="location_title">North Shore</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="trimont1" href="javascript:void(0)">
-        <div id="trimont1_overlay" class="location_thumbnail_overlay"></div>
+        <div id="trimont1_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/trimont1_toggle.png" class="location_thumbnail" alt="Trimont">
         <div class="location_title">Downtown</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="walnuttowers1" href="javascript:void(0)">
-        <div id="walnuttowers1_overlay" class="location_thumbnail_overlay"></div>
+        <div id="walnuttowers1_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/walnuttowers1_toggle.png" class="location_thumbnail" alt="Walnut Towers">
         <div class="location_title">Mon. Valley</div>
       </a>
       <a class="location_thumbnail_container location_thumbnail_container_end" data-location-id="pitt1" href="javascript:void(0)">
-        <div id="pitt1_overlay" class="location_thumbnail_overlay"></div>
+        <div id="pitt1_overlay" class="no-touch location_thumbnail_overlay"></div>
         <img src="assets/images/pitt1_toggle.png" class="location_thumbnail" alt="Pitt">
         <div class="location_title">Oakland</div>
       </a>
