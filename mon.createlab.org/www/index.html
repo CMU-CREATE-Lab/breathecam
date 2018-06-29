@@ -16,6 +16,7 @@
     <link href="assets/libs/timemachine-viewer//css/jquery-ui/smoothness/jquery-ui.custom.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="assets/libs/timemachine-viewer//css/defaultUI.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="assets/libs/timemachine-viewer//libs/change-detect/css/change.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="assets/libs/flat-block-chart/FlatBlockChart.css" media="screen" rel="stylesheet" type="text/css"/>
 
     <script src="assets/libs/timemachine-viewer//js/jquery/jquery.min.js" type="text/javascript"></script>
     <script src="assets/libs/timemachine-viewer//js/jquery/jquery-ui.custom.min.js" type="text/javascript"></script>
@@ -39,6 +40,8 @@
     <script src="assets/libs/timemachine-viewer//libs/change-detect/js/ThumbnailTool.js" type="text/javascript"></script>
     <script src="assets/libs/timemachine-viewer//libs/change-detect/js/BoxEventHandler.js" type="text/javascript"></script>
     <script src="assets/libs/timemachine-viewer//libs/change-detect/js/ChangeDetectionTool.js" type="text/javascript"></script>
+    <script src="assets/libs/flat-block-chart/FlatBlockChart.js" type="text/javascript"></script>
+
     <script src="https://tiles.cmucreatelab.org/ecam/timemachines/clairton1/clairton1.js" type="text/javascript"></script>
     <style type="text/css">
       #timeMachine {
@@ -46,8 +49,9 @@
         left: 0px;
         right: 226px;
         top: 0px;
+        bottom: 75px;
         width: auto;
-        height: 100%;
+        height: auto;
         z-index: 5;
       }
       #datepicker {
@@ -99,11 +103,95 @@
       #camera-findings-comment {
         resize: vertical;
       }
+      .thumbnail-chart-container {
+        position: fixed;
+        left: 92px;
+        right: 226px;
+        top: auto;
+        height: 75px;
+        width: auto;
+        overflow-x: scroll;
+        background-color: white;
+      }
+      #thumbnail-chart {
+        bottom: 0px;
+      }
+      .noselect {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Chrome/Safari/Opera */
+        -khtml-user-select: none; /* Konqueror */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently not supported by any browser */
+      }
+      .flat-block-chart .selected-block-no-color {
+        box-shadow: 0px 0px 0px 5px rgb(0, 154, 255) inset;
+        background-color: rgba(0, 0, 0, 0);
+      }
+      .flat-block-chart .flat-block-chart-value {
+        background-color: white;
+      }
+      #thumbnail-chart-info {
+        bottom: 0px;
+        position: fixed;
+        left: 0px;
+        right: auto;
+        top: auto;
+        height: 75px;
+        width: 91px;
+        background-color: white;
+        z-index: 999;
+      }
+      #thumbnail-chart-info p {
+        font-size: 11px;
+        text-align: center;
+        margin-top: 12px;
+      }
+      #thumbnail-chart {
+        z-index: 999;
+      }
+      .custom-dialog-2 {
+        z-index: 1000 !important;
+      }
+      .custom-dialog-2 .ui-button:focus {
+        outline: none;
+      }
+      .custom-dialog-2 .ui-dialog-titlebar {
+        background-image: none;
+        background-color: rgb(150, 150, 150);
+        color: white;
+      }
+      #thumbnail-dialog {
+
+      }
+      #thumbnail-dialog-content {
+        margin: 15px auto 0px auto;
+        height: 500px;
+        max-height: 500px;
+        width: 400px;
+        overflow-y: scroll;
+      }
+      #thumbnail-dialog-content img {
+        text-align: center;
+        width: 400px;
+      }
+      #thumbnail-dialog-content video {
+        text-align: center;
+        width: 400px;
+      }
+      #thumbnail-dialog-content p {
+        width: 400px;
+        text-align: center;
+        margin-top: 5px;
+        margin-bottom: 15px;
+      }
     </style>
     <script>
-      "use strict"
+      "use strict";
       jQuery.support.cors = true;
       var locationDivId, timelapse, timelapseFeedUnavailable, hashVars, currentDate;
+      var thumbnailChart, thumbnailUrls;
+      var $thumbnailDialog, $thumbnailDialogContent;
       var currentLocation = "clairton1";
       var locationMap = {
         "heinz" : "North Shore",
@@ -212,7 +300,7 @@
               timelapse.seekToFrame(fiveSecondsFromEnd);
             }*/
             showContent();
-            var du = timelapse.getDefaultUI()
+            var du = timelapse.getDefaultUI();
             if (du) {
               du.addEventListener('thumbnail-generated-from-ui', function(thumbnailParams) {
                 $.ajax({
@@ -246,12 +334,143 @@
             if ('ontouchstart' in document) {
               $('div').removeClass('no-touch');
             }
+            createThumbnailChart();
           }
         };
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
         loadCalendar(startingDate);
       }
-
+      function processThumbnailChartData(data) {
+        // Create a dictionary that stores the durations of all images and videos of each hour
+        var image_count_dict = {};
+        for (var i = 0; i < 24; i++) {
+          image_count_dict[i] = 0;
+        }
+        // Create a dictionary that stores the urls of all thumbnails of each hour
+        thumbnailUrls = {};
+        for (var i = 0; i < 24; i++) {
+          thumbnailUrls[i] = [];
+        }
+        // Create a matrix that stores the minutes and hours that have thumbnails
+        // Matrix H is implemented by using dictionary for O(1) lookup time
+        // The first dimension means hour, ranging from 0 to 23
+        // The second dimension means minutes, ranging from 0 to 59
+        var H = {};
+        for (var i = 0; i < 24; i++) {
+          H[i] = {};
+          for (var j = 0; j < 60; j++) {
+            H[i][j] = 0;
+          }
+        }
+        // Iterate through all image metadata
+        for (var i = 0; i < data.length; i++) {
+          var d = data[i];
+          var start_date = new Date(d["begin_time"]);
+          var end_date = new Date(d["end_time"]);
+          var start_hour = start_date.getUTCHours(); // for some unknown reason the timestamp has a "z" at the end
+          var end_hour = end_date.getUTCHours();
+          if (end_hour < start_hour) continue; // sanity check
+          var start_minute = start_date.getUTCMinutes();
+          var end_minute = end_date.getUTCMinutes();
+          for (var j = start_hour; j <= end_hour; j++) {
+            // Counting images and push urls
+            image_count_dict[j] += 1;
+            thumbnailUrls[j].push({url:d["media_path"], comment:d["comment"], format:d["media_format"]});
+            // Updating matrix H
+            var s = 0, e = 59;
+            if (j == start_hour) s = start_minute;
+            if (j == end_hour) e = end_minute;
+            for (var k = s; k <= e; k++) H[j][k] |= 1;
+          }
+        }
+        // Format data
+        var thumbnail_data = {"columnNames": ["label", "color", "height"], "data": []};
+        for (var i = 0; i < 24; i++) {
+          var h = 0; // height indicates the minutes in that hour that are covered by the thumbnails
+          for (var j = 0; j < 60; j++) h += H[i][j];
+          thumbnail_data["data"].push([i, image_count_dict[i], h]);
+        }
+        return thumbnail_data;
+      }
+      function getThumbnailDataUrl() {
+        var captureTimes = timelapse.getCaptureTimes();
+        var begin_time= parseInt(new Date(captureTimes[0]).getTime() / 1000);
+        var end_time = parseInt(new Date(captureTimes[timelapse.getNumFrames() -1]).getTime() / 1000);
+        var url = "https://breathecam.cmucreatelab.org/camera_findings?";
+        url += "begin_time=" + begin_time + "&end_time=" + end_time + "&camera_id=" + currentLocation;
+        return url;
+      }
+      function createThumbnailChart() {
+        $.getJSON(getThumbnailDataUrl(), function (json) {
+          var thumbnail_data = processThumbnailChartData(json);
+          var chart_settings = {
+            data: thumbnail_data["data"],
+            columnNames: thumbnail_data["columnNames"],
+            dataIndexForLabels: 0, // columnNames[0] is used for the label of the block
+            dataIndexForColors: 1, // columnNames[1] is used for the color of the block
+            dataIndexForHeights: 2, // columnNames[2] is used for the height of the block
+            useColorQuantiles: true,
+            colorBin: [0, 1, 2, 4],
+            colorRange: ["#ffffff", "#bdbdbd", "#969696", "#636363", "#000000"],
+            heightBin: [15, 45],
+            heightRange: ["33%", "66%", "100%"],
+            noEventWhenColorValueZero: true,
+            select: function ($e, obj) {
+              var d = $e.data();
+              $thumbnailDialog.dialog("open");
+              $thumbnailDialogContent.empty();
+              var urls = thumbnailUrls[d["label"]];
+              for (var i = 0; i < urls.length; i++) {
+                var $thumbnail;
+                var format = urls[i]["format"];
+                var src = urls[i]["url"];
+                if (format == "mp4" || format == "webm") {
+                  $thumbnail = $("<video controls src='" + src + "'></video>");
+                } else if (format == "png" || format == "gif") {
+                  $thumbnail = $("<img src='" + src + "'></img>");
+                }
+                var $comment = $("<p>" + urls[i]["comment"] + "</p>");
+                $thumbnailDialogContent.append($thumbnail);
+                $thumbnailDialogContent.append($comment);
+              }
+            }
+          };
+          thumbnailChart = new edaplotjs.FlatBlockChart("thumbnail-chart", chart_settings);
+          timelapse.addDatasetLoadedListener(function() {
+            $thumbnailDialog.dialog("close");
+            updateThumbnailChart();
+          });
+          createThumbnailDialog();
+        }).fail(function (response) {
+          console.log("server error when creating thumbnail chart:", response);
+        });
+      }
+      function createThumbnailDialog() {
+        $thumbnailDialogContent = $("#thumbnail-dialog-content");
+        $thumbnailDialog = $("#thumbnail-dialog");
+        $thumbnailDialog.dialog({
+          resizable: false,
+          autoOpen: false,
+          dialogClass: "custom-dialog-2",
+          appendTo: $("body"),
+          width: 444,
+          minHeight: 50,
+          draggable: true,
+          title: "Created Images for The Selected Hour",
+          position: { my: "center center", at: "center center", of: $("#"+timelapse.getViewerDivId())},
+          close: function() {
+            thumbnailChart.clearBlockSelection();
+          }
+        });
+      }
+      function updateThumbnailChart() {
+        $.getJSON(getThumbnailDataUrl(), function (json) {
+          var thumbnail_data = processThumbnailChartData(json);
+          thumbnailChart.updateBlocks(thumbnail_data["data"]);
+        }).fail(function (response) {
+          console.log("server error when updating thumbnail chart:", response);
+        });
+      }
       function selectTimelapseFeed() {
         $("#image_feed").css("visibility", "hidden");
         $("#stitched_image_wrapper").css("visibility", "hidden");
@@ -387,6 +606,13 @@
   <div id="locationTitle"></div>
   <div id="timelapse_feed" class="timelapse_feed_embed">
     <div id="timeMachine"></div>
+    <div id="thumbnail-chart" class="noselect thumbnail-chart-container"></div>
+    <div id="thumbnail-chart-info" class="noselect">
+      <p>Distribution<br>of created<br>images<br>over time</p>
+    </div>
+    <div id="thumbnail-dialog">
+      <div id="thumbnail-dialog-content"></div>
+    </div>
     <div id="datepicker" class="datepicker_embed"></div>
   </div>
   <div id="location_toggle_container">
