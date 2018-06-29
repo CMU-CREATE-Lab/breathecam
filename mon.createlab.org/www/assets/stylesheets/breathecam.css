@@ -169,7 +169,7 @@ a img {
   width: auto;
   height: auto;
   background: white;
-  z-index: 999;
+  z-index: 9000;
 }
 
 #loadingImg {
