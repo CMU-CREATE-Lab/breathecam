@@ -303,6 +303,13 @@
             var du = timelapse.getDefaultUI();
             if (du) {
               du.addEventListener('thumbnail-generated-from-ui', function(thumbnailParams) {
+                var formattedBeginTime = thumbnailParams.beginTime.substr(0,4) + "-" + thumbnailParams.beginTime.substr(4,2) + "-" + thumbnailParams.beginTime.substr(6,2) + " " + thumbnailParams.beginTime.substr(8,2) + ":" + thumbnailParams.beginTime.substr(10,2) + ":" + thumbnailParams.beginTime.substr(12,2);
+                var formattedEndTime = thumbnailParams.endTime.substr(0,4) + "-" + thumbnailParams.endTime.substr(4,2) + "-" + thumbnailParams.endTime.substr(6,2) + " " + thumbnailParams.endTime.substr(8,2) + ":" + thumbnailParams.endTime.substr(10,2) + ":" + thumbnailParams.endTime.substr(12,2);
+                var isUTC = (timelapse.getCaptureTimes()[0].indexOf("UTC") >= 0);
+                if (!isUTC) {
+                  formattedBeginTime = String(new Date(formattedBeginTime));
+                  formattedEndTime = String(new Date(formattedEndTime));
+                }
                 $.ajax({
                   type: "POST",
                   dataType: "json",
@@ -317,8 +324,8 @@
                       media_width : thumbnailParams.width,
                       media_height : thumbnailParams.height,
                       comment : $("#camera-findings-comment").val(),
-                      begin_time : thumbnailParams.beginTime,
-                      end_time : thumbnailParams.endTime,
+                      begin_time : formattedBeginTime,
+                      end_time : formattedEndTime,
                       start_frame : thumbnailParams.startFrame,
                       num_frames : thumbnailParams.nframes
                     }
@@ -367,11 +374,11 @@
           var d = data[i];
           var start_date = new Date(d["begin_time"]);
           var end_date = new Date(d["end_time"]);
-          var start_hour = start_date.getUTCHours(); // for some unknown reason the timestamp has a "z" at the end
-          var end_hour = end_date.getUTCHours();
+          var start_hour = start_date.getHours();
+          var end_hour = end_date.getHours();
           if (end_hour < start_hour) continue; // sanity check
-          var start_minute = start_date.getUTCMinutes();
-          var end_minute = end_date.getUTCMinutes();
+          var start_minute = start_date.getMinutes();
+          var end_minute = end_date.getMinutes();
           for (var j = start_hour; j <= end_hour; j++) {
             // Counting images and push urls
             image_count_dict[j] += 1;
