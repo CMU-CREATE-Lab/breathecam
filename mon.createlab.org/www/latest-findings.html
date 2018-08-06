@@ -36,7 +36,7 @@
 
       function init() {
         $.ajax({
-          url: "https://breathecam.cmucreatelab.org/camera_findings",
+          url: "https://breathecam.cmucreatelab.org/camera_findings" + location.search,
           dataType: "json",
         }).done(function(data) {
           mediaList = data;
