@@ -53,7 +53,7 @@ $start_time = {}
 $end_time = {}
 $append_inplace = false
 $future_appending_frames = 17000
-$check_current_time = false
+$num_time_chunks_checked = 0
 $is_monthly = false
 $skip_img_validation = false
 $num_images_to_stitch = 4
@@ -116,6 +116,11 @@ class Compiler
         $incremental_update_interval = ARGV.shift.to_i
       elsif arg == "--skip-rotate"
         $skip_rotate = true
+      elsif arg == "--alter-gamma-amount"
+        $alter_gamma_amount = ARGV.shift.to_f
+      elsif arg == "--crop-amount-bounds"
+        # Format is L,B,R,T (left, bottom, right, top)
+        $crop_amount_bounds = ARGV.shift.split(",")
       elsif arg == "--run-append-externally"
         $run_append_externally = true
       elsif arg == "-ssd-mount"
@@ -271,30 +276,23 @@ class Compiler
 
     if $input_date_from_file
       file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
-      if $check_current_time
+      if File.exists?(file)
+        last_pull_time = Time.zone.parse(File.open(file, &:readline)) + (time_chunk_in_seconds * $num_time_chunks_checked)
+        # We may be running this script once a minute so make sure we only process a specified chunk of time
+        time_diff = ($current_time_of_run - last_pull_time).floor
+        if time_diff < time_chunk_in_seconds
+          puts "[#{Time.now}] Gap less than #{$incremental_update_interval} minutes, which is less than the minimum segment. Exiting process."
+          exit
+        end
+        # Current day is now based on the day in the last pull file
+        $current_day = last_pull_time.to_date.to_s
+        tmp_start_time = last_pull_time
+        tmp_end_time = last_pull_time + time_chunk_in_seconds
+      else
         # Current day is now the day of running the script
         $current_day = $current_time_of_run.to_date.to_s
-        tmp_start_time = $current_time_of_run.beginning_of_day
+        tmp_start_time = $current_time_of_run - time_chunk_in_seconds
         tmp_end_time = $current_time_of_run
-      else
-        if File.exists?(file)
-          last_pull_time = Time.zone.parse(File.open(file, &:readline))
-          # We may be running this script once a minute so make sure we only process a specified chunk of time
-          time_diff = ($current_time_of_run - last_pull_time).floor
-          if time_diff < time_chunk_in_seconds
-            puts "[#{Time.now}] Gap less than #{$incremental_update_interval} minutes, which is less than the minimum segment. Exiting process."
-            exit
-          end
-          # Current day is now based on the day in the last pull file
-          $current_day = last_pull_time.to_date.to_s
-          tmp_start_time = last_pull_time
-          tmp_end_time = last_pull_time + time_chunk_in_seconds
-        else
-          # Current day is now the day of running the script
-          $current_day = $current_time_of_run.to_date.to_s
-          tmp_start_time = $current_time_of_run - time_chunk_in_seconds
-          tmp_end_time = $current_time_of_run
-        end
       end
     elsif $current_day
       # Process a full day, based on a date string passed in
@@ -330,14 +328,6 @@ class Compiler
     $end_time["minute"] = tmp_end_time.strftime("%M").to_i
     $end_time["sec"] = tmp_end_time.strftime("%S").to_i
     $end_time["full"] = "#{tmp_end_time.to_date} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
-
-    $original_last_pull_start_time = $start_time["full"]
-
-    if $input_date_from_file
-      tmp_file = file + ".tmp"
-      File.open(tmp_file, 'w') {|f| f.write($end_time["full"])}
-      File.rename(tmp_file, file)
-    end
   end
 
   def clear_working_dir
@@ -349,10 +339,10 @@ class Compiler
     FileUtils.rm_rf("#{$working_dir}/0100-unstitched")
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0200-tiles/*"))
     FileUtils.rm_rf(Dir.glob("#{$working_dir}/0300-tilestacks/*"))
-    check_date = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day
-    FileUtils.rm_rf(Dir.glob("#{$timemachine_output_path}/#{check_date}-*m.timemachine"));
+    FileUtils.rm_rf(Dir.glob("#{$timemachine_output_path}/*-*m.timemachine"))
     video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
-    if $do_incremental_update and !video_sets.empty? and video_sets.last.include?(check_date)
+    check_date = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day
+    if $do_incremental_update and !video_sets.empty? and video_sets.any?{|s| s.include?(check_date)}
       $create_videoset_segment_directory = true
     end
     puts "[#{Time.now}] Finished removing old files."
@@ -360,6 +350,7 @@ class Compiler
 
   def get_source_images
     camera_paths = $multi_camera_list ? $multi_camera_list : [$input_path]
+    tmp_input_path = ""
     camera_paths.each_with_index do |camera_path, idx|
       puts "[#{Time.now}] Getting source images from #{camera_path}/#{$current_day}"
       image_path = $skip_stitch ? "0100-original-images" : "050-raw-images"
@@ -414,36 +405,44 @@ class Compiler
           system("bash -c \"rsync -av --include='*.'{#{$valid_image_extensions.join(',')}} --exclude='*' #{camera_path}/#{$current_day}/ #{new_input_path}/\"")
         end
       end
-      # We need to reference files locally now that we have rsynced everything over
-      $input_path = $multi_camera_list ? File.dirname(new_input_path) : new_input_path
-      FileUtils.touch(File.join($input_path, "DONE"))
-      puts "[#{Time.now}] Finished getting source images."
+      tmp_input_path = $multi_camera_list ? File.dirname(new_input_path) : new_input_path
     end
-    remove_corrupted_images unless $RUNNING_WINDOWS or $skip_img_validation
+    remove_corrupted_images(tmp_input_path) unless $RUNNING_WINDOWS or $skip_img_validation
 
     # Check if we have enough images to do anything
-    dir = Dir.glob("#{$input_path}/**/*{#{$valid_image_extensions.join(',')}}")
+    dir = Dir.glob("#{tmp_input_path}/**/*{#{$valid_image_extensions.join(',')}}")
     if dir.length <= 2
-      puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check later when more images are hopefully available."
+      puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing for this time chunk."
       if $input_date_from_file
-        if dir.empty? and !$check_current_time and ($current_time_of_run.to_i - Time.parse($start_time["full"]).to_i > 1.day.to_i)
-          # We are most likely doing a backlog. No images found for this time chunk, so wait until next run based on a new time chunk.
-        elsif !$check_current_time and $current_time_of_run.to_date.to_s > Date.parse($start_time["full"]).to_s
-          $check_current_time = true
-          calculate_rsync_input_range
+        # Keep looking for images up to the current time
+        if Time.parse($end_time["full"]).to_i < $current_time_of_run.to_i
+          $num_time_chunks_checked += 1
+          calculate_rsync_input_range()
           clear_working_dir
           get_source_images
-        else
-          file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
-          tmp_file = file + ".tmp"
-          File.open(tmp_file, 'w') {|f| f.write($original_last_pull_start_time)}
-          File.rename(tmp_file, file)
         end
       end
       exit
     end
+
+    # We need to reference files locally (though it may be a symlink) now that we have a valid path to images that are ready to be processed
+    $input_path = tmp_input_path
+    FileUtils.touch(File.join($input_path, "DONE"))
+
+    # Update the date file with the last time we were able to process
+    if $input_date_from_file
+      file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
+      tmp_file = file + ".tmp"
+      File.open(tmp_file, 'w') {|f| f.write($end_time["full"])}
+      File.rename(tmp_file, file)
+    end
+
+    puts "[#{Time.now}] Finished getting source images."
+
     # We have a directory of images ready to turn into videos.
     if $skip_stitch
+      crop_images if $crop_amount_bounds
+      alter_image_gamma if $alter_gamma_amount
       create_tm
     else
       # We need to match/organize images for stitching. Video creation comes after that.
@@ -451,9 +450,9 @@ class Compiler
     end
   end
 
-  def remove_corrupted_images
+  def remove_corrupted_images(path_to_check)
     puts "[#{Time.now}] Checking for corrupted images."
-    system("find #{$input_path} -maxdepth 3 -name '*.[jJ][pP][gG]' | xargs jpeginfo -cd")
+    system("find #{path_to_check} -maxdepth 3 -name '*.[jJ][pP][gG]' | xargs jpeginfo -cd")
   end
 
   def match_images
@@ -508,12 +507,8 @@ class Compiler
       puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
       exit
     end
-    if $skip_rotate
-      puts "Skipping image rotations."
-      stitch_images
-    else
-      rotate_images
-    end
+    rotate_images unless $skip_rotate
+    stitch_images
   end
 
   def organize_images
@@ -565,12 +560,72 @@ class Compiler
       puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
       exit
     end
-    if $skip_rotate
-      puts "Skipping image rotations."
-      stitch_images
-    else
-      rotate_images
+    rotate_images unless $skip_rotate
+    stitch_images
+  end
+
+  def crop_images
+    count = 0
+    match_count = 0
+    puts "[#{Time.now}] Croppig images..."
+    files = Dir.glob("#{$input_path}/*")
+    Parallel.each(files, :in_threads => $num_jobs) do |img|
+      file_extension = File.extname(img)
+      next unless $valid_image_extensions.include? file_extension.downcase
+      count += 1
+      if $RUNNING_WINDOWS && file_extension == ".lnk"
+        img = Win32::Shortcut.open(img).path
+        # Get the real file extension now
+        file_extension = File.extname(img)
+      end
+      begin
+        # Format of array is LBRT
+        if $crop_amount_bounds[0]
+          system("#{$imagemagick_path} #{%Q{"#{img}"}} -gravity West -chop #{$crop_amount_bounds[0]}x0 #{%Q{"#{img}"}}")
+        end
+        if $crop_amount_bounds[1]
+          system("#{$imagemagick_path} #{%Q{"#{img}"}} -gravity South -chop 0x#{$crop_amount_bounds[1]} #{%Q{"#{img}"}}")
+        end
+        if $crop_amount_bounds[2]
+          system("#{$imagemagick_path} #{%Q{"#{img}"}} -gravity East -chop #{$crop_amount_bounds[2]}x0 #{%Q{"#{img}"}}")
+        end
+        if $crop_amount_bounds[3]
+          system("#{$imagemagick_path} #{%Q{"#{img}"}} -gravity North -chop 0x#{$crop_amount_bounds[3]} #{%Q{"#{img}"}}")
+        end
+        match_count += 1
+      rescue
+        # Ignore and move on
+        # TODO: Maybe do something in this case.
+      end
     end
+    puts "[#{Time.now}] Cropping complete. Cropped #{match_count} out of #{count} images."
+  end
+
+  def alter_image_gamma
+    count = 0
+    match_count = 0
+    puts "[#{Time.now}] Alerting gamma of images..."
+    files = Dir.glob("#{$input_path}/*")
+    Parallel.each(files, :in_threads => $num_jobs) do |img|
+      file_extension = File.extname(img)
+      next unless $valid_image_extensions.include? file_extension.downcase
+      count += 1
+      if $RUNNING_WINDOWS && file_extension == ".lnk"
+        img = Win32::Shortcut.open(img).path
+        # Get the real file extension now
+        file_extension = File.extname(img)
+      end
+      begin
+        # < 1.0 darkens
+        # > 1.0 brightens
+        system("#{$imagemagick_path} #{%Q{"#{img}"}} -gamma #{$alter_gamma_amount} #{%Q{"#{img}"}}")
+        match_count += 1
+      rescue
+        # Ignore and move on
+        # TODO: Maybe do something in this case.
+      end
+    end
+    puts "[#{Time.now}] Gamma altering complete. Altered #{match_count} out of #{count} images."
   end
 
   def rotate_images
@@ -602,7 +657,6 @@ class Compiler
       end
     end
     puts "[#{Time.now}] Rotating complete. Rotated #{match_count} out of #{count} images."
-    stitch_images
   end
 
   def stitch_images
