@@ -852,17 +852,17 @@ class Compiler
         system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}") or raise "[#{Time.now}] Error encountered processing Time Machine. Exiting."
       end
       puts "[#{Time.now}] Time Machine created."
-      add_entry_to_json
       rsync_output_files if $rsync_output and $run_append_externally
       append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
       rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
+      add_entry_to_location_json
       rsync_location_json if $rsync_location_json
     end
     trim_ssd if $ssd_mount
     completed_process
   end
 
-  def add_entry_to_json
+  def add_entry_to_location_json
     json = {}
     path_to_json = "#{$working_dir}/#{$camera_location}.json"
     path_to_js = "#{$working_dir}/#{$camera_location}.js"
