@@ -322,12 +322,14 @@ class Compiler
     $start_time["hour"] = tmp_start_time.strftime("%H").to_i
     $start_time["minute"] = tmp_start_time.strftime("%M").to_i
     $start_time["sec"] = tmp_start_time.strftime("%S").to_i
-    $start_time["full"] = "#{tmp_start_time.to_date} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']}"
+    start_time_zone_offset = (tmp_start_time.utc_offset / 1.hour) * 100
+    $start_time["full"] = "#{tmp_start_time.to_date} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']} #{start_time_zone_offset}"
 
     $end_time["hour"] = tmp_end_time.strftime("%H").to_i
     $end_time["minute"] = tmp_end_time.strftime("%M").to_i
     $end_time["sec"] = tmp_end_time.strftime("%S").to_i
-    $end_time["full"] = "#{tmp_end_time.to_date} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}"
+    end_time_zone_offset = (tmp_end_time.utc_offset / 1.hour) * 100
+    $end_time["full"] = "#{tmp_end_time.to_date} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']} #{end_time_zone_offset}"
   end
 
   def clear_working_dir
@@ -852,17 +854,17 @@ class Compiler
         system("ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}") or raise "[#{Time.now}] Error encountered processing Time Machine. Exiting."
       end
       puts "[#{Time.now}] Time Machine created."
+      add_entry_to_json
       rsync_output_files if $rsync_output and $run_append_externally
       append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
       rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
-      add_entry_to_location_json
       rsync_location_json if $rsync_location_json
     end
     trim_ssd if $ssd_mount
     completed_process
   end
 
-  def add_entry_to_location_json
+  def add_entry_to_json
     json = {}
     path_to_json = "#{$working_dir}/#{$camera_location}.json"
     path_to_js = "#{$working_dir}/#{$camera_location}.js"
