@@ -724,15 +724,16 @@ class Compiler
         date = File.basename(img, ".*").split("_")[0]
         parent_path = File.dirname(img)
         begin
+          enblend_tmp_file_prefix = "#{$camera_location}_#{date}_"
           nona_input_files_string = ""
           enblend_input_files_string = ""
           for i in 1..$num_images_to_stitch
             nona_input_files_string += " #{%Q{"#{parent_path}/#{date}_image#{i}#{file_extension}"}}"
-            enblend_input_files_string += " #{date}_#{'%04d' % (i-1)}.tif"
+            enblend_input_files_string += " #{enblend_tmp_file_prefix}#{'%04d' % (i-1)}.tif"
           end
-          system("#{$nona_path} -o #{date}_ #{%Q{"#{$master_alignment_file}"}} #{nona_input_files_string}")
+          system("#{$nona_path} -o #{enblend_tmp_file_prefix} #{%Q{"#{$master_alignment_file}"}} #{nona_input_files_string}")
           system("#{$enblend_path} --no-optimize --compression=100 --fine-mask -o #{%Q{"#{stitched_images_path}/#{date}_full.jpg"}} #{enblend_input_files_string}")
-          Dir.glob("#{date}_*.tif").each { |f| File.delete(f) }
+          Dir.glob("#{enblend_tmp_file_prefix}*.tif").each { |f| File.delete(f) }
           match_count += 1
         rescue => e
           puts e
