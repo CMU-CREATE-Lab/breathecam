@@ -8,13 +8,13 @@
 */10 * * * * . $HOME/.profile; ruby /home/pdille/breathecam/create_breathe_cam_tm.rb "pdille@timemachine1.gc.cs.cmu.edu:/usr0/web/timemachines/breathecam/images/heinz/050-original-images" "pdille@timemachine1.gc.cs.cmu.edu:/usr0/web/timemachines/breathecam/timemachines/heinz" "/home/pdille/breathecam/cameras/heinz/heinz.pto" "heinz" -j 6 --rsync-input --rsync-location-json -incremental-update-interval 10 --skip-img-validation --skip-rotate --skip-trailer --append-inplace -future-appending-frames 1400 -ssd-mount "/workspace2" -working-dir "/workspace2/heinz.tmc" >> /home/pdille/breathecam/heinz.log 2>&1
 
 # Every day at 2:20 AM
-20 2 * * * . $HOME/.profile; ruby /home/pdille/breathecam/nightly_breathecam_rsync.rb "/mnt/ssd/workspace/pitt1.tmc" "/timemachines/breathecam/pitt1" "pdille@timemachine1.gc.cs.cmu.edu" "/usr0/web/timemachines/breathecam/timemachines/pitt1" >> /home/pdille/breathecam/pitt1-rsync.log 2>&1
+20 2 * * * . $HOME/.profile; ruby /home/pdille/breathecam/nightly_breathecam_rsync.rb "/workspace/pitt1.tmc" "/timemachines/breathecam/pitt1" "pdille@timemachine1.gc.cs.cmu.edu" "/usr0/web/timemachines/breathecam/timemachines/pitt1" >> /home/pdille/breathecam/pitt1-rsync.log 2>&1
 # Every day at 2:40 AM
 40 2 * * * . $HOME/.profile; ruby /home/pdille/breathecam/nightly_breathecam_rsync.rb "/workspace/trimont1.tmc" "/timemachines/breathecam/trimont1" "pdille@timemachine1.gc.cs.cmu.edu" "/usr0/web/timemachines/breathecam/timemachines/trimont1" >> /home/pdille/breathecam/trimont1-rsync.log 2>&1
 # Every day at 3:20 AM
-20 3 * * * . $HOME/.profile; ruby /home/pdille/breathecam/nightly_breathecam_rsync.rb "/workspace/walnuttowers1.tmc" "/timemachines/breathecam/walnuttowers1" "pdille@timemachine1.gc.cs.cmu.edu" "/usr0/web/timemachines/breathecam/timemachines/walnuttowers1" >> /home/pdille/breathecam/walnuttowers-rsync.log 2>&1
+20 3 * * * . $HOME/.profile; ruby /home/pdille/breathecam/nightly_breathecam_rsync.rb "/workspace2/walnuttowers1.tmc" "/timemachines/breathecam/walnuttowers1" "pdille@timemachine1.gc.cs.cmu.edu" "/usr0/web/timemachines/breathecam/timemachines/walnuttowers1" >> /home/pdille/breathecam/walnuttowers-rsync.log 2>&1
 # Every day at 3:40 AM
-40 3 * * * . $HOME/.profile; ruby /home/pdille/breathecam/nightly_breathecam_rsync.rb "/workspace/heinz.tmc" "/timemachines/breathecam/heinz" "pdille@timemachine1.gc.cs.cmu.edu" "/usr0/web/timemachines/breathecam/timemachines/heinz" >> /home/pdille/breathecam/heinz-rsync.log 2>&1
+40 3 * * * . $HOME/.profile; ruby /home/pdille/breathecam/nightly_breathecam_rsync.rb "/workspace2/heinz.tmc" "/timemachines/breathecam/heinz" "pdille@timemachine1.gc.cs.cmu.edu" "/usr0/web/timemachines/breathecam/timemachines/heinz" >> /home/pdille/breathecam/heinz-rsync.log 2>&1
 
 # Check on startup if create_breathe_cam_tm.rb was killed mid-process and try to recover.
 @reboot /home/pdille/breathecam/breathecam-startup-check
