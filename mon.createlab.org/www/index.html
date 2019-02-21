@@ -201,7 +201,7 @@
         "clairton1" : "Clairton",
         "walnuttowers2" : "Edgar Thomson",
         "braddock1" : "Edgar Thomson",
-        "dravosburg2" : "Irvin",
+        "irvin1" : "Irvin",
         "westmifflin1" : "Edgar Thomson"
       };
       var UTIL = org.gigapan.Util;
@@ -300,41 +300,7 @@
               timelapse.seekToFrame(fiveSecondsFromEnd);
             }*/
             showContent();
-            var du = timelapse.getDefaultUI();
-            if (du) {
-              du.addEventListener('thumbnail-generated-from-ui', function(thumbnailParams) {
-                var formattedBeginTime = thumbnailParams.beginTime.substr(0,4) + "-" + thumbnailParams.beginTime.substr(4,2) + "-" + thumbnailParams.beginTime.substr(6,2) + " " + thumbnailParams.beginTime.substr(8,2) + ":" + thumbnailParams.beginTime.substr(10,2) + ":" + thumbnailParams.beginTime.substr(12,2);
-                var formattedEndTime = thumbnailParams.endTime.substr(0,4) + "-" + thumbnailParams.endTime.substr(4,2) + "-" + thumbnailParams.endTime.substr(6,2) + " " + thumbnailParams.endTime.substr(8,2) + ":" + thumbnailParams.endTime.substr(10,2) + ":" + thumbnailParams.endTime.substr(12,2);
-                var isUTC = (timelapse.getCaptureTimes()[0].indexOf("UTC") >= 0);
-                if (!isUTC) {
-                  formattedBeginTime = String(new Date(formattedBeginTime));
-                  formattedEndTime = String(new Date(formattedEndTime));
-                }
-                $.ajax({
-                  type: "POST",
-                  dataType: "json",
-                  url: "https://breathecam.cmucreatelab.org/camera_findings",
-                  data: {
-                    camera_finding: {
-                      camera_id : thumbnailParams.timemachineId,
-                      camera_name : locationMap[thumbnailParams.timemachineId],
-                      timemachine_path : thumbnailParams.root,
-                      media_path : thumbnailParams.url,
-                      media_format : thumbnailParams.format,
-                      media_width : thumbnailParams.width,
-                      media_height : thumbnailParams.height,
-                      comment : $("#camera-findings-comment").val(),
-                      begin_time : formattedBeginTime,
-                      end_time : formattedEndTime,
-                      start_frame : thumbnailParams.startFrame,
-                      num_frames : thumbnailParams.nframes
-                    }
-                  }
-                });
-              });
-            }
-            var thumbnailToolRow = $(".thumbnail-processing-time-warning").closest("tr");
-            $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(thumbnailToolRow);
+            breatheCamThumbnailSetup();
             UTIL.verticalTouchScroll($("#location_toggle_container"));
             // Elements with hover have the no-touch class and we remove it if we are on a device that supports touch, since we get an annoying effect when we swipe.
             // This is needed mostly for iOS but perhaps other mobile browsers suffer too.
@@ -478,6 +444,43 @@
           console.log("server error when updating thumbnail chart:", response);
         });
       }
+      function breatheCamThumbnailSetup() {
+        var du = timelapse.getDefaultUI();
+        if (timelapse && du) {
+          du.addEventListener('thumbnail-generated-from-ui', function(thumbnailParams) {
+            var formattedBeginTime = thumbnailParams.beginTime.substr(0,4) + "-" + thumbnailParams.beginTime.substr(4,2) + "-" + thumbnailParams.beginTime.substr(6,2) + " " + thumbnailParams.beginTime.substr(8,2) + ":" + thumbnailParams.beginTime.substr(10,2) + ":" + thumbnailParams.beginTime.substr(12,2);
+            var formattedEndTime = thumbnailParams.endTime.substr(0,4) + "-" + thumbnailParams.endTime.substr(4,2) + "-" + thumbnailParams.endTime.substr(6,2) + " " + thumbnailParams.endTime.substr(8,2) + ":" + thumbnailParams.endTime.substr(10,2) + ":" + thumbnailParams.endTime.substr(12,2);
+            var isUTC = (timelapse.getCaptureTimes()[0].indexOf("UTC") >= 0);
+            if (!isUTC) {
+              formattedBeginTime = String(new Date(formattedBeginTime));
+              formattedEndTime = String(new Date(formattedEndTime));
+            }
+            $.ajax({
+              type: "POST",
+              dataType: "json",
+              url: "https://breathecam.cmucreatelab.org/camera_findings",
+              data: {
+                camera_finding: {
+                  camera_id : thumbnailParams.timemachineId,
+                  camera_name : locationMap[thumbnailParams.timemachineId],
+                  timemachine_path : thumbnailParams.root,
+                  media_path : thumbnailParams.url,
+                  media_format : thumbnailParams.format,
+                  media_width : thumbnailParams.width,
+                  media_height : thumbnailParams.height,
+                  comment : $("#camera-findings-comment").val(),
+                  begin_time : formattedBeginTime,
+                  end_time : formattedEndTime,
+                  start_frame : thumbnailParams.startFrame,
+                  num_frames : thumbnailParams.nframes
+                }
+              }
+            });
+          });
+        }
+        var thumbnailToolRow = $(".thumbnail-processing-time-warning").closest("tr");
+        $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(thumbnailToolRow);
+      }
       function selectTimelapseFeed() {
         $("#image_feed").css("visibility", "hidden");
         $("#stitched_image_wrapper").css("visibility", "hidden");
@@ -598,8 +601,12 @@
           if (window.location.hash)
             window.location.hash = "";
           var newLocation = $(this).attr("data-location-id");
-          if (timelapse)
-            var captureTimeAsDateObj = new Date(timelapse.getCurrentCaptureTime().replace(/-/g,"/"));
+          if (timelapse) {
+            var currentCaptureTime = timelapse.getCurrentCaptureTime();
+            if (currentCaptureTime) {
+              var captureTimeAsDateObj = new Date(currentCaptureTime.replace(/-/g,"/"));
+            }
+          }
           changeLocation(newLocation, currentDate, null, null, true, null, captureTimeAsDateObj);
         });
         tm_init();
@@ -644,9 +651,9 @@
         <img src="assets/images/westmifflin1_toggle.png" class="location_thumbnail" alt="westmifflin1">
         <div class="location_title">Edgar Thomson South</div>
       </a>
-      <a class="location_thumbnail_container" data-location-id="dravosburg2" href="javascript:void(0)">
-        <div id="dravosburg2_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/dravosburg2_toggle.png" class="location_thumbnail" alt="dravosburg2">
+      <a class="location_thumbnail_container" data-location-id="irvin1" href="javascript:void(0)">
+        <div id="irvin1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/irvin1_toggle.png" class="location_thumbnail" alt="irvin1">
         <div class="location_title">Irvin</div>
       </a>
       <a class="location_thumbnail_container" data-location-id="heinz" href="javascript:void(0)">
