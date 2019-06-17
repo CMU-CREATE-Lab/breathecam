@@ -322,13 +322,13 @@ class Compiler
     $start_time["hour"] = tmp_start_time.strftime("%H").to_i
     $start_time["minute"] = tmp_start_time.strftime("%M").to_i
     $start_time["sec"] = tmp_start_time.strftime("%S").to_i
-    start_time_zone_offset = (tmp_start_time.utc_offset / 1.hour) * 100
+    start_time_zone_offset = (tmp_start_time.utc_offset / 3600) * 100
     $start_time["full"] = "#{tmp_start_time.to_date} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:#{'%02d' % $start_time['sec']} #{start_time_zone_offset}"
 
     $end_time["hour"] = tmp_end_time.strftime("%H").to_i
     $end_time["minute"] = tmp_end_time.strftime("%M").to_i
     $end_time["sec"] = tmp_end_time.strftime("%S").to_i
-    end_time_zone_offset = (tmp_end_time.utc_offset / 1.hour) * 100
+    end_time_zone_offset = (tmp_end_time.utc_offset / 3600) * 100
     $end_time["full"] = "#{tmp_end_time.to_date} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']} #{end_time_zone_offset}"
   end
 
