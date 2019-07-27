@@ -313,7 +313,8 @@ class Compiler
     tmp_start_time = current_time_obj.beginning_of_day if tmp_start_time.to_date.to_s < $current_day.to_s
     # If end time goes past the current day, wrap around to start of next day from the what is presently set as $current_day
     if tmp_end_time.to_date.to_s > $current_day.to_s
-      current_time_obj += 1.day
+      # 1 day in seconds
+      current_time_obj += 86400
       tmp_end_time = current_time_obj.beginning_of_day
     end
     # Make sure we don't go past the current time of running, since images don't exist past that point
@@ -454,6 +455,9 @@ class Compiler
 
   def remove_corrupted_images(path_to_check)
     puts "[#{Time.now}] Checking for corrupted images."
+    # Check for empty files and remove them, which is all we can do for pngs at this time
+    system("find -L #{path_to_check} -maxdepth 3 -name '*.[pP][nN][gG]' -empty -print0 | xargs -0 -r rm")
+    # Find all jpg files and remove them if they are deemed corrupted (empty, bad headers, etc)
     system("find #{path_to_check} -maxdepth 3 -name '*.[jJ][pP][gG]' | xargs jpeginfo -cd")
   end
 
