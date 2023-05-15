@@ -2,6 +2,7 @@ require "rexml/document"
 require "json"
 require "time"
 require "date"
+require "active_support"
 require "active_support/core_ext"
 
 capture_times = []

@@ -7,6 +7,7 @@ require 'date'
 require 'time'
 require 'json'
 require 'parallel'
+require 'active_support'
 require 'active_support/core_ext'
 
 $RUNNING_WINDOWS = /(win|w)32$/.match(RUBY_PLATFORM)
@@ -19,6 +20,7 @@ $jpegtran_path = $RUNNING_WINDOWS ? "jpegtran.exe" : "jpegtran"
 # Hugin tools
 $nona_path = $RUNNING_WINDOWS ? "nona.exe" : "nona"
 $enblend_path = $RUNNING_WINDOWS ? "enblend.exe" : "enblend"
+$multiblend_path = $RUNNING_WINDOWS ? "multiblend.exe" : "multiblend"
 
 # Imagemagick
 $imagemagick_path = $RUNNING_WINDOWS ? "convert.exe" : "convert"
@@ -37,7 +39,6 @@ $default_num_jobs = 4
 $rsync_input = false
 $rsync_output = false
 $rsync_location_json = false
-$skip_rotate = false
 $run_append_externally = false
 $skip_stitch = false
 $skip_leader = false
@@ -60,6 +61,11 @@ $num_images_to_stitch = 4
 $stitcher = "hugin"
 # Default to epoch time
 $file_names_date_format = "%s"
+$force_trim_on_working_dir = false
+$use_multiblend_for_hugin = false
+$calculate_image_mse = false
+$mse_golden_images = []
+$use_faster_file_lookup = false
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -68,7 +74,7 @@ end
 class Compiler
   def initialize(args)
 
-    if args.length < 4
+    if args.length < 3
       usage
     end
 
@@ -76,8 +82,7 @@ class Compiler
 
     $input_path = ARGV[0]
     $output_path = ARGV[1]
-    $master_alignment_file = ARGV[2]
-    $camera_location = ARGV[3]
+    $definition_file_path = ARGV[2]
 
     unless $input_path
       puts "Input path not provided."
@@ -89,13 +94,8 @@ class Compiler
       usage
     end
 
-    unless $master_alignment_file
-      puts "Hugin alignment file not provided."
-      usage
-    end
-
-    unless $camera_location
-      puts "Camera location name (e.g. heinz) not provided"
+    unless $definition_file_path
+      puts "Path to definition file not provided."
       usage
     end
 
@@ -112,19 +112,22 @@ class Compiler
       elsif arg == "-current-day"
         $current_day = ARGV.shift
       elsif arg == "-incremental-update-interval"
-        # In minutes.
+        # In minutes
         $incremental_update_interval = ARGV.shift.to_i
-      elsif arg == "--skip-rotate"
-        $skip_rotate = true
-      elsif arg == "--alter-gamma-amount"
+      elsif arg == "-rotate-by-list"
+        # If a multi-cam, pass in a list corresponding to the desired image rotation amount for
+        # each cam. If no rotation is required for a particular camera of a multi-cam, pass in a 0
+        # for the corresponding index. If not a multi-cam, just pass one value.
+        $rotate_by_list = ARGV.shift.split(",")
+      elsif arg == "-alter-gamma-amount"
         $alter_gamma_amount = ARGV.shift.to_f
-      elsif arg == "--crop-amount-bounds"
+      elsif arg == "-crop-amount-bounds"
         # Format is L,B,R,T (left, bottom, right, top)
         $crop_amount_bounds = ARGV.shift.split(",")
       elsif arg == "--run-append-externally"
         $run_append_externally = true
-      elsif arg == "-ssd-mount"
-        $ssd_mount = ARGV.shift
+      elsif arg == "--force-trim-on-working-dir"
+        $force_trim_on_working_dir = true
       elsif arg == "-working-dir"
         $working_dir = ARGV.shift
       elsif arg == "--skip-stitch"
@@ -177,12 +180,31 @@ class Compiler
       elsif arg == "-image-capture-interval"
         # In seconds
         $image_capture_interval = ARGV.shift.to_i
+      elsif arg == "-stitcher-master-alignment-file"
+        $stitcher_master_alignment_file = ARGV.shift.to_s
+      elsif arg == "--use-multiblend-for-hugin"
+        $use_multiblend_for_hugin = true
+      elsif arg == "-video-tile-mode"
+        $video_tile_mode = ARGV.shift
+      elsif arg == "-ramdisk-path"
+        $ramdisk_path = ARGV.shift
       end
     end
 
     # Clean up paths if coming from Windows
     $input_path = $input_path.tr('\\', "/").chomp("/")
     $output_path = $output_path.tr('\\', "/").chomp("/")
+
+    # Process definition file
+    $definition_file = load_definition_file()
+    $camera_location = $definition_file["id"]
+    $time_zone = $definition_file["source"]["time_zone"]
+    # Set global variables, based on key name from the definition file, to the values set in the definition file
+    $definition_file['config'].each do |key, val|
+      val = "'#{val}'" if val.is_a?(String)
+      eval("$#{key} = #{val}")
+    end
+    $num_images_to_stitch = $multi_camera_list.length if $multi_camera_list
 
     if !$rsync_input && !File.exists?(File.expand_path($input_path))
       puts "Invalid input path: #{$input_path}"
@@ -223,7 +245,8 @@ class Compiler
 
     FileUtils.mkdir_p($working_dir)
     FileUtils.touch(File.join($working_dir, "WIP"))
-    create_definition_file
+    #create_definition_file
+    create_ramdisk_links() if $ramdisk_path
 
     # Set time zone based on definition file
     Time.zone = $time_zone || "Eastern Time (US & Canada)"
@@ -239,23 +262,32 @@ class Compiler
     $rsync_input || $symlink_input ? get_source_images : $skip_stitch ? create_tm : organize_images
   end
 
-  def create_definition_file
-    path_to_definition_file = "#{$working_dir}/definition.tmc"
-    if File.exists?(path_to_definition_file)
-      json = open(path_to_definition_file) {|fh| JSON.load(fh)}
-      $time_zone = json["source"]["time_zone"]
+  def load_definition_file
+    if File.exists?($definition_file_path)
+      return open($definition_file_path) {|fh| JSON.load(fh)}
     else
-      FileUtils.cp("#{File.dirname(__FILE__)}/default_definition.tmc", path_to_definition_file)
-      json = open(path_to_definition_file) {|fh| JSON.load(fh)}
-      location_name = camera_name_remap($camera_location)
-      json["id"] = location_name
-      json["label"] = location_name
-      json["split_type"] = $is_monthly ? "monthly" : "daily"
-      # Use default time parser unless we are using a breathecam specific camera
-      json["source"].delete("capture_time_parser") unless $camera_type == "breathecam"
-      open(path_to_definition_file, "w") {|fh| fh.puts(JSON.pretty_generate(json))}
+       puts "Error opening definition file: #{$definition_file_path}. Does this file exist? Exiting process."
+       exit
     end
   end
+
+  #def create_definition_file
+  #  path_to_definition_file = "#{$working_dir}/definition.tmc"
+  #  if File.exists?(path_to_definition_file)
+  #    json = open(path_to_definition_file) {|fh| JSON.load(fh)}
+  #    $time_zone = json["source"]["time_zone"]
+  #  else
+  #    FileUtils.cp("#{File.dirname(__FILE__)}/default_definition.tmc", path_to_definition_file)
+  #    json = open(path_to_definition_file) {|fh| JSON.load(fh)}
+  #    location_name = camera_name_remap($camera_location)
+  #    json["id"] = location_name
+  #    json["label"] = location_name
+  #    json["split_type"] = $is_monthly ? "monthly" : "daily"
+  #    # Use default time parser unless we are using a breathecam specific camera
+  #    json["source"].delete("capture_time_parser") unless $camera_type == "breathecam"
+  #    open(path_to_definition_file, "w") {|fh| fh.puts(JSON.pretty_generate(json))}
+  #  end
+  #end
 
   def camera_name_remap(camera_location)
     if (camera_location == "heinz")
@@ -333,6 +365,17 @@ class Compiler
     $end_time["full"] = "#{tmp_end_time.to_date} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']} #{end_time_zone_offset}"
   end
 
+  def file_dir_or_symlink_exists?(path_to_file)
+    File.exist?(path_to_file) || File.symlink?(path_to_file)
+  end
+
+  def create_ramdisk_links
+    system("mkdir -p #{$ramdisk_path}/#{$camera_location}.tmc/0200-tiles")
+    system("ln -s #{$ramdisk_path}/#{$camera_location}.tmc/0200-tiles #{$working_dir}/") unless file_dir_or_symlink_exists?("#{$working_dir}/0200-tiles")
+    system("mkdir -p #{$ramdisk_path}/#{$camera_location}.tmc/0300-tilestacks")
+    system("ln -s #{$ramdisk_path}/#{$camera_location}.tmc/0300-tilestacks #{$working_dir}/") unless file_dir_or_symlink_exists?("#{$working_dir}/0300-tilestacks")
+  end
+
   def clear_working_dir
     puts "[#{Time.now}] Removing previous working files..."
     # Delete the contents of the directories, not the directories themselves since they may be symlinked.
@@ -375,7 +418,18 @@ class Compiler
         end_date_formatted = Time.zone.parse($end_time['full']).utc.strftime($file_names_date_format)
         logic_operator1 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? ">=" : ">"
         logic_operator2 = $start_time["hour"].to_i + $start_time["minute"].to_i + $start_time["sec"].to_i == 0 ? "<" : "<="
-        file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 #{logic_operator1} #{start_date_formatted} and $1 #{logic_operator2} #{end_date_formatted})'"
+        if $use_faster_file_lookup
+          if logic_operator1 == ">"
+            start_date_formatted = start_date_formatted.to_i + 1
+          end
+          if logic_operator2 == "<"
+            end_date_formatted = end_date_formatted.to_i - 1
+          end
+          # Much faster than the find/perl combo, but does hit the 'argument list too long' limit
+          file_list_command = "bash -c \"ls #{src_path}/#{img_folder}/{#{start_date_formatted}..#{end_date_formatted}}{#{$valid_image_extensions.join(',')}} 2>/dev/null | sed 's#.*/##'\""
+        else
+          file_list_command = "find #{src_path}/#{img_folder}/ -maxdepth 1 -type f -printf '%f\n' | perl -ne 'print if (m!(\\d+)*.[jJpP][pPnN][gG]! and $1 #{logic_operator1} #{start_date_formatted} and $1 #{logic_operator2} #{end_date_formatted})'"
+        end
       else
         file_list_command = "bash -O extglob -c \"find #{src_path}/#{img_folder}/*.[jJpP][pPnN]*(e)*(E)[gG] -maxdepth 1 -type f -newermt '#{$current_day} #{'%02d' % $start_time['hour']}:#{'%02d' % $start_time['minute']}:00' ! -newermt '#{$current_day} #{'%02d' % $end_time['hour']}:#{'%02d' % $end_time['minute']}:#{'%02d' % $end_time['sec']}' -printf '%f\n'\""
       end
@@ -513,7 +567,7 @@ class Compiler
       puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
       exit
     end
-    rotate_images unless $skip_rotate
+    rotate_images if $rotate_by_list
     stitch_images
   end
 
@@ -566,7 +620,7 @@ class Compiler
       puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing and check again later when more images are available."
       exit
     end
-    rotate_images unless $skip_rotate
+    rotate_images if $rotate_by_list
     stitch_images
   end
 
@@ -610,7 +664,7 @@ class Compiler
   def alter_image_gamma
     count = 0
     match_count = 0
-    puts "[#{Time.now}] Alerting gamma of images..."
+    puts "[#{Time.now}] Altering gamma of images..."
     files = Dir.glob("#{$input_path}/*")
     Parallel.each(files, :in_threads => $num_jobs) do |img|
       file_extension = File.extname(img)
@@ -635,31 +689,37 @@ class Compiler
   end
 
   def rotate_images
-    # TODO: Allow user to pass in rotate amount
-    rot_amt = 180
     count = 0
     match_count = 0
-    puts "[#{Time.now}] Rotating images #{rot_amt} degrees clockwise..."
-    files = Dir.glob("#{$organized_images_path}/*/*.*").sort
-    Parallel.each(files, :in_threads => $num_jobs) do |img|
-      file_extension = File.extname(img)
-      next unless $valid_image_extensions.include? file_extension.downcase
-      count += 1
-      if $RUNNING_WINDOWS && file_extension == ".lnk"
-        img = Win32::Shortcut.open(img).path
-        # Get the real file extension now
-        file_extension = File.extname(img)
+    for i in 1..$rotate_by_list.length
+      rot_amt = $rotate_by_list[i-1]
+      if $rotate_by_list.length == 1
+        glob_param = "*.*"
+      else
+        glob_param = "*_image#{i}.*"
       end
-      begin
-        if file_extension.downcase.include?(".jp")
-          system("#{$jpegtran_path} -copy all -rotate #{rot_amt} -optimize -outfile #{%Q{"#{img}"}} #{%Q{"#{img}"}}")
-        else
-          system("#{$imagemagick_path} #{%Q{"#{img}"}} -rotate #{rot_amt} #{%Q{"#{img}"}}")
+      puts "[#{Time.now}] Rotating images #{rot_amt} degrees clockwise..."
+      files = Dir.glob("#{$organized_images_path}/*/{glob_param}").sort
+      Parallel.each(files, :in_threads => $num_jobs) do |img|
+        file_extension = File.extname(img)
+        next unless $valid_image_extensions.include? file_extension.downcase
+        count += 1
+        if $RUNNING_WINDOWS && file_extension == ".lnk"
+          img = Win32::Shortcut.open(img).path
+          # Get the real file extension now
+          file_extension = File.extname(img)
         end
-        match_count += 1
-      rescue
-        # Ignore and move on
-        # TODO: Maybe do something in this case.
+        begin
+          if file_extension.downcase.include?(".jp")
+            system("#{$jpegtran_path} -copy all -rotate #{rot_amt} -optimize -outfile #{%Q{"#{img}"}} #{%Q{"#{img}"}}")
+          else
+            system("#{$imagemagick_path} #{%Q{"#{img}"}} -rotate #{rot_amt} #{%Q{"#{img}"}}")
+          end
+          match_count += 1
+        rescue
+          # Ignore and move on
+          # TODO: Maybe do something in this case.
+        end
       end
     end
     puts "[#{Time.now}] Rotating complete. Rotated #{match_count} out of #{count} images."
@@ -682,15 +742,16 @@ class Compiler
       # TODO: Only appends horizontally
       Parallel.each(files, :in_threads => $num_jobs) do |img|
         count += 1
-        date = File.basename(img, ".*").split("_")[0]
-        parent_path = File.dirname(img)
-        file_extension = File.extname(img)
         begin
+          date = File.basename(img, ".*").split("_")[0]
+          parent_path = File.dirname(img)
+          file_extension = File.extname(img)
+          stitched_image = "#{stitched_images_path}/#{date}_full.jpg"
           concat_input_files_string = ""
           for i in 1..$num_images_to_stitch
             concat_input_files_string += " #{%Q{"#{parent_path}/#{date}_image#{i}#{file_extension}"}}"
           end
-          system("#{$imagemagick_path} +append #{concat_input_files_string} #{%Q{"#{stitched_images_path}/#{date}_full.jpg"}}")
+          system("#{$imagemagick_path} +append #{concat_input_files_string} #{%Q{"#{stitched_image}"}}")
           match_count += 1
         rescue => e
           puts e
@@ -716,33 +777,48 @@ class Compiler
       puts "[#{Time.now}] GigaPan Stitcher is about to stitch #{count} frames."
       create_tm
     else
-      Parallel.each(files, :in_threads => $num_jobs) do |img|
-        file_extension = File.extname(img)
-        next unless $valid_image_extensions.include? file_extension.downcase
-        count += 1
-        if $RUNNING_WINDOWS && file_extension == ".lnk"
-          img = Win32::Shortcut.open(img).path
-          # Get the real file extension now
+      Dir.chdir($working_dir) do
+        Parallel.each(files, :in_threads => $num_jobs) do |img|
           file_extension = File.extname(img)
-        end
-        date = File.basename(img, ".*").split("_")[0]
-        parent_path = File.dirname(img)
-        begin
-          enblend_tmp_file_prefix = "#{$camera_location}_#{date}_"
-          nona_input_files_string = ""
-          enblend_input_files_string = ""
-          for i in 1..$num_images_to_stitch
-            nona_input_files_string += " #{%Q{"#{parent_path}/#{date}_image#{i}#{file_extension}"}}"
-            enblend_input_files_string += " #{enblend_tmp_file_prefix}#{'%04d' % (i-1)}.tif"
+          next unless $valid_image_extensions.include? file_extension.downcase
+          count += 1
+          if $RUNNING_WINDOWS && file_extension == ".lnk"
+            img = Win32::Shortcut.open(img).path
+            # Get the real file extension now
+            file_extension = File.extname(img)
           end
-          system("#{$nona_path} -o #{enblend_tmp_file_prefix} #{%Q{"#{$master_alignment_file}"}} #{nona_input_files_string}")
-          system("#{$enblend_path} --no-optimize --compression=100 --fine-mask -o #{%Q{"#{stitched_images_path}/#{date}_full.jpg"}} #{enblend_input_files_string}")
-          Dir.glob("#{enblend_tmp_file_prefix}*.tif").each { |f| File.delete(f) }
-          match_count += 1
-        rescue => e
-          puts e
-          # Ignore and move on
-          # TODO: Maybe do something in this case.
+          begin
+            date = File.basename(img, ".*").split("_")[0]
+            parent_path = File.dirname(img)
+            stitched_image = "#{stitched_images_path}/#{date}_full.jpg"
+            enblend_tmp_file_prefix = "#{$camera_location}_#{date}_"
+            nona_input_files_string = ""
+            enblend_input_files_string = ""
+            for i in 1..$num_images_to_stitch
+              nona_input_files_string += " #{%Q{"#{parent_path}/#{date}_image#{i}#{file_extension}"}}"
+              enblend_input_files_string += " #{enblend_tmp_file_prefix}#{'%04d' % (i-1)}.tif"
+            end
+            rets = []
+            rets << system("#{$nona_path} -o #{enblend_tmp_file_prefix} #{%Q{"#{$stitcher_master_alignment_file}"}} #{nona_input_files_string}")
+            if $use_multiblend_for_hugin
+              rets << system("#{$multiblend_path} --compression=100 --wideblend --quiet -o #{%Q{"#{stitched_image}"}} #{enblend_input_files_string}")
+            else
+              rets << system("#{$enblend_path} --no-optimize --compression=100 --fine-mask -o #{%Q{"#{stitched_image}"}} #{enblend_input_files_string}")
+            end
+            Dir.glob("#{enblend_tmp_file_prefix}*.tif").each { |f| File.delete(f) }
+            # If nona or enblend|multiblend crashes, we don't want to count this as a success. Also, delete the file it may have made.
+            # TODO: We have seen multiblend crash occasionally. Perhaps it is worth retrying the stitch again. For now though, we just throw it out.
+            if rets.include?(false)
+              puts "[#{Time.now}] Error stitching images for #{date}."
+              FileUtils.rm_f(stitched_image)
+            else
+              match_count += 1
+            end
+          rescue => e
+            puts e
+            # Ignore and move on
+            # TODO: Maybe do something in this case.
+          end
         end
       end
       puts "[#{Time.now}] Stitching complete. Stitched #{match_count} out of #{count} possible frames."
@@ -767,21 +843,57 @@ class Compiler
   end
 
   def create_top_video
-    output_video_path = File.join($working_dir, "0400-output-video")
-    input_images_path = File.join($working_dir, "0100-original-images") unless $organized_images_path
-    path_to_definition_file = "#{$working_dir}/definition.tmc"
-    json = open(path_to_definition_file) {|fh| JSON.load(fh)}
+    json = $definition_file
+
     fps = json["videosets"][0]["fps"]
     crf = json["videosets"][0]["quality"]
     video_type = json["videosets"][0]["type"]
-    video_dimensions = json["videosets"][0]["size"].join("x")
+    video_label = json["videosets"][0]["label"]
+    video_dimensions = json["videosets"][0]["size"]
+    tm_extra = 1.333333
+    video_dimensions_with_extra = [(video_dimensions[0].to_i * tm_extra).ceil, (video_dimensions[1].to_i * tm_extra).ceil]
+
     top_video_length_in_sec = json["top_video_length_in_sec"]
     capture_time_parser = json["source"]["capture_time_parser"]
-    path_to_tm_file = "#{output_video_path}/#{$camera_location}.json"
-    path_to_final_tm_file = "#{output_video_path}/#{$camera_location}.final.json"
-    path_to_tm_js_file = "#{output_video_path}/#{$camera_location}.js"
+
+    dataset_path = "crf#{crf}-#{fps}fps-#{video_dimensions.join('x')}"
+    input_images_path = File.join($working_dir, "0100-original-images")
+    output_root_path = File.join($working_dir, $current_day + ".timemachine")
+    output_video_path = File.join(output_root_path, dataset_path)
+    output_video_tile_path = File.join(output_video_path, "overview")
+    FileUtils.mkdir_p(output_video_tile_path)
+
+    path_to_tm_file = "#{output_root_path}/tm.json"
+    path_to_r_file = "#{output_video_path}/r.json"
+
+    if not File.exists?(path_to_tm_file)
+      File.open(path_to_tm_file, "w") do |fh|
+        tm_json = {}
+        tm_json['datasets'] = []
+        datasets = {}
+        datasets['id'] = dataset_path
+        tm_json['datasets'].push(datasets)
+        tm_json['sizes'] = video_label
+        tm_json['id'] = $camera_location
+        tm_json['capture-times'] = []
+        fh.puts(JSON.dump(tm_json))
+      end
+    end
     tm_json = open(path_to_tm_file) {|fh| JSON.load(fh)}
-    num_current_frames = tm_json["capture-times"].length
+
+    input_images = Dir.glob("#{input_images_path}/*{#{$valid_image_extensions.join(',')}}")
+
+    if not File.exists?(path_to_r_file)
+      input_image = input_images[0]
+      input_image_dimensions = `identify -ping -format '%[width]x%[height]' #{input_image}`
+      input_image_dimensions_array = input_image_dimensions.split('x')
+      File.open(path_to_r_file, "w") do |fh|
+        r_json = {}
+        r_json['fps'] = fps
+        fh.puts(JSON.dump(r_json))
+      end
+    end
+
     if video_type == "webm"
       codec = "libvpx"
       output_extension = "webm"
@@ -789,51 +901,62 @@ class Compiler
       codec = "libx264 -profile:v baseline"
       output_extension = "mp4"
     end
-    max_frames = (top_video_length_in_sec / 60) * (60 / $image_capture_interval)
-    num_new_images = Dir.glob("#{input_images_path}/*/*{#{$valid_image_extensions.join(',')}}").length
-    frame_diff = (num_current_frames + num_new_images) - max_frames
 
-    ffmpeg_output_command = "-s #{video_dimensions} -c:v #{codec} -preset veryslow -pix_fmt yuv420p -crf #{crf} -bf 0 -g 10 -threads 8"
+    if top_video_length_in_sec
+      num_new_images = input_images.length
+      num_current_frames = tm_json["capture-times"].length
+      max_frames = (top_video_length_in_sec / 60) * (60 / $image_capture_interval)
+      frame_diff = (num_current_frames + num_new_images) - max_frames
+    else
+      frame_diff = 0
+    end
 
-    system("#{$ffmpeg_path} -framerate #{fps} -pattern_type glob -i '#{input_images_path}/*/*.jpg' #{ffmpeg_output_command} #{output_video_path}/0-1.#{output_extension}")
+    ffmpeg_output_command = "-s #{video_dimensions_with_extra.join('x')} -c:v #{codec} -preset ultrafast -pix_fmt yuv420p -crf #{crf} -bf 0 -g 10 -threads 16"
 
-    capture_times = tm_json["capture-times"]
-    system("ruby #{capture_time_parser} #{input_images_path}/*/ #{path_to_tm_file}")
-    new_tm_json = open(path_to_tm_file) {|fh| JSON.load(fh)}
-    new_capture_times = new_tm_json["capture-times"]
-    new_tm_json["capture-times"] = capture_times + new_capture_times
+    system("#{$ffmpeg_path} -framerate #{fps} -pattern_type glob -i '#{input_images_path}/*.jpg' #{ffmpeg_output_command} #{output_video_tile_path}/0-1.#{output_extension}")
 
+    inplace_append = true
+    # Ensure only the last x amount of frames are stored in the video
     if frame_diff > 0
+      inplace_append = false
       seconds_to_chop = frame_diff.to_f / fps.to_f
-      concat_str = "file '#{output_video_path}/0-0.#{output_extension}'\nfile '#{output_video_path}/0-1.#{output_extension}'"
+      concat_str = "file '#{output_video_tile_path}/0-0.#{output_extension}'\nfile '#{output_video_tile_path}/0-1.#{output_extension}'"
       system("echo \"#{concat_str}\" > /tmp/#{$camera_location}.concat.txt")
-      system("#{$ffmpeg_path} -i #{output_video_path}/0.#{output_extension} -ss #{seconds_to_chop} #{ffmpeg_output_command} #{output_video_path}/0-0.#{output_extension}")
-      system("#{$ffmpeg_path} -auto_convert 1 -f concat -safe 0 -i /tmp/#{$camera_location}.concat.txt #{ffmpeg_output_command} #{output_video_path}/0-new.#{output_extension}")
+      system("#{$ffmpeg_path} -i #{output_video_tile_path}/0.#{output_extension} -ss #{seconds_to_chop} #{ffmpeg_output_command} #{output_video_tile_path}/0-0.#{output_extension}")
+      system("#{$ffmpeg_path} -auto_convert 1 -f concat -safe 0 -i /tmp/#{$camera_location}.concat.txt #{ffmpeg_output_command} #{output_video_tile_path}/0-new.#{output_extension}")
       new_tm_json["capture-times"].shift(frame_diff)
     else
-      if File.exists?("#{output_video_path}/0.#{output_extension}")
-        concat_str = "file '#{output_video_path}/0.#{output_extension}'\nfile '#{output_video_path}/0-1.#{output_extension}'"
-        system("echo \"#{concat_str}\" > /tmp/#{$camera_location}.concat.txt")
-        system("#{$ffmpeg_path} -auto_convert 1 -f concat -safe 0 -i /tmp/#{$camera_location}.concat.txt #{ffmpeg_output_command} #{output_video_path}/0-new.#{output_extension}")
+      if File.exists?("#{output_video_tile_path}/0.#{output_extension}")
+        system("concatenate-mp4-videos.py #{output_video_tile_path}/0.#{output_extension} #{output_video_tile_path}/0-1.#{output_extension} --future_frames=#{$future_appending_frames}")
+        ####concat_str = "file '#{output_video_tile_path}/0.#{output_extension}'\nfile '#{output_video_tile_path}/0-1.#{output_extension}'"
+        ####system("echo \"#{concat_str}\" > /tmp/#{$camera_location}.concat.txt")
+        # Note: Cannot use -c copy since it results in a video that has playback issues in Chrome. Gets stuck buffering while scrubbing/seeking. Not sure why this is.
+        ####system("#{$ffmpeg_path} -auto_convert 1 -f concat -safe 0 -i /tmp/#{$camera_location}.concat.txt #{ffmpeg_output_command} #{output_video_tile_path}/0-new.#{output_extension}")
       else
-        FileUtils.mv("#{output_video_path}/0-1.#{output_extension}", "#{output_video_path}/0-new.#{output_extension}", :force => true)
+        inplace_append = false
+        FileUtils.mv("#{output_video_tile_path}/0-1.#{output_extension}", "#{output_video_tile_path}/0-new.#{output_extension}", :force => true)
       end
     end
 
-    system("#{$qtfaststart_path} #{output_video_path}/0-new.#{output_extension}")
-    FileUtils.mv("#{output_video_path}/0-new.#{output_extension}", "#{output_video_path}/0.#{output_extension}", :force => true)
+    if inplace_append
+      system("#{$qtfaststart_path} #{output_video_tile_path}/0.#{output_extension}")
+    else
+      system("#{$qtfaststart_path} #{output_video_tile_path}/0-new.#{output_extension}")
+      FileUtils.mv("#{output_video_tile_path}/0-new.#{output_extension}", "#{output_video_tile_path}/0.#{output_extension}", :force => true)
+    end
 
-    tmp_file = path_to_tm_file + ".tmp"
-    tmp_file2 = path_to_tm_js_file + ".tmp"
-    open(tmp_file, "w") {|fh| fh.puts(JSON.generate(new_tm_json))}
-    open(tmp_file2, "w") {|fh| fh.puts("cached_breathecam=" + JSON.generate(new_tm_json) + ";")}
-    File.rename(tmp_file, path_to_tm_file)
-    File.rename(tmp_file2, path_to_tm_js_file)
+    current_capture_times = tm_json["capture-times"]
+    system("ruby #{capture_time_parser} #{input_images_path} #{path_to_tm_file}")
+    new_tm_json = open(path_to_tm_file) {|fh| JSON.load(fh)}
+    new_capture_times = new_tm_json["capture-times"]
+    new_tm_json["capture-times"] = current_capture_times + new_capture_times
 
-    FileUtils.cp_r(path_to_tm_file, path_to_final_tm_file, :remove_destination => true)
+    tmp_tm_file = path_to_tm_file + ".tmp"
+    open(tmp_tm_file, "w") {|fh| fh.puts(JSON.generate(new_tm_json))}
+    File.rename(tmp_tm_file, path_to_tm_file)
 
-    FileUtils.rm_f(File.join(output_video_path, "0-0.#{output_extension}"))
-    FileUtils.rm_f(File.join(output_video_path, "0-1.#{output_extension}"))
+    FileUtils.rm_f(File.join(output_video_tile_path, "0-0.#{output_extension}"))
+    FileUtils.rm_f(File.join(output_video_tile_path, "0-1.#{output_extension}"))
   end
 
   def create_tm
@@ -853,6 +976,7 @@ class Compiler
       extra_flags += "--skip-leader " if $skip_leader
       extra_flags += "--skip-videos --preserve-source-tiles " if $skip_videos
       extra_flags += "--sort-by-exif-dates " if $sort_by_exif_dates
+      extra_flags += "-tile-mode #{$video_tile_mode} " if $video_tile_mode
       # TODO: Assumes Ruby is installed and ct.rb is in the PATH
       Dir.chdir($working_dir) do
         puts "ct.rb #{$working_dir} #{$timemachine_output_path}/#{$timemachine_output_dir} -j #{$num_jobs} #{extra_flags}"
@@ -865,7 +989,8 @@ class Compiler
       rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
       rsync_location_json if $rsync_location_json
     end
-    trim_ssd if $ssd_mount
+    trim_ssd if $force_trim_on_working_dir
+    run_image_mse_checker if $calculate_image_mse
     completed_process
   end
 
@@ -898,7 +1023,7 @@ class Compiler
     latest_entry = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : new_latest
     dateset_entry = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day
     json["latest"]["date"] = new_latest
-    json["latest"]["path"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{latest_entry}.timemachine";
+    json["latest"]["path"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{latest_entry}.timemachine"
     json["datasets"]["#{$current_day}"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{dateset_entry}.timemachine"
     tmp_time = Time.now
     tmp_path_to_json = path_to_json + "_#{tmp_time}"
@@ -1197,8 +1322,25 @@ class Compiler
   end
 
   def trim_ssd
-    puts "[#{Time.now}] Trimming #{$ssd_mount}"
-    system("sudo fstrim -v #{$ssd_mount}")
+    mount_point = File.dirname($working_dir)
+    puts "[#{Time.now}] Trimming #{mount_point}"
+    system("sudo fstrim -v #{mount_point}")
+  end
+
+  def run_image_mse_checker
+    # TODO: Deal with hardcoded path to image-diff.py and conda
+    puts "[#{Time.now}] Calculating MSE for input images."
+    for i in 0..$multi_camera_list.length-1
+      file_ext = File.extname($mse_golden_images[i]).delete(".")
+      match = $multi_camera_list[i].match(/\/(#{$camera_location}.*)\//)
+      if match
+        system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py #{$mse_golden_images[i]} #{$working_dir}/050-raw-images/#{i} #{file_ext} #{match[1]} #{$current_day} #{$working_dir}/#{$camera_location}_rolling_results.json'")
+      end
+    end
+    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-a-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/3 jpg #{$camera_location}a #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
+    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-b-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/2 jpg #{$camera_location}b #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
+    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-c-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/1 jpg #{$camera_location}c #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
+    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-d-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/0 jpg #{$camera_location}d #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
   end
 
   def completed_process
@@ -1207,7 +1349,7 @@ class Compiler
   end
 
   def usage
-    puts "Basic usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_MASTER_HUGIN_ALIGNMENT_FILE CAMERA_NAME"
+    puts "Basic usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_DEFINITION_FILE"
     exit
   end
 
