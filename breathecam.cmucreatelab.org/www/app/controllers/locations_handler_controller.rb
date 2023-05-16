@@ -24,7 +24,9 @@ class LocationsHandlerController < ApplicationController
             final = a2[0] + " " + a2[1]
             time_obj = Time.parse(final)
           else
-            tmp_t = File.basename(image.original_filename, ".*").split("_")[0].to_i
+            split_array = File.basename(image.original_filename, ".*").split("_")
+            tmp_t = split_array[0].to_i
+            multi_num_pos = split_array[1].to_i
             time_obj = Time.at(tmp_t.to_i)
           end
         rescue
@@ -50,7 +52,9 @@ class LocationsHandlerController < ApplicationController
         time_obj += time_offset_in_seconds
         time_in_seconds = time_obj.to_i
         current_date = time_obj.to_s.split(" ")[0]
-        name = time_in_seconds.to_s + File.extname(image.original_filename)
+        name = time_in_seconds.to_s
+        name += "_image#{multi_num_pos}" if multi_num_pos and multi_num_pos > 0
+        name += File.extname(image.original_filename)
         camera_status = CameraStatus.find_or_create_by_camera_name(params[:id].split("_").last) do |cs|
           cs.camera_type = 'ecam'
         end

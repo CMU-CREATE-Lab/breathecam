@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>E-Cam Latest Images</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script>
       var images = <%= raw(@images) %>
       var curr_indicies = [];
@@ -22,9 +22,20 @@
             return;
           }
           curr_indicies[idx] = curr_idx;
-          this.src = this.src.replace(/[0-9]{10}.jpg/, images[idx][curr_idx]);
+          var newImg = this.src.replace(/[0-9]{10}.jpg/, images[idx][curr_idx])
+          this.src = newImg;
           var epochTime = parseInt(images[idx][curr_idx].substr(0,10)) * 1000;
           $("#date-" + idx).text(String(new Date(epochTime)).substr(4,20));
+          $.ajax({
+            url: "http://ecam.cmucreatelab.org/get_exif",
+            data: {"url" : newImg}
+          }).done(function(data) {
+            var html = "";
+            html += "<tr><td>Exposure Time: " + data.exposure_time + " ms</td></tr>";
+            html += "<tr><td>ISO: " + data.iso + "</td></tr>";
+            html += "<tr><td>Aperture: " + (data.aperture || "") + "</td></tr>";
+            $("#exifdata-" + idx).html(html);
+          });
         });
       }
     </script>

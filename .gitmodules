@@ -1,6 +1,9 @@
-[submodule "breathecam.cmucreatelab.org/www/public/timemachine-viewer"]
-	path = breathecam.cmucreatelab.org/www/public/timemachine-viewer
+[submodule "libs/timemachine-viewer"]
+	path = libs/timemachine-viewer
 	url = https://github.com/CMU-CREATE-Lab/timemachine-viewer.git
-[submodule "mon.createlab.org/www/assets/libs/timemachine-viewer"]
-	path = mon.createlab.org/www/assets/libs/timemachine-viewer
-	url = https://github.com/CMU-CREATE-Lab/timemachine-viewer.git
+[submodule "libs/video-time-controls"]
+	path = libs/video-time-controls
+	url = https://github.com/CMU-CREATE-Lab/video-time-controls.git
+[submodule "libs/mp4-concatenate"]
+	path = libs/mp4-concatenate
+	url = https://github.com/CMU-CREATE-Lab/mp4-concatenate.git

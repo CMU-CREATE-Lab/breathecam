@@ -36,7 +36,7 @@
     }
     </style>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script>
       $(function() {
         var cameras = <%= raw(@camera_statuses_json) %>
@@ -68,35 +68,37 @@
         <th>Images</th>
         <th>Latest Image</th>
         <th>Timelapse</th>
-        <th>Last Upload Timestamp</th>
-        <th>Last Uploaded Image Timestamp</th>
+        <th>Latest Time Talked to CMU</th>
+        <th>Latest Time Taken From Camera</th>
         <th>Last Processed Image Timestamp</th>
       </tr>
       <% @camera_statuses.each_with_index do |camera, i| %>
         <tr>
           <td id="<%= camera.camera_name %>">
-            <% if camera.camera_name == "nikonCamera2" || camera.camera_name == "nikonCamera6" %>
-              <%= "(Keith) - " + camera.camera_name %>
-            <% elsif camera.camera_name == "nikonCamera5" || camera.camera_name == "nikonCamera3" || camera.camera_name == "nikonCamera15" %>
-              <%= "(Golf Course) - " + camera.camera_name %>
-            <% elsif camera.camera_name == "nikonCamera21" %>
-              <%= "(Golf Course 2) - " + camera.camera_name %>
+            <% if camera.camera_name == "clairton3a" || camera.camera_name == "clairton3b" || camera.camera_name == "clairton3c" || camera.camera_name == "clairton3d" %>
+              <%= "(Keith) - " + camera.camera_name + " (PC #1, set reset 2)" %>
+            <% elsif camera.camera_name == "nikonCamera17" || camera.camera_name == "nikonCamera13" %>
+              <%= "(Keith) - " + camera.camera_name + " (PC #1, set reset 1)" %>
+            <% elsif camera.camera_name == "nikonCamera20" %>
+              <%= "(Glassport) - " + camera.camera_name + " (PC #20, set reset 1)" %>
             <% elsif camera.camera_name == "shenango1" %>
               <%= "(Leah) - " + camera.camera_name %>
             <% elsif camera.camera_name == "shenango2" %>
               <%= "(ACHD) - " + camera.camera_name %>
             <% elsif camera.camera_name == "nikonCamera8" %>
-              <%= "(Walnut Towers) - " + camera.camera_name %>
-            <% elsif camera.camera_name == "nikonCamera13" || camera.camera_name == "nikonCamera14" %>
-              <%= "(Dravosburg) - " + camera.camera_name %>
-            <% elsif camera.camera_name == "nikonCamera17" %>
-              <%= "(Dravosburg 2) - " + camera.camera_name %>
+              <%= "(Walnut Towers) - " + camera.camera_name + " (PC #6, set reset 1)" %>
             <% elsif camera.camera_name == "nikonCamera7" %>
-              <%= "(N. Braddock) - " + camera.camera_name %>
-            <% elsif camera.camera_name == "nikonCamera10" %>
-              <%= "(N. Braddock) - " + camera.camera_name %>
+              <%= "(N. Braddock) - " + camera.camera_name + " (PC #10, set reset 1)" %>
             <% elsif camera.camera_name == "nikonCamera4" %>
-              <%= "(West Mifflin) - " + camera.camera_name %>
+              <%= "(N. Braddock) - " + camera.camera_name + " (PC #10, set reset 1)" %>
+            <% elsif camera.camera_name == "nikonCamera18" %>
+              <%= "(West Mifflin) - " + camera.camera_name + " (PC #12, set reset 1)" %>
+            <% elsif camera.camera_name == "nikonCamera15" %>
+              <%= "(ACCAN at Sonia) - " + camera.camera_name + " (PC #9, set reset 1)" %>
+            <% elsif camera.camera_name == "piquad3a"  %>
+               <%= "(Lab Window) - " + camera.camera_name + " (PC #14b, set reset 1)" %>
+            <% elsif camera.camera_name == "piquad3b" %>
+              <%= "(Lab Window) - " + camera.camera_name + " (PC #14b, set reset 2)" %>
             <% else %>
               <%= camera.camera_name %>
             <% end %>
@@ -108,8 +110,10 @@
             <%= link_to("latest image", "/locations/#{camera.camera_name}/latest", :target => "_blank") %>
           </td>
           <td>
-            <% if camera.camera_name == "nikonCamera2" || camera.camera_name == "nikonCamera3" %>
+            <% if camera.camera_name == "nikonCamera2" || camera.camera_name == "nikonCamera6" %>
               <%= link_to("timelapse", "/embeds/clairton1", :target => "_blank") %>
+            <% elsif camera.camera_name == "nikonCamera9" %>
+              <%= link_to("timelapse", "/embeds/train1", :target => "_blank") %>
             <% else %>
               <%= link_to("timelapse", "/embeds/#{camera.camera_name}", :target => "_blank") %>
             <% end %>
@@ -146,7 +150,7 @@
       </tr>
       <tr>
         <td>
-          Camera offline for a month or more. Either it's not being used or we better get fixin!
+          Camera offline for a month or more. Either it's not being used or we better get fixin'!
         </td>
       </tr>
   </table>

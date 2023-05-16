@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BreatheCam</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+
+    <meta property="og:title" content="Mon Valley Cameras" />
+    <meta property="og:url" content="https://mon.createlab.org" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://mon.createlab.org/assets/images/collage.png" />
+    <meta property="fb:app_id" content="342963495886660" />
+
+    <meta name="twitter:card" content="summary" />
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700" rel="stylesheet" type="text/css">
+    <link href="assets/stylesheets/breathecam.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="assets/stylesheets/frame.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="assets/libs/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="assets/libs/timemachine-viewer/css/defaultUI.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="assets/libs/timemachine-viewer/libs/change-detect/css/change.css" media="screen" rel="stylesheet" type="text/css" />
+    <!-- <link href="assets/libs/flat-block-chart/FlatBlockChart.css" media="screen" rel="stylesheet" type="text/css"/> -->
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-10682694-12"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-10682694-12');
+    </script>
+
+    <script src="assets/libs/timemachine-viewer/js/jquery/jquery.min.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/jquery/jquery-ui.custom.min.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/jquery/plugins/dialogExtend/jquery.dialogextend.min.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/downloadjs/download.min.js"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/util.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/videoset.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/parabolicMotion.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/timelapse.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/Math.uuid.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/snaplapse.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/snaplapseViewer.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/defaultUI.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/crossdomain_api.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/template_includes.js" type="text/javascript"></script>
+    <script src="assets/javascripts/jquery.xdomainrequest.min.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/canvasjs/canvasjs.min.js" type="text/javascript"></script>
+
+    <script src="assets/libs/timemachine-viewer/js/glutils/Glb.js"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/TileIdx.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/TileView.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/WebglVideoTile.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/timelapse/WebglTimeMachineLayer.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/js/org/gigapan/frameGrab.js" type="text/javascript"></script>
+
+    <script src="assets/libs/timemachine-viewer/libs/change-detect/js/ThumbnailServiceAPI.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/libs/change-detect/js/TimeMachineCanvasLayer.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/libs/change-detect/js/ThumbnailTool.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/libs/change-detect/js/BoxEventHandler.js" type="text/javascript"></script>
+    <script src="assets/libs/timemachine-viewer/libs/change-detect/js/ChangeDetectionTool.js" type="text/javascript"></script>
+    <!-- <script src="assets/libs/flat-block-chart/FlatBlockChart.js" type="text/javascript"></script> -->
+
+    <script src="assets/javascripts/menu.js"></script>
+
+    <script src="https://tiles.cmucreatelab.org/ecam/timemachines/center1/center1.js" type="text/javascript"></script>
+
+    <style>
+      .menu-index {
+        color: rgb(255, 255, 255) !important;
+        opacity: 1 !important;
+        font-weight: 700 !important;
+      }
+    </style>
+
+    <style type="text/css">
+      #timeMachine {
+        position: fixed;
+        left: 0px;
+        right: 226px;
+        top: 61px;
+        bottom: 0px;
+        width: auto;
+        height: auto;
+        z-index: 5;
+      }
+
+      #timeMachine.snapshot-mode {
+        right: 0px;
+        top: 0px;
+      }
+
+      #timeMachine.snapshot-mode .captureTime {
+        left: 20px;
+        top: 18px;
+      }
+
+      #datepicker {
+        right: 0px !important;
+      }
+      #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
+        cursor: pointer;
+      }
+      #datepicker .ui-datepicker-header {
+        color: white;
+        background: rgb(150, 150, 150);
+        border: 0px solid rgb(204, 204, 204);
+        border-radius: 3px !important;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+      }
+      #datepicker .ui-datepicker {
+        font-size: 12px;
+        height: 190px;
+        border-radius: 0;
+        color: #555555;
+        background: rgb(248, 248, 248);
+        border: 1px solid rgb(150, 150, 150);
+      }
+      #datepicker .ui-state-default {
+        background: rgb(150, 150, 150);
+        border-radius: 3px !important;
+        color: white;
+        box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+      }
+      #datepicker .ui-state-hover {
+        background: rgb(100, 100, 100) !important;
+      }
+      #datepicker .date-highlight a {
+        color: white;
+        background: rgb(150, 150, 150);
+        border: 1px solid rgb(204, 204, 204);
+      }
+      #datepicker .ui-state-active {
+        border: 1px solid rgb(204, 204, 204) !important;
+        background: #2794DD !important;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+      }
+      #datepicker .ui-datepicker-header .ui-icon {
+        background-image: url('assets/images/ui-icons_custom_256x240.png');
+      }
+      .ui-dialog {
+        text-align: left;
+      }
+      #camera-findings-comment {
+        resize: vertical;
+      }
+      .thumbnail-chart-container {
+        position: fixed;
+        left: 92px;
+        right: 226px;
+        top: auto;
+        height: 75px;
+        width: auto;
+        overflow-x: scroll;
+        background-color: white;
+      }
+      #thumbnail-chart {
+        bottom: 0px;
+      }
+      .noselect {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Chrome/Safari/Opera */
+        -khtml-user-select: none; /* Konqueror */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently not supported by any browser */
+      }
+      .flat-block-chart .selected-block-no-color {
+        box-shadow: 0px 0px 0px 5px rgb(0, 154, 255) inset;
+        background-color: rgba(0, 0, 0, 0);
+      }
+      .flat-block-chart .flat-block-chart-value {
+        background-color: white;
+      }
+      #thumbnail-chart-info {
+        bottom: 0px;
+        position: fixed;
+        left: 0px;
+        right: auto;
+        top: auto;
+        height: 75px;
+        width: 91px;
+        background-color: white;
+        z-index: 999;
+      }
+      #thumbnail-chart-info p {
+        font-size: 11px;
+        text-align: center;
+        margin-top: 12px;
+      }
+      #thumbnail-chart {
+        z-index: 999;
+      }
+      .custom-dialog-2 {
+        z-index: 1000 !important;
+      }
+      .custom-dialog-2 .ui-button:focus {
+        outline: none;
+      }
+      .custom-dialog-2 .ui-dialog-titlebar {
+        background-image: none;
+        background-color: rgb(150, 150, 150);
+        color: white;
+      }
+      #thumbnail-dialog {
+
+      }
+      #thumbnail-dialog-content {
+        margin: 15px auto 0px auto;
+        height: 500px;
+        max-height: 500px;
+        width: 430px;
+        overflow-y: scroll;
+      }
+      #thumbnail-dialog-content img {
+        text-align: center;
+        width: 400px;
+      }
+      #thumbnail-dialog-content video {
+        text-align: center;
+        width: 400px;
+      }
+      #thumbnail-dialog-content p {
+        width: 400px;
+        text-align: center;
+        margin-top: 5px;
+        margin-bottom: 15px;
+      }
+    </style>
+    <script>
+      "use strict";
+      jQuery.support.cors = true;
+      var locationDivId, timelapse, timelapseFeedUnavailable, hashVars, currentDate;
+      var didOnTimeMachinePlayerReady = false;
+      var thumbnailChart, thumbnailUrls;
+      var $thumbnailDialog, $thumbnailDialogContent;
+      // Note that the js script include further up needs to be updated to reflect the change of default cam.
+      // TODO: Make the above not be a requirement...
+      var currentLocation = "center1";
+      var locationMap = {
+        "heinz" : "North Shore",
+        "walnuttowers1" : "Mon Valley",
+        "pitt1" : "Oakland",
+        "trimont1" : "Downtown",
+        "clairton1" : "Clairton Coke Works",
+        "clairton3" : "Clairton Coke Works 2",
+        "walnuttowers2" : "Edgar Thomson",
+        "braddock1" : "Edgar Thomson",
+        "irvin1" : "Irvin",
+        "westmifflin1" : "Edgar Thomson",
+        "accan1" : "Metalico",
+        "vanport1" : "Shell Plastics West",
+        "vanport2" : "Shell Plastics West",
+        "center1" : "Shell Plastics East"
+      };
+      var UTIL = org.gigapan.Util;
+      function tm_init() {
+        var initialDataset = cached_breathecam.latest.path;
+        var startingDate = cached_breathecam.latest.date;
+        var hash = window.location.hash.slice(1);
+        hashVars = UTIL.unpackVars(hash);
+        var loadedTimelapse = false;
+        if (hashVars) {
+          if (hashVars.d) {
+            startingDate = String(hashVars.d);
+            initialDataset = cached_breathecam.datasets[startingDate];
+            if (!initialDataset) {
+              initialDataset = cached_breathecam.latest.path;
+            }
+          }
+          if (hashVars.s) {
+            loadedTimelapse = true;
+            currentLocation = String(hashVars.s);
+            // hack
+            if (currentLocation == "vanport1") {
+              currentLocation = "vanport2";
+            }
+            changeLocation(currentLocation, startingDate, null, null, false, function() {
+              initialDataset = cached_breathecam.datasets[startingDate];
+              if (!initialDataset) {
+                initialDataset = cached_breathecam.latest.path;
+              }
+              setupTimelapse(initialDataset, startingDate);
+            });
+          }
+        }
+        locationDivId = currentLocation + "_overlay";
+        setLocationThumbnailToggle();
+        selectTimelapseFeed();
+        // If we did not load the timelapse with the hash vars above, do so now.
+        if (!loadedTimelapse)
+          setupTimelapse(initialDataset, startingDate);
+        // TODO
+        showContent();
+      }
+      function setupTimelapse(initialDataset, startingDate) {
+        initialDataset = initialDataset.replace("http:", "https:");
+        var settings = {
+          url: initialDataset,
+          disableTourLooping: true,
+          mediaType: ".mp4",
+          showFullScreenBtn: true,
+          showLogoOnDefaultUI: false,
+          showThumbnailTool: true,
+          enableChangeDetection: false,
+          datasetType: "breathecam",
+          thumbnailsSupportStartEndTimes: true,
+          headlessClientHost: location.protocol + '//' + location.host + location.pathname,
+          sideControlsInfo: {
+            position: "top-left",
+            showHomeBtn: true,
+          },
+          /*socialMedia: {
+            twitterHandle: "BreatheProject",
+            facebookAppId: "342963495886660",
+            hashTags: ["BreatheCam"]
+          },*/
+          thumbnailToolOptions: {
+            watermark: "Breathe Project|CREATE Lab",
+            shareUrlDomain: "https://share.createlab.org",
+            shortUrlTopic: "breathecam"
+          },
+          onTimeMachinePlayerReady: function(viewerDivId) {
+            // Move to inside timeMachine div so it does not overlap share view box
+            $("#locationTitle").appendTo("#timeMachine .player").show();
+            // OLD: This was when using video mode. set 'Fast' to 4x, 'Medium' to 2x and 'Slow' to 1x
+            // Now in webgl mode, we set 'Fast' to 1.5x, 'Medium' to 0.75x, and 'Slow' to 0.375x
+            timelapse.setMasterPlaybackRate(1.5);
+            timelapse.setPlaybackRate(0.75);
+            // Set thumbnail export default playback rate to 'Slow' since that's default speed
+            $(".thumbnail-playback-rate-menu").children().first().click();
+            // Override the hashchange event
+            window.onhashchange = null;
+            $(window).on("hashchange", function() {
+              var newHash = window.location.hash.slice(1);
+              var newHashVars = UTIL.unpackVars(newHash);
+              var currentHash = timelapse.getShareView();
+              var currentHashVars = UTIL.unpackVars(currentHash);
+              window.location.hash = "";
+              if (!newHashVars) return;
+              if ((newHashVars.d && currentHashVars.d != newHashVars.d) || (newHashVars.s && currentHashVars.s != newHashVars.s)) {
+                var newDate, newDataset;
+                if (newHashVars.d) {
+                  newDate = String(newHashVars.d);
+                  newDataset = cached_breathecam.datasets[newDate];
+                  if (!newDataset) return;
+                }
+                var newTime = parseFloat(newHashVars.t);
+                var newView = timelapse.normalizeView(timelapse.unsafeViewToView(newHashVars.v));
+                if (newHashVars.s && currentHashVars.s != newHashVars.s) {
+                  currentLocation = String(newHashVars.s);
+                  changeLocation(currentLocation, newDate, newView, newTime, true);
+                } else {
+                  updateCalendarAndToggleUI(newDate);
+                  newDataset = newDataset.replace("http:", "https:");
+                  timelapse.loadTimelapse(newDataset, newView, newTime, false);
+                }
+              } else {
+                // Share views
+                timelapse.loadSharedViewFromUnsafeURL(UTIL.getUnsafeHashString());
+              }
+            });
+            // Seek video towards the end to show "latest" footage
+            if (hashVars && !hashVars.t) {
+              var numFrames = timelapse.getNumFrames();
+              // 12 fps * 10 seconds = 120 frames
+              var framesFromEnd = numFrames - 120;
+              timelapse.seekToFrame(framesFromEnd);
+            } else {
+              timelapse.seek(hashVars.t);
+            }
+
+            //showContent();
+            breatheCamThumbnailSetup();
+            //createThumbnailChart();
+            UTIL.verticalTouchScroll($("#location_toggle_container"));
+            // Elements with hover have the no-touch class and we remove it if we are on a device that supports touch, since we get an annoying effect when we swipe.
+            // This is needed mostly for iOS but perhaps other mobile browsers suffer too.
+            if ('ontouchstart' in document) {
+              $('div').removeClass('no-touch');
+            }
+
+            $(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>')
+            $(".instructions").append('<span class="tourhelp"><p>Click to view a tour of how to effectively use BreatheCam.</p></span>');
+            $(".instructions").append('<span class="fullscreenhelp"><p>Click to go fullscreen, to maximize the explorable area.</p></span>');
+
+            $(".tourModal").dialog({
+              resizable: false,
+              autoOpen: false,
+              width: $("body").width(),
+              height: $("body").height(),
+              dialogClass: "tourDialog",
+              modal: true,
+              open: function() {
+                $(this).find("video").first().css("height", $("body").height() - 64);
+                $(this).dialog("option", "width", $("body").width());
+                $(this).dialog("option", "height", $("body").height());
+              },
+              close: function() {
+                var $video = $(this).find("video");
+                $video[0].pause();
+                $video[0].currentTime = 0;
+              }
+            });
+
+            $(".tour").on("click", function() {
+              $(".tourModal").dialog('open');
+            });
+
+            if (hashVars.minimalUI || hashVars.disableUI) {
+              if (hashVars.disableUI) {
+                $(".captureTime").hide();
+              } else {
+                $(".captureTime").insertBefore(".controls");
+              }
+              $("#timeMachine").addClass("snapshot-mode");
+              $(".controls, .sideToolBar, .playbackButton, #locationTitle").hide();
+              timelapse.onresize();
+            }
+
+            // Default to 'Medium' speed in the export GUI
+            $(".thumbnail-playback-rate-menu").menu().find(".ui-menu-item[data-title='Medium']").trigger("click");
+
+            didOnTimeMachinePlayerReady = true;
+          }
+        };
+        timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
+        loadCalendar(startingDate);
+        setTimeout(function() {
+          timelapse.addDatasetLoadedListener(function() {
+            if (!didOnTimeMachinePlayerReady) {
+              didOnTimeMachinePlayerReady = true;
+              //breatheCamThumbnailSetup();
+              //createThumbnailChart();
+            }
+          });
+        }, 500);
+      }
+      function processThumbnailChartData(data) {
+        // Create a dictionary that stores the durations of all images and videos of each hour
+        var image_count_dict = {};
+        for (var i = 0; i < 24; i++) {
+          image_count_dict[i] = 0;
+        }
+        // Create a dictionary that stores the urls of all thumbnails of each hour
+        thumbnailUrls = {};
+        for (var i = 0; i < 24; i++) {
+          thumbnailUrls[i] = [];
+        }
+        // Create a matrix that stores the minutes and hours that have thumbnails
+        // Matrix H is implemented by using dictionary for O(1) lookup time
+        // The first dimension means hour, ranging from 0 to 23
+        // The second dimension means minutes, ranging from 0 to 59
+        var H = {};
+        for (var i = 0; i < 24; i++) {
+          H[i] = {};
+          for (var j = 0; j < 60; j++) {
+            H[i][j] = 0;
+          }
+        }
+        // Iterate through all image metadata
+        for (var i = 0; i < data.length; i++) {
+          var d = data[i];
+          var start_date = new Date(d["begin_time"]);
+          var end_date = new Date(d["end_time"]);
+          var start_hour = start_date.getHours();
+          var end_hour = end_date.getHours();
+          if (end_hour < start_hour) continue; // sanity check
+          var start_minute = start_date.getMinutes();
+          var end_minute = end_date.getMinutes();
+          for (var j = start_hour; j <= end_hour; j++) {
+            // Counting images and push urls
+            image_count_dict[j] += 1;
+            thumbnailUrls[j].push({url:d["media_path"], comment:d["comment"], format:d["media_format"]});
+            // Updating matrix H
+            var s = 0, e = 59;
+            if (j == start_hour) s = start_minute;
+            if (j == end_hour) e = end_minute;
+            for (var k = s; k <= e; k++) H[j][k] |= 1;
+          }
+        }
+        // Format data
+        var thumbnail_data = {"columnNames": ["label", "color", "height"], "data": []};
+        for (var i = 0; i < 24; i++) {
+          var h = 0; // height indicates the minutes in that hour that are covered by the thumbnails
+          for (var j = 0; j < 60; j++) h += H[i][j];
+          thumbnail_data["data"].push([i, image_count_dict[i], h]);
+        }
+        return thumbnail_data;
+      }
+      function getThumbnailDataUrl() {
+        var captureTimes = timelapse.getCaptureTimes();
+        var begin_time= parseInt(new Date(captureTimes[0]).getTime() / 1000);
+        var end_time = parseInt(new Date(captureTimes[timelapse.getNumFrames() -1]).getTime() / 1000);
+        var url = "https://breathecam.cmucreatelab.org/camera_findings?";
+        url += "begin_time=" + begin_time + "&end_time=" + end_time + "&camera_id=" + currentLocation;
+        return url;
+      }
+      function createThumbnailChart() {
+        $.getJSON(getThumbnailDataUrl(), function (json) {
+          var thumbnail_data = processThumbnailChartData(json);
+          var chart_settings = {
+            data: thumbnail_data["data"],
+            columnNames: thumbnail_data["columnNames"],
+            dataIndexForLabels: 0, // columnNames[0] is used for the label of the block
+            dataIndexForColors: 1, // columnNames[1] is used for the color of the block
+            dataIndexForHeights: 2, // columnNames[2] is used for the height of the block
+            useColorQuantiles: true,
+            colorBin: [0, 1, 2, 4],
+            colorRange: ["#ffffff", "#bdbdbd", "#969696", "#636363", "#000000"],
+            heightBin: [15, 45],
+            heightRange: ["33%", "66%", "100%"],
+            noEventWhenColorValueZero: true,
+            select: function ($e, obj) {
+              var d = $e.data();
+              $thumbnailDialog.dialog("open");
+              $thumbnailDialogContent.empty();
+              var urls = thumbnailUrls[d["label"]];
+              for (var i = 0; i < urls.length; i++) {
+                var $thumbnail;
+                var format = urls[i]["format"];
+                var src = urls[i]["url"];
+                if (format == "mp4" || format == "webm") {
+                  $thumbnail = $("<video controls src='" + src + "'></video>");
+                } else if (format == "png" || format == "gif") {
+                  $thumbnail = $("<img src='" + src + "'></img>");
+                }
+                var $comment = $("<p>" + urls[i]["comment"] + "</p>");
+                $thumbnailDialogContent.append($thumbnail);
+                $thumbnailDialogContent.append($comment);
+              }
+            }
+          };
+          //thumbnailChart = new edaplotjs.FlatBlockChart("thumbnail-chart", chart_settings);
+          //timelapse.addDatasetLoadedListener(function() {
+          //  $thumbnailDialog.dialog("close");
+          //  updateThumbnailChart();
+          //});
+          //createThumbnailDialog();
+        }).fail(function (response) {
+          console.log("server error when creating thumbnail chart:", response);
+        });
+      }
+      function createThumbnailDialog() {
+        $thumbnailDialogContent = $("#thumbnail-dialog-content");
+        $thumbnailDialog = $("#thumbnail-dialog");
+        $thumbnailDialog.dialog({
+          resizable: false,
+          autoOpen: false,
+          dialogClass: "custom-dialog-2",
+          appendTo: $("body"),
+          width: 444,
+          minHeight: 50,
+          draggable: true,
+          title: "Created Images for The Selected Hour",
+          position: { my: "center center", at: "center center", of: $("#"+timelapse.getViewerDivId())},
+          close: function() {
+            thumbnailChart.clearBlockSelection();
+          }
+        });
+      }
+      function updateThumbnailChart() {
+        $.getJSON(getThumbnailDataUrl(), function (json) {
+          var thumbnail_data = processThumbnailChartData(json);
+          thumbnailChart.updateBlocks(thumbnail_data["data"]);
+        }).fail(function (response) {
+          console.log("server error when updating thumbnail chart:", response);
+        });
+      }
+      function breatheCamThumbnailSetup() {
+        var du = timelapse.getDefaultUI();
+        if (timelapse && du) {
+          du.addEventListener('thumbnail-generated-from-ui', function(thumbnailParams) {
+            var formattedBeginTime = thumbnailParams.beginTime.substr(0,4) + "-" + thumbnailParams.beginTime.substr(4,2) + "-" + thumbnailParams.beginTime.substr(6,2) + " " + thumbnailParams.beginTime.substr(8,2) + ":" + thumbnailParams.beginTime.substr(10,2) + ":" + thumbnailParams.beginTime.substr(12,2);
+            var formattedEndTime = thumbnailParams.endTime.substr(0,4) + "-" + thumbnailParams.endTime.substr(4,2) + "-" + thumbnailParams.endTime.substr(6,2) + " " + thumbnailParams.endTime.substr(8,2) + ":" + thumbnailParams.endTime.substr(10,2) + ":" + thumbnailParams.endTime.substr(12,2);
+            var isUTC = (timelapse.getCaptureTimes()[0].indexOf("UTC") >= 0);
+            if (!isUTC) {
+              formattedBeginTime = String(new Date(formattedBeginTime));
+              formattedEndTime = String(new Date(formattedEndTime));
+            }
+            $.ajax({
+              type: "POST",
+              dataType: "json",
+              url: "https://breathecam.cmucreatelab.org/camera_findings",
+              data: {
+                camera_finding: {
+                  camera_id : thumbnailParams.timemachineId,
+                  camera_name : locationMap[thumbnailParams.timemachineId],
+                  timemachine_path : thumbnailParams.root,
+                  media_path : thumbnailParams.url,
+                  media_format : thumbnailParams.format,
+                  media_width : thumbnailParams.width,
+                  media_height : thumbnailParams.height,
+                  comment : $("#camera-findings-comment").val(),
+                  begin_time : formattedBeginTime,
+                  end_time : formattedEndTime,
+                  start_frame : thumbnailParams.startFrame,
+                  num_frames : thumbnailParams.nframes
+                }
+              }
+            });
+          });
+        }
+        var thumbnailToolRow = $(".thumbnail-processing-time-warning").closest("tr");
+        $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(thumbnailToolRow);
+      }
+      function selectTimelapseFeed() {
+        $("#image_feed").css("visibility", "hidden");
+        $("#stitched_image_wrapper").css("visibility", "hidden");
+        $("#stitched_image").css("visibility", "hidden");
+        $("#timelapse_feed").show();
+        setLocationTitle();
+      }
+      function selectImageFeed() {
+        $("#timelapse_feed").hide();
+        $("#image_feed").css("visibility", "visible");
+        $("#stitched_image_wrapper").css("visibility", "visible");
+        $("#stitched_image").css("visibilriity", "visible");
+        $("#location_toggle_container").css("top", "0px");
+        setLocationTitle();
+      }
+      function setLocationTitle() {
+        var locationTitle = $("#location_toggle .location_thumbnail_selected").siblings(".location_title").text();
+        $("#locationTitle").text(locationTitle);
+      }
+      function showContent() {
+        $("#loading").hide();
+        $("#content").css("visibility", "visible");
+        $("#location_toggle").scrollTop($("#" + locationDivId).offset().top - $("#location_toggle").offset().top);
+      }
+      function changeLocation(locationName, newDate, newView, newTime, doLoad, callBack, newTimeAsDateObj) {
+        currentLocation = locationName;
+        if (timelapseFeedUnavailable) {
+          location.href = "/embeds/" + locationName;
+        } else {
+          $.ajax({
+            url: "https://tiles.cmucreatelab.org/ecam/timemachines/" + locationName + "/" + locationName + ".json",
+            dataType: "json"
+          }).done(function(data) {
+            cached_breathecam = data;
+            var startingDate = cached_breathecam.latest.date;
+            var startingDataset = cached_breathecam.latest.path;
+            if (newDate) {
+              var tmpStartingDataset = cached_breathecam.datasets[newDate];
+              if (tmpStartingDataset) {
+                startingDate = newDate;
+                startingDataset = tmpStartingDataset;
+              }
+            }
+            startingDataset = startingDataset.replace("http:", "https:");
+            if (!timelapse) {
+              setupTimelapse(startingDataset, startingDate);
+              return;
+            }
+            updateCalendarAndToggleUI(startingDate);
+            if (doLoad) {
+              if (timelapse && startingDataset) {
+                newTime = parseFloat(newTime);
+                timelapse.loadTimelapse(startingDataset, newView, newTime, false, newTimeAsDateObj, function() {
+                  //if (!newTimeAsDateObj && isNaN(newTime)) {
+                    var numFrames = timelapse.getNumFrames();
+                    // 12 fps * 10 seconds = 120 frames
+                    var framesFromEnd = numFrames - 120;
+                    timelapse.seekToFrame(framesFromEnd);
+                  //}
+                });
+              }
+            } else if (typeof(callBack) === "function") {
+              callBack();
+            }
+          }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR, textStatus, errorThrown);
+            changeLocation("heinz", null, null, null, true);
+          });
+        }
+      }
+      function updateCalendarAndToggleUI(startingDate) {
+        locationDivId = currentLocation + "_overlay";
+        setLocationThumbnailToggle();
+        setLocationTitle();
+        $("#datepicker").datepicker("destroy");
+        loadCalendar(startingDate);
+      }
+      function loadCalendar(startingDate) {
+        currentDate = startingDate;
+        var dateArray = startingDate.split("-");
+        $("#datepicker").datepicker({
+          defaultDate : new Date(dateArray[0], dateArray[1] - 1, dateArray[2]),
+          minDate : new Date(2014, 0),
+          onSelect : selectDay,
+          beforeShowDay : highlightDays
+        });
+      }
+      function highlightDays(date) {
+        date = $.datepicker.formatDate('yy-mm-dd', date);
+        if (cached_breathecam.datasets[date])
+          return [true, 'date-highlight'];
+        else
+          return [false, ''];
+      }
+      function selectDay(dateText, dateElem) {
+        var wasPaused = timelapse.isPaused();
+        timelapse.pause();
+        var date = $.datepicker.formatDate('yy-mm-dd', new Date(dateText));
+        var path = cached_breathecam.datasets[date];
+        if (timelapse && path) {
+          currentDate = date;
+          path = path.replace("http:", "https:");
+          timelapse.loadTimelapse(path, null, null, true);
+        }
+        if (!wasPaused) {
+          timelapse.handlePlayPause();
+        }
+      }
+      function setLocationThumbnailToggle() {
+        $(".location_thumbnail_selected").removeClass("location_thumbnail_selected");
+        $("#" + locationDivId).addClass("location_thumbnail_selected");
+      }
+      $(function() {
+        $(".location_thumbnail_container").on("click", function() {
+          if (window.location.hash) {
+            window.location.hash = "";
+          }
+          var newLocation = $(this).attr("data-location-id");
+          if (timelapse) {
+            var currentCaptureTime = timelapse.getCurrentCaptureTime();
+            if (currentCaptureTime) {
+              var captureTimeAsDateObj = new Date(currentCaptureTime.replace(/-/g,"/"));
+            }
+          }
+          changeLocation(newLocation, null, null, null, true, null, captureTimeAsDateObj);
+        });
+        tm_init();
+        $("#container").on("mousedown", function() { return false; });
+      });
+
+    </script>
+  </head>
+  <div class="menu-container"></div>
+  <div id="loading">
+    <img id="loadingImg" src="assets/images/loading.gif" width="508" height="381" alt="loading">
+  </div>
+  <div id="locationTitle"></div>
+  <div id="timelapse_feed" class="timelapse_feed_embed">
+    <div id="timeMachine"></div>
+    <!--
+    <div id="thumbnail-chart" class="noselect thumbnail-chart-container"></div>
+    <div id="thumbnail-chart-info" class="noselect">
+      <p>Distribution<br>of created<br>images<br>over time</p>
+    </div>
+    <div id="thumbnail-dialog">
+      <div id="thumbnail-dialog-content"></div>
+    </div>
+    -->
+    <div id="datepicker" class="datepicker_embed"></div>
+  </div>
+
+  <div class="tourModal" style="background: black;" title="Tutorial">
+    <div style="background: black; text-align: center;">
+      <video src="../assets/videos/tutorial-clipped.mp4" controls style="height: 100%"></video>
+    </div>
+    <span class="close-modal" title="Close"></span>
+  </div>
+
+  <div id="location_toggle_container">
+    <div id="location_toggle">
+      <a class="location_thumbnail_container" data-location-id="center1" href="javascript:void(0)">
+        <div id="center1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/center1_toggle.png" class="location_thumbnail" alt="center1">
+        <div class="location_title">Shell Plastics East</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="vanport2" href="javascript:void(0)">
+        <div id="vanport2_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/vanport2_toggle.png" class="location_thumbnail" alt="vanport2">
+        <div class="location_title">Shell Plastics West</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="clairton1" href="javascript:void(0)">
+        <div id="clairton1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/clairton1_toggle.png" class="location_thumbnail" alt="clairton1">
+        <div class="location_title">Clairton Coke Works</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="clairton3" href="javascript:void(0)">
+        <div id="clairton3_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/clairton3_toggle.png" class="location_thumbnail" alt="clairton3">
+        <div class="location_title">Clairton Coke Works 2</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="westmifflin1" href="javascript:void(0)">
+        <div id="westmifflin1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/westmifflin1_toggle.png" class="location_thumbnail" alt="westmifflin1">
+        <div class="location_title">Edgar Thomson South</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="accan1" href="javascript:void(0)">
+        <div id="accan1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/accan1_toggle.png" class="location_thumbnail" alt="accan1">
+        <div class="location_title">Metalico</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="walnuttowers2" href="javascript:void(0)">
+        <div class="not-live">Realtime cam down - Click to view past footage</div>
+        <div id="walnuttowers2_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/walnuttowers2_toggle.png" class="location_thumbnail" alt="walnuttowers2">
+        <div class="location_title">Edgar Thomson West</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="braddock1" href="javascript:void(0)">
+        <div class="not-live">Realtime cam down - Click to view past footage</div>
+        <div id="braddock1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/braddock1_toggle.png" class="location_thumbnail" alt="braddock1">
+        <div class="location_title">Edgar Thomson North</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="irvin1" href="javascript:void(0)">
+        <div class="not-live">Realtime cam down - Click to view past footage</div>
+        <div id="irvin1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/irvin1_toggle.png" class="location_thumbnail" alt="irvin1">
+        <div class="location_title">Irvin</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="heinz" href="javascript:void(0)">
+        <div class="not-live">Realtime cam down - Click to view past footage</div>
+        <div id="heinz_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/heinz_toggle.png" class="location_thumbnail" alt="Heinz">
+        <div class="location_title">North Shore</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="walnuttowers1" href="javascript:void(0)">
+        <div class="not-live">Realtime cam down - Click to view past footage</div>
+        <div id="walnuttowers1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/walnuttowers1_toggle.png" class="location_thumbnail" alt="Walnut Towers">
+        <div class="location_title">Mon. Valley</div>
+      </a>
+      <a class="location_thumbnail_container" data-location-id="trimont1" href="javascript:void(0)">
+        <div class="not-live">Realtime cam down - Click to view past footage</div>
+        <div id="trimont1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/trimont1_toggle.png" class="location_thumbnail" alt="Trimont">
+        <div class="location_title">Downtown</div>
+      </a>
+      <a class="location_thumbnail_container location_thumbnail_container_end" data-location-id="pitt1" href="javascript:void(0)">
+        <div class="not-live">Realtime cam down - Click to view past footage</div>
+        <div id="pitt1_overlay" class="no-touch location_thumbnail_overlay"></div>
+        <img src="assets/images/pitt1_toggle.png" class="location_thumbnail" alt="Pitt">
+        <div class="location_title">Oakland</div>
+      </a>
+    </div>
+  </div>
+</html>

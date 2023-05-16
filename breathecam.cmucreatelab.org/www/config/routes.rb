@@ -5,6 +5,8 @@ Breathecam::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
+  match '/get_exif' => 'latest_images#get_exif'
+  match '/camera_image_summaries' => 'latest_images#camera_image_summaries'
   match '/status' => 'camera_statuses#index'
   match '/locations/:camera/latest' => 'latest_images#index'
 

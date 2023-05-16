@@ -1492,7 +1492,7 @@
         datasetType: "breathecam",
         showThumbnailTool: true,
         enableChangeDetection: true,
-        onTimeMachinePlayerReady: function(viewerDivId) {
+        onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
           createTutorialButton(720, 540, "#timeMachine");
           fbShareUrl = "http://breatheproject.org/learn/breathe-cam/";
           $(".shareView").prepend("<div><img id='fb_share' src='assets/facebook_share.png'></div>");
@@ -1504,7 +1504,7 @@
             "bottom": "86px"
           });
           $(".shareView .ui-accordion").css("max-height", "550px");
-          timelapse.addFullScreenChangeListener(function(browserSupportsFullScreen) {
+          timelapseObj.addFullScreenChangeListener(function(browserSupportsFullScreen) {
             if (!browserSupportsFullScreen)
               post("resize_iframe", {fillScreen: true});
           });
@@ -1525,11 +1525,11 @@
             }
           });
 
-          var captureTimes = timelapse.getCaptureTimes();
+          var captureTimes = timelapseObj.getCaptureTimes();
           lastCaptureTime = captureTimes[captureTimes.length - 1];
           firstCaptureTime = captureTimes[0];
 
-          timelapse.addTimeChangeListener(changeSensorValues);
+          timelapseObj.addTimeChangeListener(changeSensorValues);
           addTimeLineSliderListeners();
           addPlayButtonListeners();
           //onCalendarDateChange();
@@ -1539,7 +1539,7 @@
           $(window).on("hashchange", function() {
             var newHash = window.location.hash.slice(1);
             var newHashVars = UTIL.unpackVars(newHash);
-            var currentHash = timelapse.getShareView();
+            var currentHash = timelapseObj.getShareView();
             var currentHashVars = UTIL.unpackVars(currentHash);
             if (!newHashVars) return;
             newHashVars.s = cameraToNameRemap(newHashVars.s);
@@ -1551,29 +1551,29 @@
                 if (!newDataset && currentHashVars.s == newHashVars.s) return;
               }
               var newTime = parseFloat(newHashVars.t);
-              var newView = timelapse.normalizeView(timelapse.unsafeViewToView(newHashVars.v));
+              var newView = timelapseObj.normalizeView(timelapseObj.unsafeViewToView(newHashVars.v));
               if (newHashVars.s && currentHashVars.s != newHashVars.s) {
                 currentLocation = String(newHashVars.s);
                 changeLocation(currentLocation, newDate, newView, newTime, true);
               } else {
                 updateCalendarAndToggleUI(newDate);
                 newDataset = newDataset.replace("http:", "https:");
-                timelapse.loadTimelapse(newDataset, newView, newTime, false, null, function() {
+                timelapseObj.loadTimelapse(newDataset, newView, newTime, false, null, function() {
                   changeSensorValues();
                   addTimeLineSliderListeners();
                 });
               }
             } else {
               // Share views
-              timelapse.loadSharedViewFromUnsafeURL(UTIL.getUnsafeHashString());
+              timelapseObj.loadSharedViewFromUnsafeURL(UTIL.getUnsafeHashString());
             }
             window.location.hash = "";
           });
           if (!hashVars) {
-            var numFrames = timelapse.getNumFrames();
+            var numFrames = timelapseObj.getNumFrames();
             // 12 fps * 5 seconds = 60 frames
             var fiveSecondsFromEnd = numFrames - 60;
-            timelapse.seekToFrame(fiveSecondsFromEnd);
+            timelapseObj.seekToFrame(fiveSecondsFromEnd);
           }
           //showContent();
           changeSensorValues();

@@ -160,13 +160,13 @@
         showThumbnailTool: true,
         enableChangeDetection: true,
         datasetType: "breathecam",
-        onTimeMachinePlayerReady: function(viewerDivId) {
+        onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
           // Override the hashchange event
           window.onhashchange = null;
           $(window).on("hashchange", function() {
             var newHash = window.location.hash.slice(1);
             var newHashVars = org.gigapan.Util.unpackVars(newHash);
-            var currentHash = timelapse.getShareView();
+            var currentHash = timelapseObj.getShareView();
             var currentHashVars = org.gigapan.Util.unpackVars(currentHash);
             window.location.hash = "";
             if (!newHashVars) return;
@@ -179,24 +179,24 @@
                 if (!newDataset) return;
               }
               var newTime = parseFloat(newHashVars.t);
-              var newView = timelapse.normalizeView(timelapse.unsafeViewToView(newHashVars.v));
+              var newView = timelapseObj.normalizeView(timelapseObj.unsafeViewToView(newHashVars.v));
               if (newHashVars.s && currentHashVars.s != newHashVars.s) {
                 currentLocation = String(newHashVars.s);
                 changeLocation(currentLocation, newDate, newView, newTime, true);
               } else {
                 updateCalendarAndToggleUI(newDate);
-                timelapse.loadTimelapse(newDataset, newView, newTime, false);
+                timelapseObj.loadTimelapse(newDataset, newView, newTime, false);
               }
             } else {
               // Share views
-              timelapse.loadSharedViewFromUnsafeURL(org.gigapan.Util.getUnsafeHashString());
+              timelapseObj.loadSharedViewFromUnsafeURL(org.gigapan.Util.getUnsafeHashString());
             }
           });
           if (!hashVars) {
-            var numFrames = timelapse.getNumFrames();
+            var numFrames = timelapseObj.getNumFrames();
             // 12 fps * 5 seconds = 60 frames
             var fiveSecondsFromEnd = numFrames - 60;
-            timelapse.seekToFrame(fiveSecondsFromEnd);
+            timelapseObj.seekToFrame(fiveSecondsFromEnd);
           }
           showContent();
         }
