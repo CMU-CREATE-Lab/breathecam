@@ -10,6 +10,7 @@ require 'parallel'
 require 'active_support'
 require 'active_support/core_ext'
 
+$CURRENT_SCRIPT_PATH = File.expand_path(File.dirname(__FILE__))
 $RUNNING_WINDOWS = /(win|w)32$/.match(RUBY_PLATFORM)
 $RUNNING_MAC = RUBY_PLATFORM.downcase.include?("darwin")
 $RUNNING_LINUX = RUBY_PLATFORM.downcase.include?("linux")
@@ -32,7 +33,13 @@ $ffmpeg_path = $RUNNING_WINDOWS ? "ffmpeg.exe" : "ffmpeg"
 $qtfaststart_path = $RUNNING_WINDOWS ? "qtfaststart.exe" : "qtfaststart"
 
 # Masking
-$masker_path = "MaskedGaussian"
+$masker_path = "#{$CURRENT_SCRIPT_PATH}/MaskedGaussian/MaskedGaussian"
+
+# Image diffing (mse)
+$image_diff_path = "#{$CURRENT_SCRIPT_PATH}/image-diff.py"
+
+# Concatnenate mp4s
+$mp4_concat_path = "#{$CURRENT_SCRIPT_PATH}/libs/mp4-concatenate/Concatenate-mp4-videos.py"
 
 $valid_image_extensions = [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".lnk"]
 $default_num_jobs = 4
@@ -927,7 +934,7 @@ class Compiler
       new_tm_json["capture-times"].shift(frame_diff)
     else
       if File.exists?("#{output_video_tile_path}/0.#{output_extension}")
-        system("concatenate-mp4-videos.py #{output_video_tile_path}/0.#{output_extension} #{output_video_tile_path}/0-1.#{output_extension} --future_frames=#{$future_appending_frames}")
+        system("#{$mp4_concat_path} #{output_video_tile_path}/0.#{output_extension} #{output_video_tile_path}/0-1.#{output_extension} --future_frames=#{$future_appending_frames}")
         ####concat_str = "file '#{output_video_tile_path}/0.#{output_extension}'\nfile '#{output_video_tile_path}/0-1.#{output_extension}'"
         ####system("echo \"#{concat_str}\" > /tmp/#{$camera_location}.concat.txt")
         # Note: Cannot use -c copy since it results in a video that has playback issues in Chrome. Gets stuck buffering while scrubbing/seeking. Not sure why this is.
@@ -1062,14 +1069,14 @@ class Compiler
   def append_and_cut_inplace(path_to_master_videoset, path_to_new_videoset, suffix_only)
     FileUtils.touch(File.join($working_dir, "WIP2"))
 
-    path_to_trailer = File.join(File.expand_path(File.dirname(__FILE__)), "suffix_10_600p.mp4")
+    path_to_trailer = File.join($CURRENT_SCRIPT_PATH, "suffix_10_600p.mp4")
     master_videos = Dir.glob("#{path_to_master_videoset}/crf*/*/*/*.mp4").sort
 
     if suffix_only
       puts "[#{Time.now}] Appending black frames to initial master set."
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
         # Take master and append the black frame chunk to it. Also prepare the file for future frames.
-        unless system("concatenate-mp4-videos.py #{master_video} #{path_to_trailer} --future_frames=#{$future_appending_frames}")
+        unless system("#{$mp4_concat_path} #{master_video} #{path_to_trailer} --future_frames=#{$future_appending_frames}")
           puts "[#{Time.now}] Error first time appending frames to master set."
           exit
         end
@@ -1095,7 +1102,7 @@ class Compiler
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
         next_segment_video = next_segment_videos[index]
         # Take master without the black frame chunk at the end, append the new segment, and then append the black frame chunk
-        unless system("concatenate-mp4-videos.py '#{master_video}[0:-1]' #{next_segment_video} #{path_to_trailer}")
+        unless system("#{$mp4_concat_path} '#{master_video}[0:-1]' #{next_segment_video} #{path_to_trailer}")
           puts "[#{Time.now}] Error appending additional frames to master set."
           exit
         end
@@ -1124,7 +1131,7 @@ class Compiler
       FileUtils.rm_rf("#{path_to_new_videoset}")
     end
 
-    # No qt-faststart required, since concatenate-mp4-videos.py already does the work and in fact, running qt-faststart
+    # No qt-faststart required, since Concatenate-mp4-videos.py already does the work and in fact, running qt-faststart
     # at this point removes the free buffer just added, which was there to speed up future appends.
 
     puts "[#{Time.now}] Finished inplace appending new files."
@@ -1172,7 +1179,7 @@ class Compiler
         # and create these frames on the fly, rather than use a pre-computed file.
         # It is faster this way, but we cannot always assume this fixed size, which is only true
         # for a day of breathecam.
-        leader_path = File.join(File.expand_path(File.dirname(__FILE__)), "leader_70_600p.mp4")
+        leader_path = File.join($CURRENT_SCRIPT_PATH, "leader_70_600p.mp4")
         leader_bytes_per_pixel={
           30 => 2701656.0 / (vid_width * vid_height * 90),
           28 => 2738868.0 / (vid_width * vid_height * 80),
@@ -1328,19 +1335,15 @@ class Compiler
   end
 
   def run_image_mse_checker
-    # TODO: Deal with hardcoded path to image-diff.py and conda
+    # TODO: Deal with hardcoded path to conda
     puts "[#{Time.now}] Calculating MSE for input images."
     for i in 0..$multi_camera_list.length-1
       file_ext = File.extname($mse_golden_images[i]).delete(".")
       match = $multi_camera_list[i].match(/\/(#{$camera_location}.*)\//)
       if match
-        system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py #{$mse_golden_images[i]} #{$working_dir}/050-raw-images/#{i} #{file_ext} #{match[1]} #{$current_day} #{$working_dir}/#{$camera_location}_rolling_results.json'")
+        system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python #{$image_diff_path} #{$mse_golden_images[i]} #{$working_dir}/050-raw-images/#{i} #{file_ext} #{match[1]} #{$current_day} #{$working_dir}/#{$camera_location}_rolling_results.json'")
       end
     end
-    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-a-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/3 jpg #{$camera_location}a #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
-    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-b-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/2 jpg #{$camera_location}b #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
-    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-c-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/1 jpg #{$camera_location}c #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
-    #system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python /home/pdille/breathecam/image-diff.py /workspace/#{$camera_location}.tmc/1669067067-d-golden.jpg /workspace/#{$camera_location}.tmc/050-raw-images/0 jpg #{$camera_location}d #{$current_day} /workspace/#{$camera_location}.tmc/#{$camera_location}_rolling_results.json'")
   end
 
   def completed_process
