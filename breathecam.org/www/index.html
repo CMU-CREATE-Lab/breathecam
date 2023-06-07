@@ -321,7 +321,7 @@
             shareUrlDomain: "https://share.createlab.org",
             shortUrlTopic: "breathecam"
           },
-          onTimeMachinePlayerReady: function(viewerDivId) {
+          onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
             // Move to inside timeMachine div so it does not overlap share view box
             $("#locationTitle").appendTo("#timeMachine .player").show();
             // OLD: This was when using video mode. set 'Fast' to 4x, 'Medium' to 2x and 'Slow' to 1x
@@ -423,6 +423,7 @@
             $(".thumbnail-playback-rate-menu").menu().find(".ui-menu-item[data-title='Medium']").trigger("click");
 
             didOnTimeMachinePlayerReady = true;
+            gFrameGrab.init(timelapse.drawToWebgl, timelapse.setDoManualWebglDraw, timelapseObj, null);
           }
         };
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
