@@ -129,10 +129,9 @@
 
     #dateAxisContainer {
       width: 100%;
-      height: 40px;
+      height: 42px;
       position: fixed;
       bottom: calc(25% - 40px);
-      border-bottom: 2px solid black;
     }
 
     #dateAxis {
@@ -231,7 +230,7 @@
 
     #zoomGrapherIn {
       position: absolute;
-      bottom: calc(25% - 10px);
+      bottom: calc(25% + 165px);
       right: 16px;
       height: 34px;
       width: 35px;
@@ -239,7 +238,7 @@
 
     #zoomGrapherOut {
       position: absolute;
-      bottom: calc(25% - 40px);
+      bottom: calc(25% + 135px);
       right: 16px;
       height: 34px;
       width: 35px;
@@ -253,7 +252,6 @@
       height: 14px;
       background-size: contain !important;
       opacity: 1;
-
     }
 
     .ui-button .ui-icon.ui-icon-custom-minus-white {
@@ -264,7 +262,23 @@
       height: 14px;
       background-size: contain !important;
       opacity: 1;
+    }
 
+    #grapher-loader {
+      padding-top: 10px;
+    }
+
+    #grapher_content {
+      display: none;
+      background-color: white;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 25%
+    }
+
+    #grapher_wrapper {
+      visibility: hidden;
     }
 
     #grapher_parent::-webkit-scrollbar {
@@ -321,11 +335,11 @@
     var initialClampTimeout;
     var series = [];
 
-    var currentDate = (new Date());
+    var currentDate;
 
     window.grapherLoad = function() {
       grapherReady = true;
-      $("#grapher-loader").empty();
+      //$("#grapher-loader").empty();
     };
 
     function selectTimelapseFeed() {
@@ -394,18 +408,25 @@
           fixedCursorPosition = pointData.date;
           var pointDataDateObj = new Date(pointData.dateString.split(".")[0]);
           var commentDate = $.datepicker.formatDate('yy-mm-dd', pointDataDateObj);
+
+          if (!currentDate) {
+            // Format to locale that uses YYYY-MM-DD
+            var dateFormatter = Intl.DateTimeFormat('sv-SE');
+            currentDate = dateFormatter.format($("#datepicker").datepicker('getDate'));
+          }
+
           if (commentDate != currentDate) {
             var path = cached_breathecam.datasets[commentDate];
             if (!path) return;
             path = path.replace("http:", "https:");
-            var currentView = timelapseObj.getView();
+            var currentView = timelapse.getView();
             currentDate = commentDate;
-            timelapseObj.loadTimelapse(path, currentView, null, null, pointDataDateObj);
+            timelapse.loadTimelapse(path, currentView, null, null, String(pointDataDateObj));
             $("#datepicker").datepicker("setDate", pointDataDateObj);
           } else {
             var desiredDateString = pointData.dateString.split(", ")[1];
-            var closestDesiredFrame = timelapseObj.findExactOrClosestCaptureTime(desiredDateString.substr(0, 8));
-            timelapseObj.seekToFrame(closestDesiredFrame);
+            var closestDesiredFrame = timelapse.findExactOrClosestCaptureTime(desiredDateString.substr(0, 8));
+            timelapse.seekToFrame(closestDesiredFrame);
           }
         }
       });
@@ -634,7 +655,7 @@
             });
             //dateAxis.setMaxRange(null, endTime);
             if (timelapse) {
-              var currentCaptureTime = timelapseObj.getCurrentCaptureTime();
+              var currentCaptureTime = timelapse.getCurrentCaptureTime();
               if (currentCaptureTime) {
                 fixedCursorPosition = Date.parse(currentCaptureTime.replace(/-/g, "/")) / 1000;
                 dateAxis.setCursorPosition(fixedCursorPosition);
@@ -665,6 +686,7 @@
                         });
                       })(j);
                     }
+                    $("#grapher_wrapper").css("visibility", "visible");
                   }
                 }
               });
@@ -695,6 +717,7 @@
 
       if (hashVars && hashVars.esdr_channels) {
         $("#timeMachine").css("height", "75%");
+        $("#grapher_content").show();
         esdrChannelsString = hashVars.esdr_channels.replace(/\(|\)/g,"")
         esdrChannelsArray = esdrChannelsString.split(",")
         grapherSetup();
@@ -882,9 +905,13 @@
       <div id="timeMachine"></div>
       <div id="datepicker" class="datepicker_embed"></div>
     </div>
-    <div id="grapher_parent" style="width:100%; position: fixed; bottom: 0px;  overflow-y: auto; height: calc(25% - 40px)">
+    <div id="grapher_content">
       <div id="grapher-loader">Loading graphs...</div>
-      <table id="grapher" border="0" cellspacing="0" cellpadding="0"></table>
+      <div id="grapher_wrapper">
+        <div id="grapher_parent" style="width:100%; position: fixed; bottom: 0px;  overflow-y: auto; height: calc(25% - 40px)">
+          <table id="grapher" border="0" cellspacing="0" cellpadding="0"></table>
+        </div>
+      </div>
     </div>
     <div id="image_feed" class="image_feed_embed">
       <div id="stitched_image_wrapper" class="image-zoom-wrapper image-zoom-wrapper-embed">
