@@ -87,9 +87,9 @@
           // latest entry is at the end of mediaList;
           var mediaListIdx = numToDisplay - numDisplayed - 1;
           if (mediaList[mediaListIdx].media_format == "mp4" || mediaList[mediaListIdx].media_format == "webm") {
-            html='<div style="height: 600px; font-size: 20px;"><video controls loop playsinline muted autoplay class="video" data-url="' + mediaList[mediaListIdx].media_path + '" style="max-width: 800px"></video><div style="font-weight: bold">' + mediaList[mediaListIdx].camera_name + ' on ' + mediaList[mediaListIdx].begin_time.substring(0,10) + '</div><div class="comment-field">' + mediaList[mediaListIdx].comment +'</div><div>';
+            html='<div style="height: 600px; font-size: 20px;"><video controls loop playsinline muted autoplay class="video" data-url="' + mediaList[mediaListIdx].media_path + '" style="max-height: 530px; max-width: 800px"></video><div style="font-weight: bold">' + mediaList[mediaListIdx].camera_name + ' on ' + mediaList[mediaListIdx].begin_time.substring(0,10) + '</div><div class="comment-field">' + mediaList[mediaListIdx].comment +'</div><div>';
           } else {
-            html='<div style="height: 600px; font-size: 20px;"><img class="image" data-url="' + mediaList[mediaListIdx].media_path + '" style="max-width: 800px"></img><div style="font-weight: bold">' + mediaList[mediaListIdx].camera_name + ' on ' + mediaList[mediaListIdx].begin_time.substring(0,10) + '</div><div class="comment-field">' + mediaList[mediaListIdx].comment +'</div><div>';
+            html='<div style="height: 600px; font-size: 20px;"><img class="image" data-url="' + mediaList[mediaListIdx].media_path + '" style="max-height: 530px; max-width: 800px"></img><div style="font-weight: bold">' + mediaList[mediaListIdx].camera_name + ' on ' + mediaList[mediaListIdx].begin_time.substring(0,10) + '</div><div class="comment-field">' + mediaList[mediaListIdx].comment +'</div><div>';
           }
           numDisplayed++;
           mainList.data('listView').append(html);

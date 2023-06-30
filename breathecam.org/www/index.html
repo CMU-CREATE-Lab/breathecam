@@ -575,11 +575,12 @@
           du.addEventListener('thumbnail-generated-from-ui', function(thumbnailParams) {
             var formattedBeginTime = thumbnailParams.beginTime.substr(0,4) + "-" + thumbnailParams.beginTime.substr(4,2) + "-" + thumbnailParams.beginTime.substr(6,2) + " " + thumbnailParams.beginTime.substr(8,2) + ":" + thumbnailParams.beginTime.substr(10,2) + ":" + thumbnailParams.beginTime.substr(12,2);
             var formattedEndTime = thumbnailParams.endTime.substr(0,4) + "-" + thumbnailParams.endTime.substr(4,2) + "-" + thumbnailParams.endTime.substr(6,2) + " " + thumbnailParams.endTime.substr(8,2) + ":" + thumbnailParams.endTime.substr(10,2) + ":" + thumbnailParams.endTime.substr(12,2);
-            var isUTC = (timelapse.getCaptureTimes()[0].indexOf("UTC") >= 0);
-            if (!isUTC) {
-              formattedBeginTime = String(new Date(formattedBeginTime));
-              formattedEndTime = String(new Date(formattedEndTime));
-            }
+            // ThumbnailTool now always has times in UTC, so no need to convert.
+            //var isUTC = (timelapse.getCaptureTimes()[0].indexOf("UTC") >= 0);
+            //if (!isUTC) {
+            //  formattedBeginTime = String(new Date(formattedBeginTime));
+            //  formattedEndTime = String(new Date(formattedEndTime));
+            //}
             $.ajax({
               type: "POST",
               dataType: "json",
