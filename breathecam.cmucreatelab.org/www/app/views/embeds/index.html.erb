@@ -1,7 +1,8 @@
+<% content_for :title, "E-Cam" %>
+
 <% content_for :css do %>
   <%= stylesheet_link_tag    "/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css",
                              "/timemachine-viewer/css/defaultUI.css",
-                             "zoomify-bundle.css",
                              "/timemachine-viewer/libs/change-detect/css/change.css"
 
   %>
@@ -11,6 +12,9 @@
   <%= javascript_include_tag "/timemachine-viewer/js/jquery/jquery.min.js",
                              "/timemachine-viewer/js/jquery/jquery-ui.custom.min.js",
                              "/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
+                             "/timemachine-viewer/js/jquery/plugins/mouse/jquery.mousewheel.min.js",
+                             "/timemachine-viewer/js/jquery/plugins/dialogExtend/jquery.dialogextend.min.js",
+                             "/timemachine-viewer/js/downloadjs/download.min.js",
                              "/timemachine-viewer/js/org/gigapan/util.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/videoset.js",
                              "/timemachine-viewer/js/org/gigapan/timelapse/parabolicMotion.js",
@@ -23,13 +27,21 @@
                              "/timemachine-viewer/template_includes.js",
                              "/extras/jquery.xdomainrequest.min.js",
                              "/timemachine-viewer/js/canvasjs/canvasjs.min.js",
+
+                             "/timemachine-viewer/js/glutils/Glb.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/TileIdx.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/TileView.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/WebglVideoTile.js",
+                             "/timemachine-viewer/js/org/gigapan/timelapse/WebglTimeMachineLayer.js",
+                             "/timemachine-viewer/js/org/gigapan/frameGrab.js",
+
                              "/timemachine-viewer/libs/change-detect/js/ThumbnailServiceAPI.js",
                              "/timemachine-viewer/libs/change-detect/js/TimeMachineCanvasLayer.js",
                              "/timemachine-viewer/libs/change-detect/js/ThumbnailTool.js",
                              "/timemachine-viewer/libs/change-detect/js/BoxEventHandler.js",
                              "/timemachine-viewer/libs/change-detect/js/ChangeDetectionTool.js",
                              "#{@root_url}/timemachines/#{@location_id}/#{@location_id}.js",
-                             "zoomify-bundle.js"  %>
+                             "/grapher/grapher2.nocache.js" %>
 
   <style type="text/css">
     #timeMachine {
@@ -41,6 +53,17 @@
       height: 100%;
       z-index: 5;
     }
+
+    #timeMachine.snapshot-mode {
+      right: 0px;
+      top: 0px;
+    }
+
+    #timeMachine.snapshot-mode .captureTime {
+      left: 20px;
+      top: 18px;
+    }
+
     #datepicker {
       right: 0px !important;
     }
@@ -84,215 +107,675 @@
     #datepicker .ui-datepicker-header .ui-icon {
       background-image: url(<%= asset_path('ui-icons_custom_256x240.png') %>);
     }
+
     .ui-dialog {
       text-align: left;
     }
+
+    #grapher {
+      font-size: 10pt !important;
+      position: relative;
+      width: 100%;
+      min-width: 385px;
+      height: 100%;
+    }
+
+    #dateAxisContainer {
+      width: 100%;
+      height: 42px;
+      position: fixed;
+      bottom: calc(25% - 40px);
+    }
+
+    #dateAxis {
+      position: absolute;
+      right: 250px;
+      left: 159px;
+      top: 0px;
+      height: 41px;
+      width: 100%;
+      background: white;
+      cursor: move;
+    }
+
+    .chart {
+      height: 85px;
+      background: #4f5457 !important;
+    }
+
+    .chartTitle {
+      position: absolute;
+      left: 0px;
+      width: 136px;
+      height: auto;
+      border: 1px solid black;
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      color: white;
+      padding: 11px
+    }
+
+    .chartContent {
+      position: absolute;
+      left: 159px;
+      right: 35px;
+      height: auto;
+      border: 1px solid black;
+      background: white;
+    }
+
+    .annotationContent {
+      position: absolute;
+      left: 159px;
+      right: 35px;
+      height: 35px;
+      border: 1px solid black;
+      background: white;
+    }
+
+    .annotationChart {
+      height: 35px;
+      background: #4f5457 !important;
+    }
+
+    .annotationChartTitle {
+      position: absolute;
+      left: 0px;
+      width: 136px;
+      height: 35px;
+      border: 1px solid black;
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      color: white;
+      padding: 11px
+    }
+
+    .chartAxis {
+      position: absolute;
+      right: 0px;
+      width: 34px;
+      height: 100%;
+      border: 1px solid black;
+      background: white;
+    }
+
+    #sensorColumnTitle {
+      background: rgb(214, 208, 208);
+      padding-left: 0px;
+      text-decoration: underline;
+      font-size: 15px;
+      border-top: 1px solid black;
+      width: 160px;
+      padding-top: 10px;
+      height: 30px;
+    }
+
+    .zoomGrapherBtn {
+      background: rgb(150,150,150) !important;
+      border-radius: 0px !important;
+      outline: none;
+      font-family: Arial, Helvetica, sans-serif !important;
+      font-size: 11px !important;
+      border: 4px solid white !important;
+    }
+
+    .zoomGrapherBtn:hover {
+      background: rgb(100,100,100) !important;
+    }
+
+    #zoomGrapherIn {
+      position: absolute;
+      bottom: calc(25% + 165px);
+      right: 14px;
+      height: 34px;
+      width: 34px;
+    }
+
+    #zoomGrapherOut {
+      position: absolute;
+      bottom: calc(25% + 135px);
+      right: 14px;
+      height: 34px;
+      width: 34px;
+    }
+
+    .ui-button .ui-icon.ui-icon-custom-plus-white {
+      background: url(<%= asset_path('plus_white.png') %>);
+      left: 15px;
+      top: 14px;
+      width: 14px;
+      height: 14px;
+      background-size: contain !important;
+      opacity: 1;
+    }
+
+    .ui-button .ui-icon.ui-icon-custom-minus-white {
+      background: url(<%= asset_path('minus_white.png') %>);
+      left: 15px;
+      top: 14px;
+      width: 14px;
+      height: 14px;
+      background-size: contain !important;
+      opacity: 1;
+    }
+
+    #grapher-loader {
+      padding-top: 10px;
+    }
+
+    #grapher_content {
+      display: none;
+      background-color: white;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 25%
+    }
+
+    #grapher_wrapper {
+      visibility: hidden;
+    }
+
+    #grapher_parent::-webkit-scrollbar {
+      -webkit-appearance: none;
+      background: transparent;
+      overflow: visible;
+      width: 14px;
+    }
+
+    #grapher_parent::-webkit-scrollbar:vertical {
+      border-width: 6px 4px;
+      min-height: 40px;
+    }
+
+    #grapher_parent::-webkit-scrollbar-track-piece {
+      background-color: #f1f1f1;
+    }
+
+    #grapher_parent::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    #grapher_parent::-webkit-scrollbar-thumb {
+      background-color: #ADADAD;
+      -webkit-box-shadow: inset 1px 1px 0 rgba(0,0,0,0.10),inset 0 -1px 0 rgba(0,0,0,0.07);
+    }
+
+    #grapher_parent::-webkit-scrollbar-thumb:hover {
+      background-color: #999;
+    }
+
   </style>
 
   <script>
     jQuery.support.cors = true;
-    var zoomify, locationDivId, timelapse, timelapseFeedUnavailable, hashVars;
-    var currentLocation = "<%= @location_id %>";
+    var initialDataset;
+    var locationDivId;
+
+    var dateAxis;
+    var fixedCursorPosition;
+    var grapherReady = false;
+    var grapherLoadedInterval = null;
+
+    var esdrChannelsString = ""
+    var esdrChannelsArray = [];
+
+    var ESDR_API_ROOT_URL = 'https://esdr.cmucreatelab.org/api/v1';
+
+    var esdr_feeds = {};
+
+    var fixedCursorPosition;
+    var clampTimeout;
+    var initialClampTimeout;
+    var series = [];
+
+    var currentDate;
+
+    window.grapherLoad = function() {
+      grapherReady = true;
+      //$("#grapher-loader").empty();
+    };
+
+    function selectTimelapseFeed() {
+      $("#timelapse_feed").show();
+    }
+
+    function padDigits(number, digits) {
+      return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
+    }
+
+    var createChart = function(feed, channelName, feedAPIKey) {
+      var startTime = feed.fullTimeRange.min;
+      var endTime = feed.fullTimeRange.max;
+
+      // Set max range of all the graphs
+      if (endTime > dateAxis.getMax()) {
+        dateAxis.setMaxRange(null, endTime);
+      }
+
+      // Add charts
+      var seriesIdx = series.length;
+      var color_line = "rgb(0,0,0)";
+      var color_fill = "rgba(106,106,106,1)";
+      if (feed.feed_id == 1 && channelName == "PM25T_UG_M3") {
+        seriesIdx = 0;
+      } else {
+        series[seriesIdx] = {};
+        series[seriesIdx].id = seriesIdx;
+        var row = $('<tr class="chart grapher_row"' + 'data-channel=' + channelName + '></tr>');
+        row.append('<td class="chartTitle" style="background:' + color_fill + '"><div>' + feed.name + '.' + channelName + '</div></td>');
+        row.append('<td id="series' + seriesIdx + '" class="chartContent"></td>');
+        row.append('<td id="series' + seriesIdx + 'axis" class="chartAxis"></td>');
+        $('#grapher').append(row);
+        series[seriesIdx].axis = new NumberAxis('series' + seriesIdx + 'axis', "vertical");
+      }
+
+      var datasource;
+      (function(source) {
+        datasource = function(level, offset, successCallback, failureCallback) {
+          $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: ESDR_API_ROOT_URL + "/feeds/" + feedAPIKey + "/channels/" + source + "/tiles/" + level + "." + offset,
+            success: function(json) {
+              successCallback(JSON.stringify(json.data));
+            },
+            failure: failureCallback
+          });
+        };
+      })(channelName);
+      var plot = new DataSeriesPlot(datasource, dateAxis, series[seriesIdx].axis, {});
+
+      plot.addDataPointListener(function(pointData, event) {
+        if (!event) return;
+        if (event.actionName == "click") {
+          fixedCursorPosition = pointData.date;
+          var pointDataDateObj = new Date(pointData.dateString.split(".")[0]);
+          var commentDate = $.datepicker.formatDate('yy-mm-dd', pointDataDateObj);
+
+          if (!currentDate) {
+            // Format to locale that uses YYYY-MM-DD
+            var dateFormatter = Intl.DateTimeFormat('sv-SE');
+            currentDate = dateFormatter.format($("#datepicker").datepicker('getDate'));
+          }
+
+          if (commentDate != currentDate) {
+            var path = cached_breathecam.datasets[commentDate];
+            if (!path) return;
+            path = path.replace("http:", "https:");
+            var currentView = timelapse.getView();
+            currentDate = commentDate;
+            timelapse.loadTimelapse(path, currentView, null, null, String(pointDataDateObj));
+            $("#datepicker").datepicker("setDate", pointDataDateObj);
+          } else {
+            var desiredDateString = pointData.dateString.split(", ")[1];
+            var closestDesiredFrame = timelapse.findExactOrClosestCaptureTime(desiredDateString.substr(0, 8));
+            timelapse.seekToFrame(closestDesiredFrame);
+          }
+        }
+      });
+
+      var cursorColor = (feed.isDouble) ? "rgba(0,0,0,0)" : "#2A2A2A";
+      plot.setStyle({
+        "cursor" : {
+          "color" : cursorColor,
+          "lineWidth" : 1
+        },
+        "styles": [
+          { "type" : "line", "lineWidth" : 1, "show" : true, "color" : color_line }/*,
+          { "type" : "circle", radius : 1, "lineWidth" : 1, "show" : true, "color" : color_line, fill : true }*/
+        ],
+        "highlight" : {
+          "lineWidth" : 1,
+          "styles" : [
+             {
+                "type" : "circle",
+                radius : 3.5,
+                "lineWidth" : 0.5,
+                "show" : true,
+                "color" : "#2A2A2A",
+                fill : true,
+                fillColor: "#2A2A2A"
+             },
+             {
+                "show" : true,
+                "type" : "value",
+                "fillColor" : "#000000",
+                "marginWidth" : 10,
+                "font" : "12pt Helvetica,Arial,Verdana,sans-serif",
+                "verticalOffset" : 5,
+                "horizontalOffset" : 12,
+                "numberFormat" : "###,##0.#"
+             }
+          ]
+        }
+      });
+
+      if (feed.isDouble) {
+        series[seriesIdx].pc.addPlot(plot);
+      } else {
+        series[seriesIdx].p = [];
+        series[seriesIdx].pc = new PlotContainer("series" + seriesIdx, false, [plot]);
+      }
+      series[seriesIdx].p.push(plot);
+
+      setSizes();
+
+      if (esdrChannelsArray.length == series.length) {
+        var calendarDate = $("#datepicker").datepicker( 'getDate' );
+        var calendarDateString = calendarDate.getFullYear() + "-" + padDigits((calendarDate.getMonth() + 1), 2) + "-" + padDigits(calendarDate.getDate(), 2);
+        setGraphTimeRange(calendarDateString);
+        initialClampTimeout = window.setTimeout(function() {
+          for (var seriesCount = 0; seriesCount < series.length; seriesCount++) {
+            var plots = series[seriesCount].p;
+            clampNumberAxisToDataRange(plots, seriesCount);
+          }
+          window.clearTimeout(initialClampTimeout);
+          initialClampTimeout = null;
+        }, 2000);
+      }
+
+    };
+
+    function clampNumberAxisToDataRange(plots, seriesIdx) {
+      var stats, tmp_stats, min = 9999, max = -9999;
+      if (!plots) return;
+      if (plots.constructor === Array) {
+        for (var i = 0; i < plots.length; i++) {
+          tmp_stats = plots[i].getSimpleStatistics(dateAxis.getMin(), dateAxis.getMax());
+          if (tmp_stats.count > 0) {
+            stats = tmp_stats;
+            if (min > stats.y_min) min = stats.y_min;
+            if (max < stats.y_max) max = stats.y_max;
+          }
+        }
+      } else {
+        stats = plots.getSimpleStatistics(dateAxis.getMin(), dateAxis.getMax());
+        min = stats.y_min;
+        max = stats.y_max;
+      }
+
+      if (stats && stats.has_data && typeof stats.y_min !== 'undefined' && typeof stats.y_max !== 'undefined') {
+        var paddedRange = paddedYAxisRange(min, max);
+        series[seriesIdx].axis.setRange(paddedRange.min, paddedRange.max);
+      }
+    }
+
+    function zoomGrapher(scale) {
+      var min_time = dateAxis.getMin();
+      var max_time = dateAxis.getMax();
+      var mean_time = (max_time+min_time)/2;
+      var range_half_scaled = scale*(max_time-min_time)/2;
+      dateAxis.setRange(mean_time-range_half_scaled,mean_time+range_half_scaled);
+    }
+
+    function paddedYAxisRange(min, max) {
+      var yDiff = max - min;
+      var padding = 0.5;
+      if (yDiff < 1e-10) {
+        padding = 0.5;
+      } else {
+        padding = 0.05 * yDiff;
+      }
+      return {min : min - padding, max : max + padding};
+    }
+
+    function setSizes() {
+      var width = $(window).width() / 2;
+      var height = $(window).height() / 2;
+      if (!dateAxis) return;
+      //$("#grapher").css({"width" : width + "px", "height" : height + "px"});
+      $("#dateAxis").width($('.chartContent').width());
+      var dateAxisWidth = $('#dateAxis').width();
+      var dateAxisHeight = $('#dateAxis').height();
+      $('.chartContent').height($('.chart').height() - 1);
+      $('.chartTitle').height($('.chart').height() - 23);
+      $('.chartAxis').height($('.chart').height() - 1);
+      if (!dateAxisWidth || !dateAxisHeight) return;
+      dateAxis.setSize(dateAxisWidth, dateAxisHeight, SequenceNumber.getNext());
+      for (var i = 0; i < series.length; i++) {
+        var newHeight = $('.chart').height();
+        //if (i === 0)
+        //  newHeight = $('.annotationContent').height();
+        if (series[i].axis)
+          series[i].axis.setSize($('#series' + i + 'axis').width(), newHeight, SequenceNumber.getNext());
+        if (series[i].pc)
+          series[i].pc.setSize($('#series' + i).width(), newHeight, SequenceNumber.getNext());
+      }
+    }
+
+    function setGraphTimeRange(date) {
+      if (!dateAxis) return;
+      var dayStartString = date + " 00:00:00";
+      var dayEndString = date + " 23:59:59";
+      var dayStart = (new Date((dayStartString).replace(/-/g,"/")).getTime()) / 1000;
+      var dayEnd = (new Date((dayEndString).replace(/-/g,"/")).getTime()) / 1000;
+      dateAxis.setRange(dayStart, dayEnd);
+    }
+
+    function grapherSetup() {
+      for (var i = 0; i < esdrChannelsArray.length; i++) {
+        var feed_channel = esdrChannelsArray[i].split(".")
+        if (!esdr_feeds[feed_channel[0]]) {
+          esdr_feeds[feed_channel[0]] = {};
+          esdr_feeds[feed_channel[0]].name = "";
+          esdr_feeds[feed_channel[0]].apiKey = "";
+          esdr_feeds[feed_channel[0]].channels = [];
+          esdr_feeds[feed_channel[0]].fullTimeRange = {};
+        }
+        esdr_feeds[feed_channel[0]].channels.push(feed_channel[1]);
+      }
+
+      var feed_ids = Object.keys(esdr_feeds);
+
+      for (var i = 0; i < feed_ids.length; i++) {
+        (function(i){
+          var feed_id = feed_ids[i];
+          $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: ESDR_API_ROOT_URL + '/feeds/' + feed_id,
+            success: function(json) {
+              esdr_feeds[feed_id].name = json.data.name;
+              esdr_feeds[feed_id].apiKey = json.data.apiKeyReadOnly;
+            }
+          });
+        })(i);
+      }
+
+      grapherLoadedInterval = window.setInterval(function() {
+          if (!grapherReady) return;
+
+          window.clearInterval(grapherLoadedInterval);
+          grapherLoadedInterval = null;
+
+          $(window).resize(function() {
+            setSizes();
+          });
+
+          // Initial creation
+          if (!$("#dateAxisContainer").length) {
+            $("#grapher_parent").before('<tr id="dateAxisContainer" class="grapher_row"><td id="sensorColumnTitle">Location / Sensor</td><td id="dateAxis"></td><td></td></tr>');
+            dateAxis = new DateAxis("dateAxis", "horizontal");
+
+            // Create zooming buttons
+            $("#grapher_parent").before('<button id="zoomGrapherIn" class="zoomGrapherBtn" title="Zoom in the graphs"></button>');
+            $("#grapher_parent").before('<button id="zoomGrapherOut" class="zoomGrapherBtn" title="Zoom out the graphs"></button>');
+            $("#zoomGrapherIn").button({
+              icons: {
+                secondary: "ui-icon-custom-plus-white"
+              },
+              text: false
+            }).on("click", function() {
+              zoomGrapher(0.7);
+            });
+            $("#zoomGrapherOut").button({
+              icons: {
+                secondary: "ui-icon-custom-minus-white"
+              },
+              text: false
+            }).on("click", function() {
+              zoomGrapher(1.3);
+            });
+
+            dateAxis.setCursorColor("#1A1A1A");
+            dateAxis.addAxisChangeListener(function(e) {
+              if (e) {
+                var cursorPosition = e.cursorPosition;
+                if (fixedCursorPosition != cursorPosition) {
+                  // Reset the cursor position
+                  dateAxis.setCursorPosition(fixedCursorPosition);
+                }
+              }
+              if (clampTimeout || initialClampTimeout) return;
+              clampTimeout = window.setTimeout(function() {
+                for (var seriesCount = 0; seriesCount < series.length; seriesCount++) {
+                  var plots = series[seriesCount].p;
+                  clampNumberAxisToDataRange(plots, seriesCount);
+                }
+                window.clearTimeout(clampTimeout);
+                clampTimeout = null;
+              }, 150);
+            });
+            //dateAxis.setMaxRange(null, endTime);
+            if (timelapse) {
+              var currentCaptureTime = timelapse.getCurrentCaptureTime();
+              if (currentCaptureTime) {
+                fixedCursorPosition = Date.parse(currentCaptureTime.replace(/-/g, "/")) / 1000;
+                dateAxis.setCursorPosition(fixedCursorPosition);
+              }
+            }
+          }
+
+          // Initialize Graphs
+          for (var i = 0; i < feed_ids.length; i++) {
+            (function(i){
+              var feed_id = feed_ids[i];
+              $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: ESDR_API_ROOT_URL + '/feeds/' + esdr_feeds[feed_id].apiKey,
+                success: function(json) {
+                  esdr_feeds[feed_id].fullTimeRange.min = json.data.minTimeSecs;
+                  esdr_feeds[feed_id].fullTimeRange.max = json.data.maxTimeSecs;
+                  if (i == feed_ids.length - 1) {
+                    for (var j = 0; j < feed_ids.length; j++) {
+                      (function(j){
+                        var feed = esdr_feeds[feed_ids[j]];
+                        var channelNames = feed.channels;
+                        channelNames.forEach(function(channelName) {
+                          window.setTimeout(function() {
+                            createChart(feed, channelName, feed.apiKey);
+                          }, j*50);
+                        });
+                      })(j);
+                    }
+                    $("#grapher_wrapper").css("visibility", "visible");
+                  }
+                }
+              });
+            })(i);
+          }
+        }, 10);
+      };
+
+      window.requestAnim =
+        window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function(callback) {
+          return window.setTimeout(callback, 10);
+        };
 
     function tm_init() {
       selectTimelapseFeed();
 
-      var initialDataset = cached_breathecam.latest.path;
-      var startingDate = cached_breathecam.latest.date;
+      initialDataset = cached_breathecam.latest.path;
+      var startingDate = cached_breathecam.latest.date.replace("UTC", "");
+      var splitType = cached_breathecam.split_type || "daily";
 
       var hash = window.location.hash.slice(1);
-      hashVars = org.gigapan.Util.unpackVars(hash);
-      var loadedTimelapse = false;
-      if (hashVars) {
-        if (hashVars.d) {
-          startingDate = String(hashVars.d);
-          initialDataset = cached_breathecam.datasets[startingDate];
-          if (!initialDataset) {
-            initialDataset = cached_breathecam.latest.path;
-          }
-        }
-        if (hashVars.s) {
-          loadedTimelapse = true;
-          currentLocation = String(hashVars.s);
-          changeLocation(currentLocation, startingDate, null, null, false, function() {
-            initialDataset = cached_breathecam.datasets[startingDate];
-            if (!initialDataset) {
-              initialDataset = cached_breathecam.latest.path;
-            }
-            setupTimelapse(initialDataset, startingDate);
-          });
-        }
+      var hashVars = unpackVars(hash);
+
+      if (hashVars && hashVars.esdr_channels) {
+        $("#timeMachine").css("height", "75%");
+        $("#grapher_content").show();
+        esdrChannelsString = hashVars.esdr_channels.replace(/\(|\)/g,"")
+        esdrChannelsArray = esdrChannelsString.split(",")
+        grapherSetup();
       }
 
-      // If we did not load the timelapse with the hash vars above, do so now.
-      if (!loadedTimelapse)
-        setupTimelapse(initialDataset, startingDate);
-    }
+      if (hashVars && hashVars.d) {
+        startingDate = hashVars.d;
+        initialDataset = initialDataset.replace(/\d\d\d\d-\d\d-\d\d/, hashVars.d);
+      }
 
-    function img_init() {
-      zoomify = new org.gigapan.zoomify({
-        onImageReady: function(imgId) {
-          showContent();
-          if (!$("#timelapse_feed").is(':visible')) {
-            selectImageFeed();
-          }
-        }
-      });
-
-      $("#stitched_image").load(function() {
-        zoomify.makeImageZoomable("stitched_image");
-      });
-
-      $("#stitched_image").bind("mouseover mouseup", function() {
-        $(this).removeClass("openHand closedHand").addClass("openHand");
-      }).bind("mousedown", function() {
-        $(this).removeClass("openHand closedHand").addClass("closedHand");
-      });
-    }
-
-    function setupTimelapse(initialDataset, startingDate) {
-      var settings = {
+      var viewerOptions = {
         url: initialDataset,
         disableTourLooping: true,
         mediaType: ".mp4",
         showFullScreenBtn: false,
         showLogoOnDefaultUI: false,
+        datasetType: "breathecam",
         showThumbnailTool: true,
         enableChangeDetection: true,
-        datasetType: "breathecam",
+        headlessClientHost: location.protocol + '//' + location.host + location.pathname,
+        sideControlsInfo: {
+          position: "top-left",
+          showHomeBtn: true,
+        },
+        /*socialMedia: {
+          twitterHandle: "BreatheProject",
+          facebookAppId: "342963495886660",
+          hashTags: ["BreatheCam"]
+        },*/
+        thumbnailToolOptions: {
+          watermark: "Breathe Project|CREATE Lab",
+          useShortUrl: true,
+          shortUrlTopic: "breathecam"
+        },
         onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
-          // Override the hashchange event
-          window.onhashchange = null;
-          $(window).on("hashchange", function() {
-            var newHash = window.location.hash.slice(1);
-            var newHashVars = org.gigapan.Util.unpackVars(newHash);
-            var currentHash = timelapseObj.getShareView();
-            var currentHashVars = org.gigapan.Util.unpackVars(currentHash);
-            window.location.hash = "";
-            if (!newHashVars) return;
-
-            if ((newHashVars.d && currentHashVars.d != newHashVars.d) || (newHashVars.s && currentHashVars.s != newHashVars.s)) {
-              var newDate, newDataset;
-              if (newHashVars.d) {
-                newDate = String(newHashVars.d);
-                newDataset = cached_breathecam.datasets[newDate];
-                if (!newDataset) return;
-              }
-              var newTime = parseFloat(newHashVars.t);
-              var newView = timelapseObj.normalizeView(timelapseObj.unsafeViewToView(newHashVars.v));
-              if (newHashVars.s && currentHashVars.s != newHashVars.s) {
-                currentLocation = String(newHashVars.s);
-                changeLocation(currentLocation, newDate, newView, newTime, true);
-              } else {
-                updateCalendarAndToggleUI(newDate);
-                timelapseObj.loadTimelapse(newDataset, newView, newTime, false);
-              }
-            } else {
-              // Share views
-              timelapseObj.loadSharedViewFromUnsafeURL(org.gigapan.Util.getUnsafeHashString());
+          timelapseObj.addTimeChangeListener(function(videoTime) {
+            if (dateAxis) {
+              fixedCursorPosition = Date.parse(timelapseObj.getCurrentCaptureTime().replace(/-/g, "/")) / 1000;
+              dateAxis.setCursorPosition(fixedCursorPosition);
             }
           });
-          if (!hashVars) {
-            var numFrames = timelapseObj.getNumFrames();
-            // 12 fps * 5 seconds = 60 frames
-            var fiveSecondsFromEnd = numFrames - 60;
-            timelapseObj.seekToFrame(fiveSecondsFromEnd);
+          if (splitType == "monthly") {
+            timelapseObj.addTimeChangeListener(function() {
+              $('#datepicker').datepicker("setDate", new Date(timelapseObj.getCurrentCaptureTime().replace(/-/g, "/").replace("UTC","")));
+            });
           }
+          if (!hashVars) {
+            if (splitType == "daily") {
+              var numFrames = timelapseObj.getNumFrames();
+              // 12 fps * 10 seconds = 120 frames
+              var framesFromEnd = numFrames - 120;
+              timelapseObj.seekToFrame(framesFromEnd);
+            } else {
+              timelapseObj.loadTimelapse(initialDataset, null, null, null, new Date((new Date().setHours(0,0,0,0))));
+            }
+          } else {
+            if (hashVars.t) {
+              timelapseObj.seek(hashVars.t);
+            }
+
+            if (hashVars.minimalUI) {
+              $(".captureTime").insertBefore(".controls");
+              $("#timeMachine").addClass("snapshot-mode");
+              $(".controls, .sideToolBar, .playbackButton, #locationTitle").hide();
+              timelapseObj.onresize()
+            }
+          }
+          $('#datepicker').datepicker("setDate", new Date(timelapseObj.getCurrentCaptureTime().replace(/-/g, "/").replace("UTC","")));
           showContent();
+          didOnTimeMachinePlayerReady = true;
+          gFrameGrab.init(timelapseObj.drawToWebgl, timelapseObj.setDoManualWebglDraw, timelapseObj, null);
         }
       };
-      timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
 
-      loadCalendar(startingDate);
-    }
+      timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", viewerOptions);
 
-    function selectTimelapseFeed() {
-      $("#image_feed").css("visibility", "hidden");
-      $("#stitched_image_wrapper").css("visibility", "hidden");
-      $("#stitched_image").css("visibility", "hidden");
-      $("#timelapse_feed").show();
-      setLocationTitle();
-    }
-
-    function selectImageFeed() {
-      $("#timelapse_feed").hide();
-      $("#image_feed").css("visibility", "visible");
-      $("#stitched_image_wrapper").css("visibility", "visible");
-      $("#stitched_image").css("visibilriity", "visible");
-      $("#location_toggle_container").css("top", "0px");
-      setLocationTitle();
-    }
-
-    function setLocationTitle() {
-      var locationTitle = $("#location_toggle .location_thumbnail_selected").siblings(".location_title").text();
-      $("#locationTitle").text(locationTitle);
-    }
-
-    function showContent() {
-      $("#loading").hide();
-      $("#content").css("visibility", "visible");
-      $("#location_toggle").scrollTop($("#" + locationDivId).offset().top - $("#location_toggle").offset().top);
-    }
-
-    function changeLocation(locationName, newDate, newView, newTime, doLoad, callBack) {
-      currentLocation = locationName;
-      if (timelapseFeedUnavailable) {
-        location.href = "/embeds/" + locationName;
-      } else {
-        $.ajax({
-          url: "<%= @root_url %>/timemachines/" + locationName + "/" + locationName + ".json",
-          dataType: "json"
-        }).done(function(data) {
-          cached_breathecam = data;
-          var startingDate = cached_breathecam.latest.date;
-          var startingDataset = cached_breathecam.latest.path;
-
-          if (newDate) {
-            var tmpStartingDataset = cached_breathecam.datasets[newDate];
-            if (tmpStartingDataset) {
-              startingDate = newDate;
-              startingDataset = tmpStartingDataset;
-            }
-          }
-          // If there is no timelapse object at this point, then that means that we have just arrived at the page
-          // with a share link that has an invalid location name.
-          // Load the timelapse with the default location specified in the .fail() callback below.
-          if (!timelapse) {
-            setupTimelapse(startingDataset, startingDate);
-            return;
-          }
-          updateCalendarAndToggleUI(startingDate);
-          if (doLoad) {
-            if (timelapse && startingDataset) {
-              newTime = parseFloat(newTime);
-              timelapse.loadTimelapse(startingDataset, newView, newTime, false, null, function() {
-                if (isNaN(newTime)) {
-                  var numFrames = timelapse.getNumFrames();
-                  // 12 fps * 5 seconds = 60 frames
-                  var fiveSecondsFromEnd = numFrames - 60;
-                  timelapse.seekToFrame(fiveSecondsFromEnd);
-                }
-              });
-            }
-          } else if (typeof(callBack) === "function") {
-            callBack();
-          }
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-          console.log(jqXHR, textStatus, errorThrown);
-          changeLocation("heinz", null, null, null, true);
-        });
-      }
-    }
-
-    function updateCalendarAndToggleUI(startingDate) {
-      locationDivId = currentLocation + "_overlay";
-      setLocationThumbnailToggle();
-      setLocationTitle();
-      $("#datepicker").datepicker("destroy");
-      loadCalendar(startingDate);
-    }
-
-    function loadCalendar(startingDate) {
       var dateArray = startingDate.split("-");
       $("#datepicker").datepicker({
         defaultDate : new Date(dateArray[0], dateArray[1] - 1, dateArray[2]),
@@ -300,6 +783,25 @@
         onSelect : selectDay,
         beforeShowDay : highlightDays
       });
+
+    }
+
+    function showContent() {
+      $("#loading").hide();
+      $("#content").css("visibility", "visible");
+    }
+
+    function unpackVars(str) {
+      var keyvals = str.split('&');
+      var vars = {};
+
+      if (keyvals.length == 1 && keyvals[0] === "") return null;
+
+      for (var i = 0; i < keyvals.length; i++) {
+        var keyval = keyvals[i].split('=');
+        vars[keyval[0]] = keyval[1];
+      }
+      return vars;
     }
 
     function highlightDays(date) {
@@ -315,88 +817,49 @@
       timelapse.pause();
       var date = $.datepicker.formatDate('yy-mm-dd', new Date(dateText));
       var path = cached_breathecam.datasets[date];
-      if (timelapse && path) {
-        timelapse.loadTimelapse(path, null, null, true);
+      setGraphTimeRange(date);
+      if (typeof(timelapse) !== "undefined" && timelapse && path) {
+        var newDate = date + " " + timelapse.getCurrentCaptureTime().substr(11,8);
+        timelapse.loadTimelapse(path, timelapse.getView(), null, false, newDate);
       }
       if (!wasPaused) {
         timelapse.handlePlayPause();
       }
     }
 
-    function setLocationThumbnailToggle() {
-      $(".location_thumbnail_selected").removeClass("location_thumbnail_selected");
-      $("#" + locationDivId).addClass("location_thumbnail_selected");
-    }
-
     $(function() {
       var timelapseSupported = org.gigapan.Util.browserSupported();
-      var stitchedImage = "<%= @stitched_image %>";
+      var error_text = "";
       locationDivId = "<%= @location_id %>" + "_overlay";
-      setLocationThumbnailToggle();
 
-      $(".location_thumbnail_container").on("click", function() {
-        window.location.hash = "";
-        changeLocation($(this).attr("data-location-id"), null, null, null, true);
-      });
-
-      if ((!timelapseSupported || typeof (cached_breathecam) === "undefined") && stitchedImage === "") {
-        // Nothing is up. Hide containers and inform the user
-        $("#stitched_image_wrapper").hide();
-        $("#location_toggle").hide();
+      if (!timelapseSupported || typeof (cached_breathecam) === "undefined") {
+        // Nothing is up. Inform the user
         $("#loading").html("<div class='error_msg2'>Content currently unavailable. Please try again later.</div>");
-      } else if (!timelapseSupported || typeof (cached_breathecam) === "undefined") {
-        timelapseFeedUnavailable = true;
-        // Timelapse unavailable, show latest stitched pano
-        // Calendar is gone in this mode, so move thumbnail toggles to top of page
-        $("#location_toggle").css({'top':'0px'});
-        $("#image_feed_timestamp").css({"top" : "48px", "right" : "22px"});
-        img_init();
       } else {
-        // Show timelapse
         tm_init();
       }
-      $("#container").on("mousedown", function() { return false; });
+
+      $("body").on("selectstart", function(e) { e.preventDefault(); });
     });
   </script>
 <% end %>
 
-<div id="loading">
-  <img id="loadingImg" src="<%= asset_path('loading.gif') %>" width="508" height="381" alt="loading">
-</div>
-<div id="locationTitle"></div>
-<div id="timelapse_feed" class="timelapse_feed_embed">
-  <div id="timeMachine"></div>
-  <div id="datepicker" class="datepicker_embed"></div>
-</div>
-<div id="image_feed" class="image_feed_embed">
-  <div id="stitched_image_wrapper" class="image-zoom-wrapper image-zoom-wrapper-embed">
-    <div id="zoom-in" title="Zoom in"><p>+</p></div>
-    <div id="zoom-out" title="Zoom out"><p>_</p></div>
-    <img id="stitched_image" class="image-zoom" src="<%= @stitched_image %>" alt="Latest Stich">
-    <span id="image_feed_timestamp"><%= @pretty_time %></span>
+<div>
+  <div id="loading">
+    <img src="<%= asset_path('loading.gif') %>">
   </div>
-</div>
-<div id="location_toggle_container">
-  <div id="location_toggle">
-    <a class="location_thumbnail_container" data-location-id="heinz" href="javascript:void(0)">
-      <div id="heinz_overlay" class="location_thumbnail_overlay"></div>
-      <img src="<%= asset_path('heinz_toggle.png') %>" class="location_thumbnail" alt="Heinz">
-      <div class="location_title">North Shore</div>
-    </a>
-    <a class="location_thumbnail_container" data-location-id="trimont1" href="javascript:void(0)">
-      <div id="trimont1_overlay" class="location_thumbnail_overlay"></div>
-      <img src="<%= asset_path('trimont1_toggle.png') %>" class="location_thumbnail" alt="Trimont">
-      <div class="location_title">Downtown</div>
-    </a>
-    <a class="location_thumbnail_container" data-location-id="walnuttowers1" href="javascript:void(0)">
-      <div id="walnuttowers1_overlay" class="location_thumbnail_overlay"></div>
-      <img src="<%= asset_path('walnuttowers1_toggle.png') %>" class="location_thumbnail" alt="Walnut Towers">
-      <div class="location_title">Mon. Valley</div>
-    </a>
-    <a class="location_thumbnail_container location_thumbnail_container_end" data-location-id="pitt1" href="javascript:void(0)">
-      <div id="pitt1_overlay" class="location_thumbnail_overlay"></div>
-      <img src="<%= asset_path('pitt1_toggle.png') %>" class="location_thumbnail" alt="Pitt">
-      <div class="location_title">Oakland</div>
-    </a>
+  <div>
+    <div id="timelapse_feed" class="timelapse_feed_embed">
+      <div id="timeMachine"></div>
+      <div id="datepicker" class="datepicker_embed"></div>
+    </div>
+    <div id="grapher_content">
+      <div id="grapher-loader">Loading graphs...</div>
+      <div id="grapher_wrapper">
+        <div id="grapher_parent" style="width:100%; position: fixed; bottom: 0px;  overflow-y: auto; height: calc(25% - 40px)">
+          <table id="grapher" border="0" cellspacing="0" cellpadding="0"></table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

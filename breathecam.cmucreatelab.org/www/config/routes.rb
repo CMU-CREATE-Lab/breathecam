@@ -11,26 +11,27 @@ Breathecam::Application.routes.draw do
   match '/locations/:camera/latest' => 'latest_images#index'
 
   # TODO: This can probably be combined into one statement.
+  # All paths under the 'ecam' subdomain get swallowed here.
   root :to => "embeds#index", :constraints => { :subdomain  => "ecam" }
   match '(*path)/:location' => "embeds#index", :constraints => { :subdomain  => "ecam" }
 
   root :to => 'home#index'
 
-  match 'embeds/' => 'embeds#index', :defaults => { :location => "heinz" }
-  match 'embeds/:location' => 'embeds#index', :defaults => { :location => "heinz" }
-
-  match 'achd/' => 'achd#index', :defaults => { :location => "heinz" }
-  match 'achd/:location' => 'achd#index', :defaults => { :location => "heinz" }
-
   post '/location_pinger' => 'locations_handler#receive_data'
   post '/upload' => 'locations_handler#upload'
   match '/upload', :controller => 'locations_handler', :action => 'upload', :constraints => {:method => 'OPTIONS'}
 
-  # Legacy route
+  # Legacy routes for breathecam.cmucreatelab.org domain
+  # Redirects to BreatheProject website
   match 'locations/' => 'locations#index', :defaults => { :location => "heinz" }
   match 'locations/:location' => 'locations#index'
 
-  #static routes
+  # Legacy routes for original 4 breathecams
+  # Only accessible through 'breathecam' subdomain
+  match 'achd/' => 'achd#index', :defaults => { :location => "heinz" }
+  match 'achd/:location' => 'achd#index', :defaults => { :location => "heinz" }
+
+  # Static routes
   match ':action', :controller => "static"
 
 end

@@ -1,59 +1,6 @@
 <% content_for :head do %>
   <script>
-    /* Handle old share links when the index page was poiting to the Heinz breathecam */
-    //var locationArray = window.location.href.split("#");
-    //if (locationArray.length > 1)
-    //  window.location.href = locationArray[0] + "locations/heinz#" + locationArray[1];
     // Redirect to Breathe Project site
     window.location = "http://breatheproject.org/learn/breathe-cam/" + location.hash;
   </script>
 <% end %>
-
-<div id="body-index">
-  <table>
-    <tr>
-      <td class="thumbnail">
-        <a href="/embeds/heinz">
-          <div>
-            <%= image_tag("heinz.png", :class=>"thumbnail-image") %>
-            <div class="thumbnail-title">Heinz</div>
-            <div class="thumbnail-description">Timelapse captured from downtown Pittsburgh.</div>
-          </div>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="thumbnail">
-        <a href="/embeds/trimont1">
-          <div>
-            <%= image_tag("trimont1.png", :class=>"thumbnail-image") %>
-            <div class="thumbnail-title">Trimont</div>
-            <div class="thumbnail-description">Timelapse captured from Mount Washington.</div>
-          </div>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="thumbnail">
-        <a href="/embeds/walnuttowers1">
-          <div>
-            <%= image_tag("walnuttowers1.png", :class=>"thumbnail-image") %>
-            <div class="thumbnail-title">Walnut Towers</div>
-            <div class="thumbnail-description">Timelapse captured from Squirrel Hill.</div>
-          </div>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="thumbnail">
-        <a href="/embeds/pitt1">
-          <div>
-            <%= image_tag("pitt1.png", :class=>"thumbnail-image") %>
-            <div class="thumbnail-title">Benedum Hall</div>
-            <div class="thumbnail-description">Timelapse captured from Oakland.</div>
-          </div>
-        </a>
-      </td>
-    </tr>
-  </table>
-</div>
