@@ -238,7 +238,7 @@
         "walnuttowers2" : "Edgar Thomson",
         "braddock1" : "Edgar Thomson",
         "irvin1" : "Irvin",
-        "westmifflin1" : "Edgar Thomson",
+        "westmifflin2" : "Edgar Thomson",
         "accan2" : "Metalico",
         "vanport1" : "Shell Plastics West",
         "vanport2" : "Shell Plastics West",
@@ -253,6 +253,9 @@
         hashVars = UTIL.unpackVars(hash);
         var loadedTimelapse = false;
         if (hashVars) {
+          if (hashVars.minimalUI) {
+            $("#timeMachine").addClass("snapshot-mode");
+          }
           if (hashVars.d) {
             startingDate = String(hashVars.d);
             initialDataset = cached_breathecam.datasets[startingDate];
@@ -402,13 +405,11 @@
 
             if (hashVars.minimalUI || hashVars.disableUI) {
               if (hashVars.disableUI) {
-                $(".captureTime").hide();
+                $(".captureTime").addClass("hidden");
               } else {
                 $(".captureTime").insertBefore(".controls");
               }
-              $("#timeMachine").addClass("snapshot-mode");
-              $(".controls, .sideToolBar, .playbackButton, #locationTitle").hide();
-              timelapse.onresize();
+              $(".controls, .sideToolBar, .playbackButton, #locationTitle").addClass("hidden");
             }
 
             // Default to 'Medium' speed in the export GUI
