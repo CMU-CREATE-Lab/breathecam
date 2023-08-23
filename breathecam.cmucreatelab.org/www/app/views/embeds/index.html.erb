@@ -582,110 +582,110 @@
       }
 
       grapherLoadedInterval = window.setInterval(function() {
-          if (!grapherReady) return;
+        if (!grapherReady) return;
 
-          window.clearInterval(grapherLoadedInterval);
-          grapherLoadedInterval = null;
+        window.clearInterval(grapherLoadedInterval);
+        grapherLoadedInterval = null;
 
-          $(window).resize(function() {
-            setSizes();
+        $(window).resize(function() {
+          setSizes();
+        });
+
+        // Initial creation
+        if (!$("#dateAxisContainer").length) {
+          $("#grapher_parent").before('<tr id="dateAxisContainer" class="grapher_row"><td id="sensorColumnTitle">Location / Sensor</td><td id="dateAxis"></td><td></td></tr>');
+          dateAxis = new DateAxis("dateAxis", "horizontal");
+
+          // Create zooming buttons
+          $("#grapher_parent").before('<button id="zoomGrapherIn" class="zoomGrapherBtn" title="Zoom in the graphs"></button>');
+          $("#grapher_parent").before('<button id="zoomGrapherOut" class="zoomGrapherBtn" title="Zoom out the graphs"></button>');
+          $("#zoomGrapherIn").button({
+            icons: {
+              secondary: "ui-icon-custom-plus-white"
+            },
+            text: false
+          }).on("click", function() {
+            zoomGrapher(0.7);
+          });
+          $("#zoomGrapherOut").button({
+            icons: {
+              secondary: "ui-icon-custom-minus-white"
+            },
+            text: false
+          }).on("click", function() {
+            zoomGrapher(1.3);
           });
 
-          // Initial creation
-          if (!$("#dateAxisContainer").length) {
-            $("#grapher_parent").before('<tr id="dateAxisContainer" class="grapher_row"><td id="sensorColumnTitle">Location / Sensor</td><td id="dateAxis"></td><td></td></tr>');
-            dateAxis = new DateAxis("dateAxis", "horizontal");
-
-            // Create zooming buttons
-            $("#grapher_parent").before('<button id="zoomGrapherIn" class="zoomGrapherBtn" title="Zoom in the graphs"></button>');
-            $("#grapher_parent").before('<button id="zoomGrapherOut" class="zoomGrapherBtn" title="Zoom out the graphs"></button>');
-            $("#zoomGrapherIn").button({
-              icons: {
-                secondary: "ui-icon-custom-plus-white"
-              },
-              text: false
-            }).on("click", function() {
-              zoomGrapher(0.7);
-            });
-            $("#zoomGrapherOut").button({
-              icons: {
-                secondary: "ui-icon-custom-minus-white"
-              },
-              text: false
-            }).on("click", function() {
-              zoomGrapher(1.3);
-            });
-
-            dateAxis.setCursorColor("#1A1A1A");
-            dateAxis.addAxisChangeListener(function(e) {
-              if (e) {
-                var cursorPosition = e.cursorPosition;
-                if (fixedCursorPosition != cursorPosition) {
-                  // Reset the cursor position
-                  dateAxis.setCursorPosition(fixedCursorPosition);
-                }
-              }
-              if (clampTimeout || initialClampTimeout) return;
-              clampTimeout = window.setTimeout(function() {
-                for (var seriesCount = 0; seriesCount < series.length; seriesCount++) {
-                  var plots = series[seriesCount].p;
-                  clampNumberAxisToDataRange(plots, seriesCount);
-                }
-                window.clearTimeout(clampTimeout);
-                clampTimeout = null;
-              }, 150);
-            });
-            //dateAxis.setMaxRange(null, endTime);
-            if (timelapse) {
-              var currentCaptureTime = timelapse.getCurrentCaptureTime();
-              if (currentCaptureTime) {
-                fixedCursorPosition = Date.parse(currentCaptureTime.replace(/-/g, "/")) / 1000;
+          dateAxis.setCursorColor("#1A1A1A");
+          dateAxis.addAxisChangeListener(function(e) {
+            if (e) {
+              var cursorPosition = e.cursorPosition;
+              if (fixedCursorPosition != cursorPosition) {
+                // Reset the cursor position
                 dateAxis.setCursorPosition(fixedCursorPosition);
               }
             }
+            if (clampTimeout || initialClampTimeout) return;
+            clampTimeout = window.setTimeout(function() {
+              for (var seriesCount = 0; seriesCount < series.length; seriesCount++) {
+                var plots = series[seriesCount].p;
+                clampNumberAxisToDataRange(plots, seriesCount);
+              }
+              window.clearTimeout(clampTimeout);
+              clampTimeout = null;
+            }, 150);
+          });
+          //dateAxis.setMaxRange(null, endTime);
+          if (timelapse) {
+            var currentCaptureTime = timelapse.getCurrentCaptureTime();
+            if (currentCaptureTime) {
+              fixedCursorPosition = Date.parse(currentCaptureTime.replace(/-/g, "/")) / 1000;
+              dateAxis.setCursorPosition(fixedCursorPosition);
+            }
           }
+        }
 
-          // Initialize Graphs
-          for (var i = 0; i < feed_ids.length; i++) {
-            (function(i){
-              var feed_id = feed_ids[i];
-              $.ajax({
-                type: "GET",
-                dataType: "json",
-                url: ESDR_API_ROOT_URL + '/feeds/' + esdr_feeds[feed_id].apiKey,
-                success: function(json) {
-                  esdr_feeds[feed_id].fullTimeRange.min = json.data.minTimeSecs;
-                  esdr_feeds[feed_id].fullTimeRange.max = json.data.maxTimeSecs;
-                  if (i == feed_ids.length - 1) {
-                    for (var j = 0; j < feed_ids.length; j++) {
-                      (function(j){
-                        var feed = esdr_feeds[feed_ids[j]];
-                        var channelNames = feed.channels;
-                        channelNames.forEach(function(channelName) {
-                          window.setTimeout(function() {
-                            createChart(feed, channelName, feed.apiKey);
-                          }, j*50);
-                        });
-                      })(j);
-                    }
-                    $("#grapher_wrapper").css("visibility", "visible");
+        // Initialize Graphs
+        for (var i = 0; i < feed_ids.length; i++) {
+          (function(i){
+            var feed_id = feed_ids[i];
+            $.ajax({
+              type: "GET",
+              dataType: "json",
+              url: ESDR_API_ROOT_URL + '/feeds/' + esdr_feeds[feed_id].apiKey,
+              success: function(json) {
+                esdr_feeds[feed_id].fullTimeRange.min = json.data.minTimeSecs;
+                esdr_feeds[feed_id].fullTimeRange.max = json.data.maxTimeSecs;
+                if (i == feed_ids.length - 1) {
+                  for (var j = 0; j < feed_ids.length; j++) {
+                    (function(j){
+                      var feed = esdr_feeds[feed_ids[j]];
+                      var channelNames = feed.channels;
+                      channelNames.forEach(function(channelName) {
+                        window.setTimeout(function() {
+                          createChart(feed, channelName, feed.apiKey);
+                        }, j*50);
+                      });
+                    })(j);
                   }
+                  $("#grapher_wrapper").css("visibility", "visible");
                 }
-              });
-            })(i);
-          }
-        }, 10);
-      };
+              }
+            });
+          })(i);
+        }
+      }, 10);
+    }
 
-      window.requestAnim =
-        window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function(callback) {
-          return window.setTimeout(callback, 10);
-        };
+    window.requestAnim =
+      window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.oRequestAnimationFrame ||
+      window.msRequestAnimationFrame ||
+      function(callback) {
+        return window.setTimeout(callback, 10);
+      };
 
     function tm_init() {
       selectTimelapseFeed();
@@ -696,6 +696,10 @@
 
       var hash = window.location.hash.slice(1);
       var hashVars = unpackVars(hash);
+
+      if (hashVars && hashVars.minimalUI) {
+        $("#timeMachine").addClass("snapshot-mode");
+      }
 
       if (hashVars && hashVars.esdr_channels) {
         $("#timeMachine").css("height", "75%");
@@ -759,12 +763,13 @@
             if (hashVars.t) {
               timelapseObj.seek(hashVars.t);
             }
-
-            if (hashVars.minimalUI) {
-              $(".captureTime").insertBefore(".controls");
-              $("#timeMachine").addClass("snapshot-mode");
-              $(".controls, .sideToolBar, .playbackButton, #locationTitle").hide();
-              timelapseObj.onresize()
+            if (hashVars.minimalUI || hashVars.disableUI) {
+              if (hashVars.disableUI) {
+                $(".captureTime").addClass("hidden");
+              } else {
+                $(".captureTime").insertBefore(".controls");
+              }
+              $(".controls, .sideToolBar, .playbackButton, #locationTitle").addClass("hidden");
             }
           }
           $('#datepicker').datepicker("setDate", new Date(timelapseObj.getCurrentCaptureTime().replace(/-/g, "/").replace("UTC","")));
