@@ -245,6 +245,7 @@
         "center1" : "Shell Plastics East"
       };
       var UTIL = org.gigapan.Util;
+
       function tm_init() {
         var initialDataset = cached_breathecam.latest.path;
         var startingDate = cached_breathecam.latest.date;
@@ -284,6 +285,7 @@
         // TODO
         showContent();
       }
+
       function setupTimelapse(initialDataset, startingDate) {
         initialDataset = initialDataset.replace("http:", "https:");
         var settings = {
@@ -428,6 +430,7 @@
           });
         }, 500);
       }
+
       function processThumbnailChartData(data) {
         // Create a dictionary that stores the durations of all images and videos of each hour
         var image_count_dict = {};
@@ -480,6 +483,7 @@
         }
         return thumbnail_data;
       }
+
       function getThumbnailDataUrl() {
         var captureTimes = timelapse.getCaptureTimes();
         var begin_time= parseInt(new Date(captureTimes[0]).getTime() / 1000);
@@ -488,6 +492,7 @@
         url += "begin_time=" + begin_time + "&end_time=" + end_time + "&camera_id=" + currentLocation;
         return url;
       }
+
       function createThumbnailChart() {
         $.getJSON(getThumbnailDataUrl(), function (json) {
           var thumbnail_data = processThumbnailChartData(json);
@@ -527,6 +532,7 @@
           console.log("server error when creating thumbnail chart:", response);
         });
       }
+
       function createThumbnailDialog() {
         $thumbnailDialogContent = $("#thumbnail-dialog-content");
         $thumbnailDialog = $("#thumbnail-dialog");
@@ -545,6 +551,7 @@
           }
         });
       }
+
       function updateThumbnailChart() {
         $.getJSON(getThumbnailDataUrl(), function (json) {
           var thumbnail_data = processThumbnailChartData(json);
@@ -553,6 +560,7 @@
           console.log("server error when updating thumbnail chart:", response);
         });
       }
+
       function breatheCamThumbnailSetup() {
         var du = timelapse.getDefaultUI();
         if (timelapse && du) {
@@ -591,6 +599,7 @@
         var thumbnailToolRow = $(".thumbnail-processing-time-warning").closest("tr");
         $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(thumbnailToolRow);
       }
+
       function selectTimelapseFeed() {
         $("#image_feed").css("visibility", "hidden");
         $("#stitched_image_wrapper").css("visibility", "hidden");
@@ -598,6 +607,7 @@
         $("#timelapse_feed").show();
         setLocationTitle();
       }
+
       function selectImageFeed() {
         $("#timelapse_feed").hide();
         $("#image_feed").css("visibility", "visible");
@@ -606,15 +616,18 @@
         $("#location_toggle_container").css("top", "0px");
         setLocationTitle();
       }
+
       function setLocationTitle() {
         var locationTitle = $("#location_toggle .location_thumbnail_selected").siblings(".location_title").text();
         $("#locationTitle").text(locationTitle);
       }
+
       function showContent() {
         $("#loading").hide();
         $("#content").css("visibility", "visible");
         $("#location_toggle").scrollTop($("#" + locationDivId).offset().top - $("#location_toggle").offset().top);
       }
+
       function changeLocation(locationName, newDate, newView, newTime, doLoad, callBack, newTimeAsDateObj) {
         currentLocation = locationName;
         if (timelapseFeedUnavailable) {
@@ -661,6 +674,7 @@
           });
         }
       }
+
       function updateCalendarAndToggleUI(startingDate) {
         locationDivId = currentLocation + "_overlay";
         setLocationThumbnailToggle();
@@ -668,6 +682,7 @@
         $("#datepicker").datepicker("destroy");
         loadCalendar(startingDate);
       }
+
       function loadCalendar(startingDate) {
         currentDate = startingDate;
         var dateArray = startingDate.split("-");
@@ -678,6 +693,7 @@
           beforeShowDay : highlightDays
         });
       }
+
       function highlightDays(date) {
         date = $.datepicker.formatDate('yy-mm-dd', date);
         if (cached_breathecam.datasets[date])
@@ -685,6 +701,7 @@
         else
           return [false, ''];
       }
+
       function selectDay(dateText, dateElem) {
         var wasPaused = timelapse.isPaused();
         timelapse.pause();
@@ -699,10 +716,12 @@
           timelapse.handlePlayPause();
         }
       }
+
       function setLocationThumbnailToggle() {
         $(".location_thumbnail_selected").removeClass("location_thumbnail_selected");
         $("#" + locationDivId).addClass("location_thumbnail_selected");
       }
+
       $(function() {
         $(".location_thumbnail_container").on("click", function() {
           if (window.location.hash) {
