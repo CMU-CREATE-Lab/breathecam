@@ -41,6 +41,9 @@ $image_diff_path = "#{$CURRENT_SCRIPT_PATH}/image-diff.py"
 # Concatnenate mp4s
 $mp4_concat_path = "#{$CURRENT_SCRIPT_PATH}/libs/mp4-concatenate/Concatenate-mp4-videos.py"
 
+# Rsync script
+$rsync_script = "#{$CURRENT_SCRIPT_PATH}/breathecam_rsync_and_delete_source_images.rb"
+
 $valid_image_extensions = [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".lnk"]
 $default_num_jobs = 4
 $rsync_input = false
@@ -73,6 +76,9 @@ $use_multiblend_for_hugin = false
 $calculate_image_mse = false
 $mse_golden_images = []
 $use_faster_file_lookup = false
+# What percent of expected frames do we accept not being processed?
+# This is relevant to the automated rsyncing/deleting of source images.
+$percent_accepted_frame_loss = 0.05
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -316,17 +322,17 @@ class Compiler
     if $input_date_from_file
       file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
       if File.exists?(file)
-        last_pull_time = Time.zone.parse(File.open(file, &:readline)) + (time_chunk_in_seconds * $num_time_chunks_checked)
+        $last_pull_time = Time.zone.parse(File.open(file, &:readline)) + (time_chunk_in_seconds * $num_time_chunks_checked)
         # We may be running this script once a minute so make sure we only process a specified chunk of time
-        time_diff = ($current_time_of_run - last_pull_time).floor
+        time_diff = ($current_time_of_run - $last_pull_time).floor
         if time_diff < time_chunk_in_seconds
           puts "[#{Time.now}] Gap less than #{$incremental_update_interval} minutes, which is less than the minimum segment. Exiting process."
           exit
         end
         # Current day is now based on the day in the last pull file
-        $current_day = last_pull_time.to_date.to_s
-        tmp_start_time = last_pull_time
-        tmp_end_time = last_pull_time + time_chunk_in_seconds
+        $current_day = $last_pull_time.to_date.to_s
+        tmp_start_time = $last_pull_time
+        tmp_end_time = $last_pull_time + time_chunk_in_seconds
       else
         # Current day is now the day of running the script
         $current_day = $current_time_of_run.to_date.to_s
@@ -402,9 +408,9 @@ class Compiler
   end
 
   def get_source_images
-    camera_paths = $multi_camera_list ? $multi_camera_list : [$input_path]
+    $camera_paths = $multi_camera_list ? $multi_camera_list : [$input_path]
     tmp_input_path = ""
-    camera_paths.each_with_index do |camera_path, idx|
+    $camera_paths.each_with_index do |camera_path, idx|
       puts "[#{Time.now}] Getting source images from #{camera_path}/#{$current_day}"
       image_path = $skip_stitch ? "0100-original-images" : "050-raw-images"
       new_input_path = File.join($working_dir, image_path, idx.to_s)
@@ -515,11 +521,15 @@ class Compiler
   end
 
   def remove_corrupted_images(path_to_check)
-    puts "[#{Time.now}] Checking for corrupted images."
-    # Check for empty files and remove them, which is all we can do for pngs at this time
-    system("find -L #{path_to_check} -maxdepth 3 -name '*.[pP][nN][gG]' -empty -print0 | xargs -0 -r rm")
-    # Find all jpg files and remove them if they are deemed corrupted (empty, bad headers, etc)
-    system("find #{path_to_check} -maxdepth 3 -name '*.[jJ][pP][gG]' | xargs jpeginfo -cd")
+    puts "[#{Time.now}] Starting check for corrupted images."
+    cam_dirs = Dir.glob("#{path_to_check}/*/")
+    Parallel.each(cam_dirs, :in_threads => [cam_dirs.length, $num_jobs].min) do |cam_dir|
+      puts "[#{Time.now}] Checking #{cam_dir} for corrupted images."
+      # Check for empty files and remove them, which is all we can do for pngs at this time
+      system("find -L #{cam_dir} -maxdepth 3 -name '*.[pP][nN][gG]' -empty -print0 | xargs -0 -r rm")
+      # Find all jpg files and remove them if they are deemed corrupted (empty, bad headers, etc)
+      system("find #{cam_dir} -maxdepth 3 -name '*.[jJ][pP][gG]' | xargs jpeginfo -cd")
+    end
   end
 
   def match_images
@@ -1069,9 +1079,15 @@ class Compiler
   def append_and_cut_inplace(path_to_master_videoset, path_to_new_videoset, suffix_only)
     FileUtils.touch(File.join($working_dir, "WIP2"))
 
+    # This file is a set of 10 black frames. It is 10 frames long because we insert a keyframe every 10 frames
+    # and this matches a full chunk in the mp4 file, which we append to the end if necessary.
     path_to_trailer = File.join($CURRENT_SCRIPT_PATH, "suffix_10_600p.mp4")
     master_videos = Dir.glob("#{path_to_master_videoset}/crf*/*/*/*.mp4").sort
 
+    # TODO: if skip_trailer is true, this means that we are not producing extra black frames in each segment
+    # This code assumes that to be the case and handles adding in these trailing black frames. It's not clear
+    # that we even need these extra frames anymore to deal with browser bugs. I don't even recall what those bugs were...
+    # That said, we can't use this same flag to disable appending trailing frames entirely and need yet another one.
     if suffix_only
       puts "[#{Time.now}] Appending black frames to initial master set."
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
@@ -1099,9 +1115,11 @@ class Compiler
 
       next_segment_videos = Dir.glob("#{path_to_new_videoset}/crf*/*/*/*.mp4").sort
 
+      # Note: This assumes each segment has the same number of tiles. If image resolution changes between segment processing, then this will break.
       Parallel.each_with_index(master_videos, :in_threads => $num_jobs) do |master_video, index|
         next_segment_video = next_segment_videos[index]
         # Take master without the black frame chunk at the end, append the new segment, and then append the black frame chunk
+        # We can make use of python-style slicing, so [0:-1] excludes the last chunk of the master, which removes the 10 frame trailer.
         unless system("#{$mp4_concat_path} '#{master_video}[0:-1]' #{next_segment_video} #{path_to_trailer}")
           puts "[#{Time.now}] Error appending additional frames to master set."
           exit
@@ -1111,7 +1129,8 @@ class Compiler
       tmp_time = Time.now
 
       # Update r.json with the new number of frames being added.
-      master_r_json["frames"] = num_frames.to_i + additional_frame_count
+      new_total_frames = num_frames.to_i + additional_frame_count
+      master_r_json["frames"] = new_total_frames
       tmp_path_to_master_r_json = path_to_master_r_json + "_#{tmp_time}"
       open(tmp_path_to_master_r_json, "w") {|fh| fh.puts(JSON.pretty_generate(master_r_json))}
       FileUtils.mv(tmp_path_to_master_r_json, path_to_master_r_json, :force => true)
@@ -1129,6 +1148,28 @@ class Compiler
 
       # Remove the new set since we just finished appending it to the master.
       FileUtils.rm_rf("#{path_to_new_videoset}")
+
+      # If we are no longer the day we started with, this means we are now the next day.
+      # Also check how many frames we processed. This is kinda arbitrary since we can have a few situations where less frames than expected get processed.
+      #   We start a run much later in the day, with the intent to reprocess at some point. How to deal with that?
+      #      This is manual intervention so it's on us to re-process.
+      #   Matching images get confused and we end up processing much less than we should and we need to redo the day. How to deal with that?
+      #      Ensure matching is always happy...not easy since if a camera lags behind, images can come in very staggered.
+      if $last_pull_time and Time.zone.parse($end_time["full"]).beginning_of_day != $last_pull_time.beginning_of_day
+        # If we are only missing at most 5% of total frames, we call success for the day
+        if new_total_frames > ($future_appending_frames / (1 + $percent_accepted_frame_loss)).round
+          puts "Turned over to a new day, run rsync script."
+          # Note assumes no commas in camera paths
+          puts "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
+          pid = fork do
+            exec("run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log")
+            exit
+          end
+          Process.detach(pid)
+        else
+          puts "Turned over to a new day, but only #{new_total_frames} were processed. No rsyncing or original image deletion will happen for #{$current_day}."
+        end
+      end
     end
 
     # No qt-faststart required, since Concatenate-mp4-videos.py already does the work and in fact, running qt-faststart
