@@ -201,6 +201,8 @@ class Compiler
         $video_tile_mode = ARGV.shift
       elsif arg == "-ramdisk-path"
         $ramdisk_path = ARGV.shift
+      elsif arg == "-percent-accepted-frame-loss"
+        $percent_accepted_frame_loss = ARGV.shift
       end
     end
 
