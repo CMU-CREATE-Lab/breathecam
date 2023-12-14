@@ -1159,7 +1159,7 @@ class Compiler
       #      Ensure matching is always happy...not easy since if a camera lags behind, images can come in very staggered.
       if $last_pull_time and Time.zone.parse($end_time["full"]).beginning_of_day != $last_pull_time.beginning_of_day
         # If we are only missing at most 5% of total frames, we call success for the day
-        if new_total_frames > ($future_appending_frames / (1 + $percent_accepted_frame_loss)).round
+        if new_total_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
           puts "Turned over to a new day, run rsync script."
           # Note assumes no commas in camera paths
           puts "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
