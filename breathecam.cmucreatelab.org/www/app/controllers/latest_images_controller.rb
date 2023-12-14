@@ -8,19 +8,28 @@ class LatestImagesController < ApplicationController
   #@@root_path = Rails.root.join("public", "timemachine_uploads")
 
   def index
+    # TODO: Load this information from an external config
+    #       Same with the name mapping that happens in camera_statuses/index.html.erb
+
     #walnuttowers = ["nikonCamera8"]
     keith = ["nikonCamera17", "nikonCamera13"]
     #golf_course = ["nikonCamera5", "nikonCamera3", "nikonCamera15"]
     #irvin = ["nikonCamera5"]
     #dravosburg = ["nikonCamera14", "nikonCamera13"]
     #dravosburg2 = ["nikonCamera17"]
-    n_braddock = ["nikonCamera7", "nikonCamera4"]
-    piquad3 = ["piquad3a", "piquad3b"]
+    #n_braddock = ["nikonCamera7", "nikonCamera4"]
+    #piquad3 = ["piquad3a", "piquad3b"]
     clairton3 = ["clairton3d", "clairton3c", "clairton3b", "clairton3a"]
     vanport1 = ["vanport1d", "vanport1c", "vanport1b", "vanport1a"]
     vanport2 = ["vanport2d", "vanport2c", "vanport2b", "vanport2a"]
+    wmifflin1 = ["wmifflin1d", "wmifflin1c", "wmifflin1b", "wmifflin1a"]
+    metalico1 = ["metalico1d", "metalico1c", "metalico1b", "metalico1a"]
+    center1 = ["center1d", "center1c", "center1b", "center1a"]
+    cryo1 = ["cryo2d", "cryo2c", "cryo2b", "cryo2a", "cryo1d", "cryo1c", "cryo1b", "cryo1a"]
 
-    camera_collections = [keith, n_braddock, piquad3, clairton3, vanport1, vanport2]
+    portrait_cams = [cryo1].flatten
+    camera_collections = [keith, clairton3, vanport1, vanport2, wmifflin1, metalico1, center1, cryo1]
+
     current_camera_collection = []
     latest_epoch_times = []
     @images = []
@@ -65,7 +74,11 @@ class LatestImagesController < ApplicationController
       @images << images_array
       latest_img = images_array.last
       latest_imgs_exif_data << Exiftool.new("#{@@root_path}/#{camera}/050-original-images/#{last_date}/#{latest_img}").to_hash
-      @html += "<td><img style='cursor: pointer' onclick='window.open(this.src)' src='http://timemachine1.gc.cs.cmu.edu/timemachine_uploads/#{camera}/050-original-images/#{last_date}/#{latest_img}' width='640' height='480'></td>"
+      img_class = "current-image"
+      if portrait_cams.include?(camera)
+        img_class += " portrait"
+      end
+      @html += "<td><img class='#{img_class}' onclick='window.open(this.src)' src='http://timemachine1.gc.cs.cmu.edu/timemachine_uploads/#{camera}/050-original-images/#{last_date}/#{latest_img}'></td>"
       latest_epoch_times << File.basename(latest_img, File.extname(latest_img))
     end
     @html += "</tr><tr>"

@@ -36,7 +36,7 @@
     }
     </style>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
       $(function() {
         var cameras = <%= raw(@camera_statuses_json) %>
@@ -93,7 +93,7 @@
               <%= "(N. Braddock) - " + camera.camera_name + " (PC #10, set reset 1)" %>
             <% elsif camera.camera_name == "nikonCamera18" %>
               <%= "(West Mifflin) - " + camera.camera_name + " (PC #12, set reset 1)" %>
-            <% elsif camera.camera_name == "nikonCamera15" %>
+            <% elsif camera.camera_name == "metalico1a" or camera.camera_name == "metalico1b" or camera.camera_name == "metalico1c" or camera.camera_name == "metalico1d" %>
               <%= "(ACCAN at Sonia) - " + camera.camera_name + " (PC #9, set reset 1)" %>
             <% elsif camera.camera_name == "piquad3a"  %>
                <%= "(Lab Window) - " + camera.camera_name + " (PC #14b, set reset 1)" %>

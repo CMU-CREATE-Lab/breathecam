@@ -2,7 +2,19 @@
 <html>
   <head>
     <title>E-Cam Latest Images</title>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <style>
+      .current-image {
+        cursor: pointer;
+        width: auto;
+        height: 480px;
+        object-fit: contain;
+      }
+      .portrait {
+        width: auto;
+        height: 640px;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
       var images = <%= raw(@images) %>
       var curr_indicies = [];
