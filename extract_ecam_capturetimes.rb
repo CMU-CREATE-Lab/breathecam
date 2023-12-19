@@ -9,6 +9,7 @@ dir = ARGV[0].dup
 time_diff = 0
 
 print_seconds = true
+show_time_zone = false
 
 path_to_tm_json = ARGV[1]
 
@@ -24,7 +25,9 @@ while !ARGV.empty?
     time_diff = ARGV.shift.to_i
   elsif arg == "-time-zone"
     time_zone = ARGV.shift
-  end
+  elsif arg == "--show-time-zone"
+    show_time_zone = true
+   end
 end
 
 Time.zone = time_zone
@@ -38,7 +41,8 @@ files.each do |img_path|
  date = file.split("_")[0].to_i
  date += time_diff
  extra = print_seconds ? ":%S" : ""
- capture_times << Time.zone.at(date).to_datetime.strftime("%Y-%m-%d %H:%M:%S ") + Time.zone.tzinfo.strftime("%Z")
+ time_zone_str = show_time_zone ? Time.zone.tzinfo.strftime(" %Z") : ""
+ capture_times << Time.zone.at(date).to_datetime.strftime("%Y-%m-%d %H:%M:%S") + time_zone_str
 end
 
 json = open(path_to_tm_json) {|fh| JSON.load(fh)}
