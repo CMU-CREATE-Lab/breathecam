@@ -327,6 +327,9 @@ class Compiler
       file = File.join($working_dir, "#{$camera_location}-last-pull-date.txt")
       if File.exists?(file)
         $last_pull_time = Time.zone.parse(File.open(file, &:readline)) + (time_chunk_in_seconds * $num_time_chunks_checked)
+        if !$initial_last_pull_time
+          $initial_last_pull_time = $last_pull_time
+        end
         # We may be running this script once a minute so make sure we only process a specified chunk of time
         time_diff = ($current_time_of_run - $last_pull_time).floor
         if time_diff < time_chunk_in_seconds
@@ -335,6 +338,9 @@ class Compiler
         end
         # Current day is now based on the day in the last pull file
         $current_day = $last_pull_time.to_date.to_s
+        if !$initial_current_day
+          $initial_current_day = $current_day
+        end
         tmp_start_time = $last_pull_time
         tmp_end_time = $last_pull_time + time_chunk_in_seconds
       else
@@ -405,6 +411,7 @@ class Compiler
     FileUtils.rm_rf(Dir.glob("#{$timemachine_output_path}/*-*m.timemachine"))
     video_sets = Dir.glob("#{$timemachine_output_path}/*.timemachine").sort
     check_date = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day
+    $create_videoset_segment_directory = false
     if $do_incremental_update and !video_sets.empty? and video_sets.any?{|s| s.include?(check_date)}
       $create_videoset_segment_directory = true
     end
@@ -1028,6 +1035,7 @@ class Compiler
       append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
       rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
       rsync_location_json if $rsync_location_json
+      rsync_tile_tree_if_necessary
     end
     trim_ssd if $force_trim_on_working_dir
     run_image_mse_checker if $calculate_image_mse
@@ -1171,28 +1179,6 @@ class Compiler
 
       # Remove the new set since we just finished appending it to the master.
       FileUtils.rm_rf("#{path_to_new_videoset}")
-
-      # If we are no longer the day we started with, this means we are now the next day.
-      # Also check how many frames we processed. This is kinda arbitrary since we can have a few situations where less frames than expected get processed.
-      #   We start a run much later in the day, with the intent to reprocess at some point. How to deal with that?
-      #      This is manual intervention so it's on us to re-process.
-      #   Matching images get confused and we end up processing much less than we should and we need to redo the day. How to deal with that?
-      #      Ensure matching is always happy...not easy since if a camera lags behind, images can come in very staggered.
-      if $last_pull_time and Time.zone.parse($end_time["full"]).beginning_of_day != $last_pull_time.beginning_of_day
-        # If we are only missing at most N% of total frames, we call success for the day
-        if new_total_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
-          puts "Turned over to a new day, run rsync script."
-          # Note: Assumes no commas in camera paths
-          puts "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
-          pid = fork do
-            exec("run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log")
-            exit
-          end
-          Process.detach(pid)
-        else
-          puts "Turned over to a new day, but only #{new_total_frames} were processed. No rsyncing or original image deletion will happen for #{$current_day}."
-        end
-      end
     end
 
     # No qt-faststart required, since Concatenate-mp4-videos.py already does the work and in fact, running qt-faststart
@@ -1376,6 +1362,35 @@ class Compiler
     dir_to_rsync ||= "#{$timemachine_output_dir}"
     puts "[#{Time.now}] Rsyncing #{$timemachine_output_path}/#{dir_to_rsync} to #{$output_path}"
     system("rsync -a #{$timemachine_output_path}/#{dir_to_rsync} #{$output_path}")
+  end
+
+  def rsync_tile_tree_if_necessary()
+    # If we are no longer the day we started with, this means we are now the next day.
+    # Also check how many frames we processed. This is kinda arbitrary since we can have a few situations where less frames than expected get processed.
+    #   We start a run much later in the day, with the intent to reprocess at some point. How to deal with that?
+    #      This is manual intervention so it's on us to re-process.
+    #   Matching images get confused and we end up processing much less than we should and we need to redo the day. How to deal with that?
+    #      Ensure matching is always happy...not easy since if a camera lags behind, images can come in very staggered.
+    if $initial_last_pull_time and Time.zone.parse($end_time["full"]).beginning_of_day != $initial_last_pull_time.beginning_of_day
+      path_to_master_r_json = Dir.glob("#{$working_dir}/#{$initial_current_day}.timemachine/crf*/r.json").first
+      master_r_json = open(path_to_master_r_json) {|fh| JSON.load(fh)}
+      num_frames = master_r_json["frames"].to_f
+      puts(num_frames)
+      # If we are only missing at most N% of total frames, we call success for the day
+      if num_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
+        puts "Turned over to a new day, #{num_frames} frames were processed. Run rsync script."
+        # Note: Assumes no commas in camera paths
+        cmd = "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$initial_current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
+        puts cmd
+        pid = fork do
+          exec(cmd)
+          exit
+        end
+        Process.detach(pid)
+      else
+        puts "Turned over to a new day, but only #{num_frames} frames were processed. No rsyncing or original image deletion will happen for #{$initial_current_day}."
+      end
+    end
   end
 
   def rsync_location_json
