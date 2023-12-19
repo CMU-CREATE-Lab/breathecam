@@ -67,6 +67,7 @@ $future_appending_frames = 17000
 $num_time_chunks_checked = 0
 $is_monthly = false
 $skip_img_validation = false
+$repair_img = false
 $num_images_to_stitch = 4
 $stitcher = "hugin"
 # Default to epoch time
@@ -183,9 +184,8 @@ class Compiler
         $is_monthly = true
       elsif arg == "--skip-img-validation"
         $skip_img_validation = true
-      elsif arg == "-multi-camera-list"
-        $multi_camera_list = ARGV.shift.to_s.split(",")
-        $num_images_to_stitch = $multi_camera_list.length
+      elsif arg == "-camera-list"
+        $camera_list = ARGV.shift.to_s.split(",")
       elsif arg == "-stitcher"
         $stitcher = ARGV.shift
       elsif arg == "--create-top-video-only"
@@ -203,6 +203,8 @@ class Compiler
         $ramdisk_path = ARGV.shift
       elsif arg == "-percent-accepted-frame-loss"
         $percent_accepted_frame_loss = ARGV.shift
+      elsif arg == "--repair-img"
+        $repair_img = true
       end
     end
 
@@ -210,7 +212,7 @@ class Compiler
     $input_path = $input_path.tr('\\', "/").chomp("/")
     $output_path = $output_path.tr('\\', "/").chomp("/")
 
-    # Process definition file
+    # Process definition file, which has taken the place of all the arguments previously passed in above.
     $definition_file = load_definition_file()
     $camera_location = $definition_file["id"]
     $time_zone = $definition_file["source"]["time_zone"]
@@ -219,7 +221,7 @@ class Compiler
       val = "'#{val}'" if val.is_a?(String)
       eval("$#{key} = #{val}")
     end
-    $num_images_to_stitch = $multi_camera_list.length if $multi_camera_list
+    $num_images_to_stitch = ($camera_list.length <= 1 ? 0 : $camera_list.length) if $camera_list
 
     if !$rsync_input && !File.exists?(File.expand_path($input_path))
       puts "Invalid input path: #{$input_path}"
@@ -410,7 +412,7 @@ class Compiler
   end
 
   def get_source_images
-    $camera_paths = $multi_camera_list ? $multi_camera_list : [$input_path]
+    $camera_paths = $camera_list ? $camera_list : [$input_path]
     tmp_input_path = ""
     $camera_paths.each_with_index do |camera_path, idx|
       puts "[#{Time.now}] Getting source images from #{camera_path}/#{$current_day}"
@@ -450,7 +452,7 @@ class Compiler
       end
       subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
       puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
-      if $symlink_input
+      if $symlink_input && !$repair_img
         puts "[#{Time.now}] Symlinking source images."
         if $do_incremental_update or $subsample_input
           file_list = `#{file_list_command} #{subsample_command}`
@@ -465,20 +467,29 @@ class Compiler
         puts "[#{Time.now}] Rsyncing source images."
         if $do_incremental_update or $subsample_input
           # Writing to a file to prevent extensive quoting and commandline escaping madness
-          # Need to escape $ or it will be expanded by echo below
-          # Also need to escape any double quotes since echo will be calling this command string
-          commands_to_run_remotely = "#{file_list_command} #{subsample_command} > /tmp/#{$camera_location}-files.txt".gsub("$","\\$").gsub('"','\"')
-          commands_file = "/tmp/#{$camera_location}-ssh.sh"
-          system("echo \"#{commands_to_run_remotely}\" > #{commands_file}")
-          system("cat #{commands_file} | ssh -T #{host} > /dev/null")
+          commands_to_run = "#{file_list_command} #{subsample_command} > /tmp/#{$camera_location}-files.txt"
+          rsync_input_prefix = ""
+          # If host is a mounted fileshare (e.g. NFS), don't do remote command
+          if not host.match(/^\//).nil?
+            system(commands_to_run)
+          else
+            # Need to escape $ or it will be expanded by echo below
+            # Also need to escape any double quotes since echo will be calling this command string
+            commands_to_run = commands_to_run.gsub("$","\\$").gsub('"','\"')
+            commands_file = "/tmp/#{$camera_location}-ssh.sh"
+            system("echo \"#{commands_to_run}\" > #{commands_file}")
+            system("cat #{commands_file} | ssh -T #{host} > /dev/null")
+            rsync_input_prefix = ":"
+          end
           # Cannot get files-from to use absolute paths (hence the need for -printf in the file_list_command) with remote transfers...Clearly missing something important in how this works.
-          system("rsync -a --files-from=:/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}/")
+          system("rsync -a --files-from=#{rsync_input_prefix}/tmp/#{$camera_location}-files.txt #{camera_path}/#{$current_day}/ #{new_input_path}/")
         else
           system("bash -c \"rsync -av --include='*.'{#{$valid_image_extensions.join(',')}} --exclude='*' #{camera_path}/#{$current_day}/ #{new_input_path}/\"")
         end
       end
-      tmp_input_path = $multi_camera_list ? File.dirname(new_input_path) : new_input_path
+      tmp_input_path = $camera_list ? File.dirname(new_input_path) : new_input_path
     end
+    repair_img_extraneous_bytes_error(tmp_input_path) unless $RUNNING_WINDOWS or !$repair_img
     remove_corrupted_images(tmp_input_path) unless $RUNNING_WINDOWS or $skip_img_validation
 
     # Check if we have enough images to do anything
@@ -518,7 +529,16 @@ class Compiler
       create_tm
     else
       # We need to match/organize images for stitching. Video creation comes after that.
-      $multi_camera_list ? match_images : organize_images
+      $camera_list ? match_images : organize_images
+    end
+  end
+
+  def repair_img_extraneous_bytes_error(path_to_check)
+    puts "[#{Time.now}] Running 'mogrify' on images to re-encode and fix typical 'extraneous bytes' error."
+    cam_dirs = Dir.glob("#{path_to_check}/*/")
+    Parallel.each(cam_dirs, :in_threads => [cam_dirs.length, $num_jobs].min) do |cam_dir|
+      puts "[#{Time.now}] Attempting to repair images in #{cam_dir}"
+      system("find #{cam_dir} -maxdepth 3 -name '*.[jJ][pP][gG]' | xargs mogrify -quiet 2>/dev/null")
     end
   end
 
@@ -590,6 +610,7 @@ class Compiler
     stitch_images
   end
 
+  # OLD; Deprecated (Arecont camera days)
   def organize_images
     # TODO: Assumes images are of the format EPOCHDATE_image{1,2,3,4}.([jJ][pP][gG]|lnk)
     $organized_images_path = File.join($working_dir, "075-organized-raw-images")
@@ -1158,10 +1179,10 @@ class Compiler
       #   Matching images get confused and we end up processing much less than we should and we need to redo the day. How to deal with that?
       #      Ensure matching is always happy...not easy since if a camera lags behind, images can come in very staggered.
       if $last_pull_time and Time.zone.parse($end_time["full"]).beginning_of_day != $last_pull_time.beginning_of_day
-        # If we are only missing at most 5% of total frames, we call success for the day
+        # If we are only missing at most N% of total frames, we call success for the day
         if new_total_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
           puts "Turned over to a new day, run rsync script."
-          # Note assumes no commas in camera paths
+          # Note: Assumes no commas in camera paths
           puts "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
           pid = fork do
             exec("run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log")
@@ -1380,9 +1401,9 @@ class Compiler
   def run_image_mse_checker
     # TODO: Deal with hardcoded path to conda
     puts "[#{Time.now}] Calculating MSE for input images."
-    for i in 0..$multi_camera_list.length-1
+    for i in 0..$camera_list.length-1
       file_ext = File.extname($mse_golden_images[i]).delete(".")
-      match = $multi_camera_list[i].match(/\/(#{$camera_location}.*)\//)
+      match = $camera_list[i].match(/\/(#{$camera_location}.*)\//)
       if match
         system("bash -c '. /home/pdille/.bashrc_conda; conda activate image-diff; python #{$image_diff_path} #{$mse_golden_images[i]} #{$working_dir}/050-raw-images/#{i} #{file_ext} #{match[1]} #{$current_day} #{$working_dir}/#{$camera_location}_rolling_results.json'")
       end
