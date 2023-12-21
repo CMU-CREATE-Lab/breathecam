@@ -138,6 +138,10 @@ class Compiler
       elsif arg == "-crop-amount-bounds"
         # Format is L,B,R,T (left, bottom, right, top)
         $crop_amount_bounds = ARGV.shift.split(",")
+      elsif arg == "-resize-dimensions-percentage"
+        # Format is WxH, where values above 100 enlarge the dimension and values below 100 shrink it.
+        # Aspect ratio is ignored.
+        $resize_dimensions_percentage = ARGV.shift.split(",")
       elsif arg == "--run-append-externally"
         $run_append_externally = true
       elsif arg == "--force-trim-on-working-dir"
@@ -459,7 +463,7 @@ class Compiler
       end
       subsample_command = $subsample_input ? "| sed -n '1~#{$subsample_input}p'" : ""
       puts "[#{Time.now}] #{file_list_command} #{subsample_command}"
-      if $symlink_input && !$repair_img
+      if $symlink_input
         puts "[#{Time.now}] Symlinking source images."
         if $do_incremental_update or $subsample_input
           file_list = `#{file_list_command} #{subsample_command}`
@@ -533,6 +537,8 @@ class Compiler
     if $skip_stitch
       crop_images if $crop_amount_bounds
       alter_image_gamma if $alter_gamma_amount
+      rotate_images if $rotate_by_list
+      resize_images if $resize_dimensions_percentage
       create_tm
     else
       # We need to match/organize images for stitching. Video creation comes after that.
@@ -614,6 +620,7 @@ class Compiler
       exit
     end
     rotate_images if $rotate_by_list
+    resize_images if $resize_dimensions_percentage
     stitch_images
   end
 
@@ -675,7 +682,7 @@ class Compiler
     count = 0
     match_count = 0
     puts "[#{Time.now}] Croppig images..."
-    files = Dir.glob("#{$input_path}/*")
+    files = Dir.glob("#{$input_path}/**/*")
     Parallel.each(files, :in_threads => $num_jobs) do |img|
       file_extension = File.extname(img)
       next unless $valid_image_extensions.include? file_extension.downcase
@@ -712,7 +719,7 @@ class Compiler
     count = 0
     match_count = 0
     puts "[#{Time.now}] Altering gamma of images..."
-    files = Dir.glob("#{$input_path}/*")
+    files = Dir.glob("#{$input_path}/**/*")
     Parallel.each(files, :in_threads => $num_jobs) do |img|
       file_extension = File.extname(img)
       next unless $valid_image_extensions.include? file_extension.downcase
@@ -746,7 +753,7 @@ class Compiler
         glob_param = "*_image#{i}.*"
       end
       puts "[#{Time.now}] Rotating images #{rot_amt} degrees clockwise..."
-      files = Dir.glob("#{$organized_images_path}/*/{glob_param}").sort
+      files = Dir.glob("#{$input_path}/**/{glob_param}").sort
       Parallel.each(files, :in_threads => $num_jobs) do |img|
         file_extension = File.extname(img)
         next unless $valid_image_extensions.include? file_extension.downcase
@@ -757,6 +764,7 @@ class Compiler
           file_extension = File.extname(img)
         end
         begin
+          # jpegtran is lossless jpeg rotation
           if file_extension.downcase.include?(".jp")
             system("#{$jpegtran_path} -copy all -rotate #{rot_amt} -optimize -outfile #{%Q{"#{img}"}} #{%Q{"#{img}"}}")
           else
@@ -770,6 +778,41 @@ class Compiler
       end
     end
     puts "[#{Time.now}] Rotating complete. Rotated #{match_count} out of #{count} images."
+  end
+
+  def resize_images
+    count = 0
+    match_count = 0
+    puts "[#{Time.now}] Resizing images..."
+    files = Dir.glob("#{$input_path}/**/*")
+
+    # A value of 100 means keep same dimension size.
+    new_width = $resize_dimensions_percentage[0].to_i > 0 ? $resize_dimensions_percentage[0].to_i : 100
+    new_height = $resize_dimensions_percentage[1].to_i > 0 ? $resize_dimensions_percentage[1].to_i : 100
+
+    if new_width == 100 and new_height == 100
+      puts "[#{Time.now}] No resize dimensions given, skipping."
+      return
+    end
+
+    Parallel.each(files, :in_threads => $num_jobs) do |img|
+      file_extension = File.extname(img)
+      next unless $valid_image_extensions.include? file_extension.downcase
+      count += 1
+      if $RUNNING_WINDOWS && file_extension == ".lnk"
+        img = Win32::Shortcut.open(img).path
+        # Get the real file extension now
+        file_extension = File.extname(img)
+      end
+      begin
+        system("#{$imagemagick_path} #{%Q{"#{img}"}} -resize #{new_width}%!x#{new_height}%! -quiet #{%Q{"#{img}"}}")
+        match_count += 1
+      rescue
+        # Ignore and move on
+        # TODO: Maybe do something in this case.
+      end
+    end
+    puts "[#{Time.now}] Resizing complete. Resized #{match_count} out of #{count} images."
   end
 
   def stitch_images
