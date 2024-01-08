@@ -355,7 +355,7 @@ class Compiler
       end
     elsif $current_day
       # Process a full day, based on a date string passed in
-      current_time_obj = Time.parse($current_day)
+      current_time_obj = Time.zone.parse($current_day)
       tmp_start_time = current_time_obj.beginning_of_day
       tmp_end_time = current_time_obj.end_of_day
     else
@@ -366,7 +366,7 @@ class Compiler
     end
 
     # $current_day may have changed from above
-    current_time_obj = Time.parse($current_day)
+    current_time_obj = Time.zone.parse($current_day)
 
     # Ensure start time is of the same day
     tmp_start_time = current_time_obj.beginning_of_day if tmp_start_time.to_date.to_s < $current_day.to_s
@@ -509,7 +509,7 @@ class Compiler
       puts "<= 2 images found. Because of the current inability to append <= 2 frames with the inline method, we skip processing for this time chunk."
       if $input_date_from_file
         # Keep looking for images up to the current time
-        if Time.parse($end_time["full"]).to_i < $current_time_of_run.to_i
+        if Time.zone.parse($end_time["full"]).to_i < $current_time_of_run.to_i
           $num_time_chunks_checked += 1
           calculate_rsync_input_range()
           clear_working_dir
@@ -1078,7 +1078,7 @@ class Compiler
       append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
       rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
       rsync_location_json if $rsync_location_json
-      rsync_tile_tree_if_necessary
+      rsync_tile_tree_if_necessary unless $is_monthly
     end
     trim_ssd if $force_trim_on_working_dir
     run_image_mse_checker if $calculate_image_mse
@@ -1116,7 +1116,7 @@ class Compiler
     json["latest"]["date"] = new_latest
     json["latest"]["path"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{latest_entry}.timemachine"
     json["datasets"]["#{$current_day}"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{dateset_entry}.timemachine"
-    tmp_time = Time.now
+    tmp_time = Time.zone.now
     tmp_path_to_json = path_to_json + "_#{tmp_time}"
     tmp_path_to_js = path_to_js + "_#{tmp_time}"
     open(tmp_path_to_json, "w") {|fh| fh.puts(JSON.generate(json))}
@@ -1200,7 +1200,7 @@ class Compiler
         end
       end
 
-      tmp_time = Time.now
+      tmp_time = Time.zone.now
 
       # Update r.json with the new number of frames being added.
       new_total_frames = num_frames.to_i + additional_frame_count
@@ -1342,7 +1342,7 @@ class Compiler
         File.delete(tmp_master + ".ts")
       end
 
-      tmp_time = Time.now
+      tmp_time = Time.zone.now
 
       # Update r.json with the new number of frames being added.
       master_r_json["frames"] = num_frames.to_i + additional_frame_count
@@ -1369,7 +1369,7 @@ class Compiler
       # Once we go past 5pm or so, our appends may take too long to also run qt-faststart in our 10 min window.
       # So, we skip the following for the time being and do it again once we rsync over the next day.
       unless $skip_qtfaststart_append
-        curr_hour = Time.now.hour
+        curr_hour = Time.zone.now.hour
         if curr_hour < 17 and (curr_hour != 0 or $current_day == Date.today.to_s)
           run_qtfaststart(path_to_master_videoset)
         end
@@ -1418,7 +1418,6 @@ class Compiler
       path_to_master_r_json = Dir.glob("#{$working_dir}/#{$initial_current_day}.timemachine/crf*/r.json").first
       master_r_json = open(path_to_master_r_json) {|fh| JSON.load(fh)}
       num_frames = master_r_json["frames"].to_f
-      puts(num_frames)
       # If we are only missing at most N% of total frames, we call success for the day
       if num_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
         puts "Turned over to a new day, #{num_frames} frames were processed. Run rsync script."
