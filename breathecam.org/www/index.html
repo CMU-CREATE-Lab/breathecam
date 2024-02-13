@@ -748,7 +748,7 @@
     </script>
     <script id="locations-template" type="text/x-handlebars-template">
       {{#each locations}}
-        <a class="location_thumbnail_container" data-location-id="{{id}}" href="javascript:void(0)">
+        <a class="location_thumbnail_container {{#if @last}}location_thumbnail_container_end{{/if}}" data-location-id="{{id}}" href="javascript:void(0)">
           {{#unless live}}
           <div class="not-live">Realtime cam down - Click to view past footage</div>
           {{/unless}}
