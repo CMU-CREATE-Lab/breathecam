@@ -218,6 +218,8 @@
 
     <script src="https://tiles.cmucreatelab.org/ecam/timemachines/center1/center1.js" type="text/javascript"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js" type="text/javascript"></script>
+
     <script>
       "use strict";
       jQuery.support.cors = true;
@@ -228,23 +230,8 @@
       // Note that the js script include further up needs to be updated to reflect the change of default cam.
       // TODO: Make the above not be a requirement...
       var currentLocation = "center1";
-      var locationMap = {
-        "heinz" : "North Shore",
-        "walnuttowers1" : "Mon Valley",
-        "pitt1" : "Oakland",
-        "trimont1" : "Downtown",
-        "clairton1" : "Clairton Coke Works",
-        "clairton3" : "Clairton Coke Works",
-        "walnuttowers2" : "Edgar Thomson",
-        "braddock1" : "Edgar Thomson",
-        "irvin1" : "Irvin",
-        "westmifflin2" : "Edgar Thomson",
-        "accan2" : "Metalico",
-        "vanport1" : "Shell Plastics West",
-        "vanport2" : "Shell Plastics West",
-        "center1" : "Shell Plastics East",
-        "braddock2" : "Edgar Thomson",
-      };
+      var locations = {};
+      var locationMap = {};
       var oldLocationIdMapper = {
           "vanport1" : "vanport2",
           "accan1" : "accan2",
@@ -253,7 +240,19 @@
 
       var UTIL = org.gigapan.Util;
 
-      function tm_init() {
+      async function tm_init() {
+        const response = await fetch("cameras.json");
+        if (!response.ok) {
+          const message = `Error retrieving camera locations list: ${response.status}`;
+          throw new Error(message);
+        }
+        locations = await response.json();
+        locationMap = locations.map(loc => {return {[loc.id]:loc.name}});
+
+        var locationsTemplateSource  = $("#locations-template").html();
+        var locationsTemplate = Handlebars.compile(locationsTemplateSource);
+        $("#location_toggle").html(locationsTemplate({locations:locations}));
+
         var initialDataset = cached_breathecam.latest.path;
         var startingDate = cached_breathecam.latest.date;
         var hash = window.location.hash.slice(1);
@@ -730,7 +729,7 @@
       }
 
       $(function() {
-        $(".location_thumbnail_container").on("click", function() {
+        $("#location_toggle").on("click", ".location_thumbnail_container", function() {
           if (window.location.hash) {
             window.location.hash = "";
           }
@@ -746,7 +745,18 @@
         tm_init();
         $("#container").on("mousedown", function() { return false; });
       });
-
+    </script>
+    <script id="locations-template" type="text/x-handlebars-template">
+      {{#each locations}}
+        <a class="location_thumbnail_container" data-location-id="{{id}}" href="javascript:void(0)">
+          {{#unless live}}
+          <div class="not-live">Realtime cam down - Click to view past footage</div>
+          {{/unless}}
+          <div id="{{id}}_overlay" class="no-touch location_thumbnail_overlay"></div>
+          <img src="assets/images/{{id}}_toggle.png" class="location_thumbnail" alt="{{id}}">
+          <div class="location_title">{{name}}</div>
+        </a>
+      {{/each}}
     </script>
   </head>
   <div class="menu-container"></div>
@@ -776,78 +786,6 @@
   </div>
 
   <div id="location_toggle_container">
-    <div id="location_toggle">
-      <a class="location_thumbnail_container" data-location-id="center1" href="javascript:void(0)">
-        <div id="center1_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/center1_toggle.png" class="location_thumbnail" alt="center1">
-        <div class="location_title">Shell Plastics East</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="vanport2" href="javascript:void(0)">
-        <div id="vanport2_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/vanport2_toggle.png" class="location_thumbnail" alt="vanport2">
-        <div class="location_title">Shell Plastics West</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="clairton3" href="javascript:void(0)">
-        <div id="clairton3_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/clairton3_toggle.png" class="location_thumbnail" alt="clairton3">
-        <div class="location_title">Clairton Coke Works 2</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="clairton1" href="javascript:void(0)">
-        <div id="clairton1_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/clairton1_toggle.png" class="location_thumbnail" alt="clairton1">
-        <div class="location_title">Clairton Coke Works</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="westmifflin2" href="javascript:void(0)">
-        <div id="westmifflin2_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/westmifflin1_toggle.png" class="location_thumbnail" alt="westmifflin2">
-        <div class="location_title">Edgar Thomson South</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="braddock2" href="javascript:void(0)">
-        <div id="braddock2_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/braddock2_toggle.png" class="location_thumbnail" alt="braddock2">
-        <div class="location_title">Edgar Thomson North</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="accan2" href="javascript:void(0)">
-        <div id="accan2_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/accan1_toggle.png" class="location_thumbnail" alt="accan2">
-        <div class="location_title">Metalico</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="walnuttowers2" href="javascript:void(0)">
-        <div class="not-live">Realtime cam down - Click to view past footage</div>
-        <div id="walnuttowers2_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/walnuttowers2_toggle.png" class="location_thumbnail" alt="walnuttowers2">
-        <div class="location_title">Edgar Thomson West</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="irvin1" href="javascript:void(0)">
-        <div class="not-live">Realtime cam down - Click to view past footage</div>
-        <div id="irvin1_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/irvin1_toggle.png" class="location_thumbnail" alt="irvin1">
-        <div class="location_title">Irvin</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="heinz" href="javascript:void(0)">
-        <div class="not-live">Realtime cam down - Click to view past footage</div>
-        <div id="heinz_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/heinz_toggle.png" class="location_thumbnail" alt="Heinz">
-        <div class="location_title">North Shore</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="walnuttowers1" href="javascript:void(0)">
-        <div class="not-live">Realtime cam down - Click to view past footage</div>
-        <div id="walnuttowers1_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/walnuttowers1_toggle.png" class="location_thumbnail" alt="Walnut Towers">
-        <div class="location_title">Mon. Valley</div>
-      </a>
-      <a class="location_thumbnail_container" data-location-id="trimont1" href="javascript:void(0)">
-        <div class="not-live">Realtime cam down - Click to view past footage</div>
-        <div id="trimont1_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/trimont1_toggle.png" class="location_thumbnail" alt="Trimont">
-        <div class="location_title">Downtown</div>
-      </a>
-      <a class="location_thumbnail_container location_thumbnail_container_end" data-location-id="pitt1" href="javascript:void(0)">
-        <div class="not-live">Realtime cam down - Click to view past footage</div>
-        <div id="pitt1_overlay" class="no-touch location_thumbnail_overlay"></div>
-        <img src="assets/images/pitt1_toggle.png" class="location_thumbnail" alt="Pitt">
-        <div class="location_title">Oakland</div>
-      </a>
-    </div>
+    <div id="location_toggle"></div>
   </div>
 </html>
