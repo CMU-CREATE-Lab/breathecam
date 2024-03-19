@@ -1,80 +1,103 @@
 [
     {
-        "id": "center1",
-        "name": "Shell Plastics East",
-        "thumbnail_path": "assets/images/center1_toggle.png",
-        "live": true
+        "id": "clairton4",
+        "name": "Clairton Coke Works",
+        "thumbnail_path": "assets/images/clairton3_toggle.png",
+        "live": true,
+        "historical": true,
+        "is_initial": true
     },
     {
         "id": "vanport2",
         "name": "Shell Plastics West",
         "thumbnail_path": "assets/images/vanport2_toggle.png",
-        "live": true
-    },
-    {
-        "id": "clairton3",
-        "name": "Clairton Coke Works 2",
-        "thumbnail_path": "assets/images/clairton3_toggle.png",
-        "live": true
-    },
-    {
-        "id": "clairton1",
-        "name": "Clairton Coke Works",
-        "thumbnail_path": "assets/images/clairton1_toggle.png",
-        "live": true
+        "live": true,
+        "historical": false
     },
     {
         "id": "westmifflin2",
         "name": "Edgar Thomson South",
-        "thumbnail_path": "assets/images/westmifflin1_toggle.png",
-        "live": true
+        "thumbnail_path": "assets/images/westmifflin2_toggle.png",
+        "live": true,
+        "historical": false
     },
     {
         "id": "braddock2",
         "name": "Edgar Thomson North",
         "thumbnail_path": "assets/images/braddock2_toggle.png",
-        "live": true
+        "live": true,
+        "historical": false
     },
     {
         "id": "accan2",
         "name": "Metalico",
         "thumbnail_path": "assets/images/accan1_toggle.png",
-        "live": true
+        "live": true,
+        "historical": false
+    },
+    {
+        "id": "cryocam",
+        "name": "Revolution ETC/Harmon Creek Gas Processing Plants",
+        "thumbnail_path": "assets/images/cryocam_toggle.png",
+        "live": true,
+        "historical": false,
+        "is_initial": false
+    },
+    {
+        "id": "cementcam",
+        "name": "Riverside Concrete",
+        "thumbnail_path": "assets/images/cementcam_toggle.png",
+        "live": true,
+        "historical": false,
+        "is_initial": false
+    },
+    {
+        "id": "center1",
+        "name": "Shell Plastics East",
+        "thumbnail_path": "assets/images/center1_toggle.png",
+        "live": false,
+        "historical": false
     },
     {
         "id": "walnuttowers2",
         "name": "Edgar Thomson West",
         "thumbnail_path": "assets/images/walnuttowers2_toggle.png",
-        "live": false
+        "live": false,
+        "historical": false
     },
     {
         "id": "irvin1",
         "name": "Irvin",
         "thumbnail_path": "assets/images/irvin1_toggle.png",
-        "live": false
+        "live": false,
+        "historical": false
     },
     {
         "id": "heinz",
         "name": "North Shore",
         "thumbnail_path": "assets/images/heinz_toggle.png",
-        "live": false
+        "live": false,
+        "historical": false
     },
     {
         "id": "walnuttowers1",
         "name": "Mon. Valley",
         "thumbnail_path": "assets/images/walnuttowers1_toggle.png",
-        "live": false
+        "live": false,
+        "historical": false
     },
     {
         "id": "trimont1",
         "name": "Downtown",
         "thumbnail_path": "assets/images/trimont1_toggle.png",
-        "live": false
+        "live": false,
+        "historical": false
     },
     {
         "id": "pitt1",
         "name": "Oakland",
         "thumbnail_path": "assets/images/pitt1_toggle.png",
-        "live": false
+        "live": false,
+        "historical": false
     }
 ]

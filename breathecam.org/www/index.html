@@ -216,42 +216,44 @@
 
     <script src="assets/javascripts/menu.js"></script>
 
-    <script src="https://tiles.cmucreatelab.org/ecam/timemachines/center1/center1.js" type="text/javascript"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js" type="text/javascript"></script>
 
     <script>
       "use strict";
       jQuery.support.cors = true;
-      var locationDivId, timelapse, timelapseFeedUnavailable, hashVars, currentDate;
+      var locationDivId, timelapse, timelapseFeedUnavailable, hashVars, currentDate, currentLocation;
       var didOnTimeMachinePlayerReady = false;
       var thumbnailChart, thumbnailUrls;
       var $thumbnailDialog, $thumbnailDialogContent;
-      // Note that the js script include further up needs to be updated to reflect the change of default cam.
-      // TODO: Make the above not be a requirement...
-      var currentLocation = "center1";
+
       var locations = {};
       var locationMap = {};
       var oldLocationIdMapper = {
           "vanport1" : "vanport2",
           "accan1" : "accan2",
-          "braddock1" : "braddock2"
+          "braddock1" : "braddock2",
+          "clairton2" : "clairton4",
+          "clairton1" : "clairton4"
       };
 
       var UTIL = org.gigapan.Util;
 
       async function tm_init() {
-        const response = await fetch("cameras.json");
-        if (!response.ok) {
-          const message = `Error retrieving camera locations list: ${response.status}`;
+        const camListResponse = await fetch("cameras.json");
+        if (!camListResponse.ok) {
+          const message = `Error retrieving camera locations list: ${camListResponse.status}`;
           throw new Error(message);
         }
-        locations = await response.json();
+        locations = await camListResponse.json();
         locationMap = locations.map(loc => {return {[loc.id]:loc.name}});
 
         var locationsTemplateSource  = $("#locations-template").html();
         var locationsTemplate = Handlebars.compile(locationsTemplateSource);
         $("#location_toggle").html(locationsTemplate({locations:locations}));
+
+        var initialLoc = locations.find(loc => loc.is_initial === true);
+        currentLocation = initialLoc.id;
+        await $.when($.getScript(`https://tiles.cmucreatelab.org/ecam/timemachines/${initialLoc.id}/${initialLoc.id}.js`));
 
         var initialDataset = cached_breathecam.latest.path;
         var startingDate = cached_breathecam.latest.date;
@@ -753,7 +755,7 @@
           <div class="not-live">Realtime cam down - Click to view past footage</div>
           {{/unless}}
           <div id="{{id}}_overlay" class="no-touch location_thumbnail_overlay"></div>
-          <img src="assets/images/{{id}}_toggle.png" class="location_thumbnail" alt="{{id}}">
+          <img src="{{thumbnail_path}}" class="location_thumbnail" alt="{{id}}">
           <div class="location_title">{{name}}</div>
         </a>
       {{/each}}
