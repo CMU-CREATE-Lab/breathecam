@@ -39,7 +39,8 @@ $masker_path = "#{$CURRENT_SCRIPT_PATH}/MaskedGaussian/MaskedGaussian"
 $image_diff_path = "#{$CURRENT_SCRIPT_PATH}/image-diff.py"
 
 # Concatnenate mp4s
-$mp4_concat_path = "#{$CURRENT_SCRIPT_PATH}/libs/mp4-concatenate/Concatenate-mp4-videos.py"
+# As of 03/2024, Concatenate-mp4-videos.py still requires python2
+$mp4_concat_path = "python2 #{$CURRENT_SCRIPT_PATH}/libs/mp4-concatenate/Concatenate-mp4-videos.py"
 
 # Rsync script
 $rsync_script = "#{$CURRENT_SCRIPT_PATH}/breathecam_rsync_and_delete_source_images.rb"
