@@ -5,9 +5,9 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
 
     <meta property="og:title" content="Mon Valley Cameras" />
-    <meta property="og:url" content="https://mon.createlab.org" />
+    <meta property="og:url" content="https://breathecam.org" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://mon.createlab.org/assets/images/collage.png" />
+    <meta property="og:image" content="https://breathecam.org/assets/images/collage.png" />
     <meta property="fb:app_id" content="342963495886660" />
 
     <meta name="twitter:card" content="summary" />
@@ -226,15 +226,9 @@
       var thumbnailChart, thumbnailUrls;
       var $thumbnailDialog, $thumbnailDialogContent;
 
-      var locations = {};
-      var locationMap = {};
-      var oldLocationIdMapper = {
-          "vanport1" : "vanport2",
-          "accan1" : "accan2",
-          "braddock1" : "braddock2",
-          "clairton2" : "clairton4",
-          "clairton1" : "clairton4"
-      };
+      var rootTileUrl;
+      var locations;
+      var locationMap;
 
       var UTIL = org.gigapan.Util;
 
@@ -244,8 +238,11 @@
           const message = `Error retrieving camera locations list: ${camListResponse.status}`;
           throw new Error(message);
         }
-        locations = await camListResponse.json();
+        var config = await camListResponse.json();
+        rootTileUrl = config.rootTileUrl || "";
+        locations = config.locations || {};
         locationMap = locations.map(loc => {return {[loc.id]:loc.name}});
+        var oldLocationIdMapper = config.oldLocationIdMappings || {};
 
         var locationsTemplateSource  = $("#locations-template").html();
         var locationsTemplate = Handlebars.compile(locationsTemplateSource);
@@ -253,7 +250,7 @@
 
         var initialLoc = locations.find(loc => loc.is_initial === true);
         currentLocation = initialLoc.id;
-        await $.when($.getScript(`https://tiles.cmucreatelab.org/ecam/timemachines/${initialLoc.id}/${initialLoc.id}.js`));
+        await $.when($.getScript(`${rootTileUrl}/${initialLoc.id}/${initialLoc.id}.js`));
 
         var initialDataset = cached_breathecam.latest.path;
         var startingDate = cached_breathecam.latest.date;
@@ -636,13 +633,13 @@
         $("#location_toggle").scrollTop($("#" + locationDivId).offset().top - $("#location_toggle").offset().top);
       }
 
-      function changeLocation(locationName, newDate, newView, newTime, doLoad, callBack, newTimeAsDateObj) {
-        currentLocation = locationName;
+      function changeLocation(locationId, newDate, newView, newTime, doLoad, callBack, newTimeAsDateObj) {
+        currentLocation = locationId;
         if (timelapseFeedUnavailable) {
-          location.href = "/embeds/" + locationName;
+          location.href = "/embeds/" + locationId;
         } else {
           $.ajax({
-            url: "https://tiles.cmucreatelab.org/ecam/timemachines/" + locationName + "/" + locationName + ".json",
+            url: rootTileUrl + "/" + locationId + "/" + locationId + ".json",
             dataType: "json"
           }).done(function(data) {
             cached_breathecam = data;
@@ -678,7 +675,8 @@
             }
           }).fail(function(jqXHR, textStatus, errorThrown) {
             console.log(jqXHR, textStatus, errorThrown);
-            changeLocation("heinz", null, null, null, true);
+            // Default to first location in cameras.json
+            changeLocation(locations[0].id, null, null, null, true);
           });
         }
       }
