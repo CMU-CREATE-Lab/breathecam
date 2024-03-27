@@ -51,21 +51,23 @@ puts "Deleting local timemachine."
 FileUtils.rm_rf(src_tm_path)
 puts "Finished deleting local timemachine."
 
-puts "Deleting remote source images:"
-cmd = "ssh #{host} \""
-remote_camera_source_paths.each do |remote_camera_source_path|
-  next if remote_camera_source_path.strip == "*"
-  remote_camera_source_path.gsub!(local_camera_source_mnt, "")
-  puts "  #{remote_camera_source_path}/#{finished_day}"
-  cmd += "cd #{remote_camera_source_path}; rm -rf #{finished_day}; "
+if remote_camera_source_paths
+  puts "Deleting remote source images:"
+  cmd = "ssh #{host} \""
+  remote_camera_source_paths.each do |remote_camera_source_path|
+    next if remote_camera_source_path.strip == "*"
+    remote_camera_source_path.gsub!(local_camera_source_mnt, "")
+    puts "  #{remote_camera_source_path}/#{finished_day}"
+    cmd += "cd #{remote_camera_source_path}; rm -rf #{finished_day}; "
+  end
+  cmd += "\""
+  puts "#{cmd}"
+  is_success = system(cmd)
+  if !is_success
+    puts "Error deleting remote source images."
+    exit
+  end
+  puts "Finished deleting remote source images."
 end
-cmd += "\""
-puts "#{cmd}"
-is_success = system(cmd)
-if !is_success
-  puts "Error deleting remote source images."
-  exit
-end
-puts "Finished deleting remote source images."
 
 puts "Done."

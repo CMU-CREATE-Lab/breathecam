@@ -81,6 +81,7 @@ $use_faster_file_lookup = false
 # What percent of expected frames do we accept not being processed?
 # This is relevant to the automated rsyncing/deleting of source images.
 $percent_accepted_frame_loss = 0.05
+$root_tile_url = ""
 
 if $RUNNING_WINDOWS
   require File.join(File.dirname(__FILE__), 'shortcut')
@@ -251,7 +252,6 @@ class Compiler
       puts "Specifying a day AND doing incremental appending is not supported. You can only do incremental appending from the actual day of running the script. \n So, either just specify a day OR specify incremental updating."
       exit
     end
-
 
     if File.exists?(File.join($working_dir, "WIP"))
       puts "[#{Time.now}] A file called 'WIP' was detected in '#{$working_dir}', which indicates that this working directory is already in the middle of processing. Exiting new process."
@@ -1115,8 +1115,8 @@ class Compiler
     latest_entry = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : new_latest
     dateset_entry = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : $current_day
     json["latest"]["date"] = new_latest
-    json["latest"]["path"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{latest_entry}.timemachine"
-    json["datasets"]["#{$current_day}"] = "http://tiles.cmucreatelab.org/#{$camera_type}/timemachines/#{$camera_location}/#{dateset_entry}.timemachine"
+    json["latest"]["path"] = File.join($root_tile_url, $camera_location, "#{latest_entry}.timemachine")
+    json["datasets"]["#{$current_day}"] = File.join($root_tile_url, $camera_location, "#{dateset_entry}.timemachine")
     tmp_time = Time.zone.now
     tmp_path_to_json = path_to_json + "_#{tmp_time}"
     tmp_path_to_js = path_to_js + "_#{tmp_time}"
@@ -1422,8 +1422,16 @@ class Compiler
       # If we are only missing at most N% of total frames, we call success for the day
       if num_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
         puts "Turned over to a new day, #{num_frames} frames were processed. Run rsync script."
+        remote_symlink_path = ""
+        if $rsync_info['symlink_root']
+          remote_symlink_path = "#{$rsync_info['symlink_root']}/#{$camera_location}"
+        end
+        image_paths_to_delete = ""
+        if $rsync_info['delete_input_images']
+          image_paths_to_delete = $camera_paths.join(',')
+        end
         # Note: Assumes no commas in camera paths
-        cmd = "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{$rsync_info['symlink_root']}/#{$camera_location} #{$initial_current_day} #{$camera_paths.join(',')}, #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
+        cmd = "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{remote_symlink_path} #{$initial_current_day} #{image_paths_to_delete} #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
         puts cmd
         pid = fork do
           exec(cmd)
@@ -1444,8 +1452,8 @@ class Compiler
       src_path = args[1] || args[0]
       extra_ssh_command = ". $HOME/.profile;"
       tm_name = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : nil
-      puts "ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$camera_type} #{$camera_location} #{$current_day} #{tm_name}\""
-      system("ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$camera_type} #{$camera_location} #{$current_day} #{tm_name}\"")
+      puts "ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$root_tile_url} #{$camera_location} #{$current_day} #{tm_name}\""
+      system("ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$root_tile_url} #{$camera_location} #{$current_day} #{tm_name}\"")
       #system("rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{$output_path}")
     end
   end

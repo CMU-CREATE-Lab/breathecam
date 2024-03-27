@@ -3,7 +3,7 @@
 require 'fileutils'
 require 'json'
 
-def add_entry_to_json(parent_path, camera_type, camera_location, current_day)
+def add_entry_to_json(parent_path, root_tile_url, camera_location, current_day)
   path_to_json = "#{parent_path}/#{camera_location}.json"
   path_to_js = "#{parent_path}/#{camera_location}.js"
 
@@ -34,8 +34,8 @@ def add_entry_to_json(parent_path, camera_type, camera_location, current_day)
     json["latest"] = {}
   end
   json["latest"]["date"] = new_latest
-  json["latest"]["path"] = "http://tiles.cmucreatelab.org/#{camera_type}/timemachines/#{camera_location}/#{new_latest}.timemachine";
-  json["datasets"]["#{current_day}"] = "http://tiles.cmucreatelab.org/#{camera_type}/timemachines/#{camera_location}/#{current_day}.timemachine"
+  json["latest"]["path"] = File.join(root_tile_url, camera_location, "#{new_latest}.timemachine")
+  json["datasets"]["#{current_day}"] = File.join(root_tile_url, camera_location, "#{current_day}.timemachine")
 
   tmp_time = Time.now
   tmp_path_to_json = path_to_json + "_#{tmp_time}"
