@@ -4,22 +4,22 @@ require 'date'
 src_root = ARGV[0]
 dest_path = ARGV[1]
 host = ARGV[2]
-symlink_root = ARGV[3]
-finished_day = ARGV[4] || (Date.today - 1).to_s
-remote_camera_source_paths = ARGV[5].split(",") || []
-local_camera_source_mnt = ARGV[6] || ""
-log_file_path = ARGV[7] || ""
+symlink_root = ARGV[3].empty? ? nil : ARGV[3]
+finished_day = ARGV[4].empty? ? (Date.today - 1).to_s : ARGV[4]
+remote_camera_source_paths = ARGV[5].empty? ? nil : ARGV[5].split(",")
+local_camera_source_mnt = ARGV[6].empty? ? "" : ARGV[6]
+log_file_path = ARGV[7].empty? ? nil : ARGV[7]
 
 if log_file_path
-  $stdout.reopen(log_file_path, "w")
+  $stdout.reopen(log_file_path, "a")
   $stdout.sync = true
-  $stderr.reopen(log_file_path, "w")
+  $stderr.reopen(log_file_path, "a")
   $stderr.sync = true
 end
 
 src_tm_path  = "#{src_root}/#{finished_day}.timemachine"
 year_month_day = finished_day.split("-")
-parent_output_path = "#{dest_path}/#{year_month_day[0]}/#{year_month_day[1]}"
+parent_output_path = symlink_root ? "#{dest_path}/#{year_month_day[0]}/#{year_month_day[1]}" : "#{dest_path}"
 final_output_tm_path = "#{parent_output_path}/#{finished_day}.timemachine"
 tmp_output_tm_path = final_output_tm_path + ".tmp"
 

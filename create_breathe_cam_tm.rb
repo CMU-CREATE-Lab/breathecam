@@ -48,9 +48,7 @@ $rsync_script = "#{$CURRENT_SCRIPT_PATH}/breathecam_rsync_and_delete_source_imag
 $valid_image_extensions = [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".lnk"]
 $default_num_jobs = 4
 $rsync_input = false
-$rsync_output = false
 $rsync_location_json = false
-$run_append_externally = false
 $skip_stitch = false
 $skip_leader = false
 $skip_trailer = false
@@ -90,39 +88,24 @@ end
 class Compiler
   def initialize(args)
 
-    if args.length < 3
+    if args.length < 1
       usage
     end
 
     puts "Start Time: #{Time.now}"
 
-    $input_path = ARGV[0]
-    $output_path = ARGV[1]
-    $definition_file_path = ARGV[2]
-
-    unless $input_path
-      puts "Input path not provided."
-      usage
-    end
-
-    unless $output_path
-      puts "Output path not provided."
-      usage
-    end
-
-    unless $definition_file_path
-      puts "Path to definition file not provided."
-      usage
-    end
+    $definition_file_path = ARGV[0]
 
     while !ARGV.empty?
       arg = ARGV.shift
-      if arg == "-j"
+      if arg == "-input-path"
+        $input_path = ARGV.shift
+      elsif arg == "-output-path"
+        $output_path = ARGV.shift
+      elsif arg == "-j"
         $num_jobs = ARGV.shift.to_i
       elsif arg == "--rsync-input"
         $rsync_input = true
-      elsif arg == "--rsync-output"
-        $rsync_output = true
       elsif arg == "--rsync-location-json"
         $rsync_location_json = true
       elsif arg == "-current-day"
@@ -144,8 +127,6 @@ class Compiler
         # Format is WxH, where values above 100 enlarge the dimension and values below 100 shrink it.
         # Aspect ratio is ignored.
         $resize_dimensions_percentage = ARGV.shift.split(",")
-      elsif arg == "--run-append-externally"
-        $run_append_externally = true
       elsif arg == "--force-trim-on-working-dir"
         $force_trim_on_working_dir = true
       elsif arg == "-working-dir"
@@ -214,10 +195,6 @@ class Compiler
       end
     end
 
-    # Clean up paths if coming from Windows
-    $input_path = $input_path.tr('\\', "/").chomp("/")
-    $output_path = $output_path.tr('\\', "/").chomp("/")
-
     # Process definition file, which has taken the place of all the arguments previously passed in above.
     $definition_file = load_definition_file()
     $camera_location = $definition_file["id"]
@@ -227,23 +204,33 @@ class Compiler
       val = "'#{val}'" if val.is_a?(String)
       eval("$#{key} = #{val}")
     end
+
     $num_images_to_stitch = ($camera_list.length <= 1 ? 0 : $camera_list.length) if $camera_list
 
-    if !$rsync_input && !File.exists?(File.expand_path($input_path))
+    if !$rsync_input && !$camera_list && !File.exists?(File.expand_path($input_path))
       puts "Invalid input path: #{$input_path}"
       exit
     end
 
+    if !$rsync_output_info && $output_path && !File.exists?(File.expand_path($output_path))
+      puts "Invalid output path: #{$output}"
+      exit
+    end
+
+    if $rsync_output_info && $rsync_output_info['host'] && $rsync_output_info['dest_root']
+      $output_path = "#{$rsync_output_info['host']}:#{$rsync_output_info['dest_root']}/#{$camera_location}"
+    end
+
     # Specify where all 0XXX directories go. If the user does not pass in a custom path, then default to main output directory
     unless $working_dir
-      if $rsync_output || $rsync_location_json
+      if $rsync_output_info || $rsync_location_json
         $working_dir = File.join(File.dirname(__FILE__), "#{$camera_location}.tmc")
       else
         $working_dir = File.join($output_path, "#{$camera_location}.tmc")
       end
     end
 
-    $timemachine_output_path = $rsync_output || $rsync_location_json ? $working_dir : $output_path
+    $timemachine_output_path = $rsync_output_info || $rsync_location_json ? $working_dir : $output_path
 
     # If the user specifies a chunk of time to process or we are reading a start time from a file (which we treat as a chunk of time, as opposed to a full day, though it may be that), set to true.
     $do_incremental_update = true if defined?($incremental_update_interval) or $input_date_from_file
@@ -288,7 +275,7 @@ class Compiler
     if File.exists?($definition_file_path)
       return open($definition_file_path) {|fh| JSON.load(fh)}
     else
-       puts "Error opening definition file: #{$definition_file_path}. Does this file exist? Exiting process."
+       puts "Error opening definition file: '#{$definition_file_path}'. Does this file exist? Exiting process."
        exit
     end
   end
@@ -1075,9 +1062,7 @@ class Compiler
       end
       puts "[#{Time.now}] Time Machine created."
       add_entry_to_json
-      rsync_output_files if $rsync_output and $run_append_externally
       append_new_segments if $append_inplace or (!$append_inplace and $create_videoset_segment_directory)
-      rsync_output_files($timemachine_master_output_dir) if $rsync_output and !$run_append_externally
       rsync_location_json if $rsync_location_json
       rsync_tile_tree_if_necessary unless $is_monthly
     end
@@ -1128,26 +1113,11 @@ class Compiler
   end
 
   def append_new_segments
-    # The code for appending is in a separate script, since it may potentially need to be run on another machine if the output files are there.
-    # Rsync does allow us to send partial data and thus only the new segments would be sent, which we will take advantage of if we can, but if
-    # we do not have rsync, at least the append script is separate and we have the choice to handle things outside this master script.
     output_path = $timemachine_output_path
-    if $rsync_output && $run_append_externally
-      args = $output_path.split(":")
-      host = args[0]
-      output_path = args[1]
-      extra_ssh_command = ". $HOME/.profile;"
-      # TODO: Appending script assumed to be in the same directory we ssh in. Also assumes ruby is installed and in the PATH.
-      cmd = "ssh #{host} \"#{extra_ssh_command} ruby append_breathecam_videos.rb #{output_path}/#{$current_day}.timemachine #{output_path}/#{$timemachine_output_dir} #{$num_jobs}\""
-      system(cmd)
+    if $append_inplace
+      append_and_cut_inplace("#{output_path}/#{$timemachine_master_output_dir}", "#{output_path}/#{$timemachine_output_dir}", !$create_videoset_segment_directory)
     else
-      # TODO: Appending script assumed to be in the same directory from which we called the script currently running. Also assumes ruby is installed and in the PATH.
-      #cmd = "ruby #{File.join(File.dirname(__FILE__), 'append_breathecam_videos.rb')} #{output_path}/#{$timemachine_master_output_dir} #{output_path}/#{$timemachine_output_dir} #{$num_jobs}"
-      if $append_inplace
-        append_and_cut_inplace("#{output_path}/#{$timemachine_master_output_dir}", "#{output_path}/#{$timemachine_output_dir}", !$create_videoset_segment_directory)
-      else
-        append_and_cut("#{output_path}/#{$timemachine_master_output_dir}", "#{output_path}/#{$timemachine_output_dir}")
-      end
+      append_and_cut("#{output_path}/#{$timemachine_master_output_dir}", "#{output_path}/#{$timemachine_output_dir}")
     end
   end
 
@@ -1402,13 +1372,23 @@ class Compiler
     system("find #{path_to_master_videoset}/crf*/ -type f -name '*.mp4' -exec qtfaststart {} \\;")
   end
 
-  def rsync_output_files(dir_to_rsync)
-    dir_to_rsync ||= "#{$timemachine_output_dir}"
-    puts "[#{Time.now}] Rsyncing #{$timemachine_output_path}/#{dir_to_rsync} to #{$output_path}"
-    system("rsync -a #{$timemachine_output_path}/#{dir_to_rsync} #{$output_path}")
-  end
+  def rsync_tile_tree_if_necessary
 
-  def rsync_tile_tree_if_necessary()
+    remote_symlink_path = "''"
+    if $rsync_output_info['symlink_root']
+      remote_symlink_path = "#{$rsync_output_info['symlink_root']}/#{$camera_location}"
+    end
+    image_paths_to_delete = "''"
+    if $rsync_output_info['delete_input_images']
+      image_paths_to_delete = $camera_paths.join(',')
+    end
+    local_img_src_mnt = "''"
+    if $rsync_output_info['local_img_src_mnt']
+      local_img_src_mnt = $rsync_output_info['local_img_src_mnt']
+    end
+
+    dest_path = "#{$rsync_output_info['dest_root']}/#{$camera_location}"
+
     # If we are no longer the day we started with, this means we are now the next day.
     # Also check how many frames we processed. This is kinda arbitrary since we can have a few situations where less frames than expected get processed.
     #   We start a run much later in the day, with the intent to reprocess at some point. How to deal with that?
@@ -1422,16 +1402,8 @@ class Compiler
       # If we are only missing at most N% of total frames, we call success for the day
       if num_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
         puts "Turned over to a new day, #{num_frames} frames were processed. Run rsync script."
-        remote_symlink_path = ""
-        if $rsync_info['symlink_root']
-          remote_symlink_path = "#{$rsync_info['symlink_root']}/#{$camera_location}"
-        end
-        image_paths_to_delete = ""
-        if $rsync_info['delete_input_images']
-          image_paths_to_delete = $camera_paths.join(',')
-        end
         # Note: Assumes no commas in camera paths
-        cmd = "run-one ruby #{$rsync_script} #{$working_dir} #{$rsync_info['dest_root']}/#{$camera_location} #{$rsync_info['host']} #{remote_symlink_path} #{$initial_current_day} #{image_paths_to_delete} #{$rsync_info['local_img_src_mnt']} #{$rsync_info['log_file_root']}/#{$camera_location}-rsync.log"
+        cmd = "run-one ruby #{$rsync_script} #{$working_dir} #{dest_path} #{$rsync_output_info['host']} #{remote_symlink_path} #{$initial_current_day} #{image_paths_to_delete} #{local_img_src_mnt} #{$rsync_output_info['log_file_root']}/#{$camera_location}-rsync.log"
         puts cmd
         pid = fork do
           exec(cmd)
@@ -1441,20 +1413,46 @@ class Compiler
       else
         puts "Turned over to a new day, but only #{num_frames} frames were processed. No rsyncing or original image deletion will happen for #{$initial_current_day}."
       end
+    elsif $rsync_output_info['rsync_by_increment']
+      src_tm_path  = "#{$working_dir}/#{$initial_current_day}.timemachine"
+      year_month_day = $initial_current_day.split("-")
+      parent_output_path = remote_symlink_path == "''" ? "#{dest_path}" : "#{dest_path}/#{year_month_day[0]}/#{year_month_day[1]}"
+      final_output_tm_path = "#{parent_output_path}/#{$initial_current_day}.timemachine"
+
+      remote_command = "mkdir -p #{parent_output_path}"
+      remote_command += "; ln -s #{final_output_tm_path} #{remote_symlink_path}/#{$initial_current_day}.timemachine" if remote_symlink_path != "''" && !$create_videoset_segment_directory
+
+      cmd = "rsync -a --rsync-path='#{remote_command} && rsync' #{src_tm_path}/ #{$rsync_output_info['host']}:/#{final_output_tm_path}"
+      puts cmd
+      is_success = system(cmd)
+      if is_success
+        puts "Successfully rsynced latest processed increment."
+      else
+        puts "Error rsyncing."
+        exit
+      end
     end
   end
 
   def rsync_location_json
     if !$create_videoset_segment_directory || $is_monthly
-      puts "[#{Time.now}] Rsyncing #{$camera_location}.js{on} to #{$output_path}"
-      args = $output_path.split(":")
-      host = args[0]
-      src_path = args[1] || args[0]
-      extra_ssh_command = ". $HOME/.profile;"
-      tm_name = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : nil
-      puts "ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$root_tile_url} #{$camera_location} #{$current_day} #{tm_name}\""
-      system("ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$root_tile_url} #{$camera_location} #{$current_day} #{tm_name}\"")
-      #system("rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{$output_path}")
+      location_json_output_path = $output_path
+      if $rsync_output_info['symlink_root']
+        location_json_output_path = "#{$rsync_output_info['host']}:#{$rsync_output_info['symlink_root']}/#{$camera_location}"
+      end
+      puts "[#{Time.now}] Rsyncing #{$camera_location}.js{on} to #{location_json_output_path}"
+      args = location_json_output_path.split(":")
+      if args.length > 1
+        host = args[0]
+        src_path = args[1]
+        extra_ssh_command = "source .profile;"
+        tm_name = $is_monthly ? Date.parse($current_day).beginning_of_month.to_s : nil
+        cmd = "ssh #{host} \"#{extra_ssh_command} modify_breathecam_json.rb #{src_path} #{$root_tile_url} #{$camera_location} #{$current_day} #{tm_name}\""
+      else
+        cmd = "rsync -a #{$working_dir}/#{$camera_location}.json #{$working_dir}/#{$camera_location}.js #{location_json_output_path}"
+      end
+      puts cmd
+      system(cmd)
     end
   end
 
@@ -1482,7 +1480,7 @@ class Compiler
   end
 
   def usage
-    puts "Basic usage: ruby create_breathe_cam_tm.rb PATH_TO_IMAGES OUTPUT_PATH_FOR_TIMEMACHINE PATH_TO_DEFINITION_FILE"
+    puts "Basic usage: ruby create_breathe_cam_tm.rb PATH_TO_DEFINITION_FILE"
     exit
   end
 
