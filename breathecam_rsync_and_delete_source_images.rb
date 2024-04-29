@@ -9,6 +9,7 @@ finished_day = ARGV[4].empty? ? (Date.today - 1).to_s : ARGV[4]
 remote_camera_source_paths = ARGV[5].empty? ? nil : ARGV[5].split(",")
 local_camera_source_mnt = ARGV[6].empty? ? "" : ARGV[6]
 log_file_path = ARGV[7].empty? ? nil : ARGV[7]
+rsync_by_increment = ARGV[8]
 
 if log_file_path
   $stdout.reopen(log_file_path, "a")
@@ -21,7 +22,11 @@ src_tm_path  = "#{src_root}/#{finished_day}.timemachine"
 year_month_day = finished_day.split("-")
 parent_output_path = symlink_root ? "#{dest_path}/#{year_month_day[0]}/#{year_month_day[1]}" : "#{dest_path}"
 final_output_tm_path = "#{parent_output_path}/#{finished_day}.timemachine"
-tmp_output_tm_path = final_output_tm_path + ".tmp"
+if rsync_by_increment
+  tmp_output_tm_path = final_output_tm_path
+else
+  tmp_output_tm_path = final_output_tm_path + ".tmp"
+end
 
 puts "Running qtfaststart on tiles."
 cmd = "find #{src_tm_path} -type f -name '*.mp4' -exec qtfaststart {} \\;"
@@ -37,13 +42,19 @@ if !is_success
   exit
 end
 
-cmd = "ssh #{host} \"mv #{tmp_output_tm_path} #{final_output_tm_path}"
-cmd += symlink_root ? "; ln -s #{final_output_tm_path} #{symlink_root}/#{finished_day}.timemachine\"" : "\""
-puts "#{cmd}"
-is_success = system(cmd)
-if !is_success
-  puts "Error renaming and/or creating symlink on output server."
-  exit
+cmd = "ssh #{host} "
+extra_cmd = "\""
+extra_cmd += "mv #{tmp_output_tm_path} #{final_output_tm_path};" unless rsync_by_increment
+extra_cmd += "ln -s #{final_output_tm_path} #{symlink_root}/#{finished_day}.timemachine;" if symlink_root
+extra_cmd += "\""
+final_cmd = cmd + extra_cmd
+puts "#{final_cmd}"
+unless extra_cmd == "\"\""
+  is_success = system(final_cmd)
+  if !is_success
+    puts "Error renaming and/or creating symlink on output server."
+    exit
+  end
 end
 puts "Finished rsyncing."
 
