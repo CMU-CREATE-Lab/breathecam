@@ -13,7 +13,8 @@
     <meta name="twitter:card" content="summary" />
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700" rel="stylesheet" type="text/css">
-    <link href="assets/stylesheets/breathecam.css" media="all" rel="stylesheet" type="text/css" />
+    <!-- <link href="assets/stylesheets/breathecam.css" media="all" rel="stylesheet" type="text/css" /> -->
+    <link href="assets/stylesheets/breathecam2.css" media="all" rel="stylesheet" type="text/css" />
     <link href="assets/stylesheets/frame.css" media="all" rel="stylesheet" type="text/css" />
     <link href="assets/libs/timemachine-viewer/css/jquery-ui/smoothness/jquery-ui.custom.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="assets/libs/timemachine-viewer/css/defaultUI.css" media="screen" rel="stylesheet" type="text/css" />
@@ -29,7 +30,7 @@
       #timeMachine {
         position: fixed;
         left: 0px;
-        right: 226px;
+        right: 0px;
         top: 61px;
         bottom: 0px;
         width: auto;
@@ -48,7 +49,9 @@
       }
 
       #datepicker {
+        top: 88px;
         right: 0px !important;
+        z-index: 5;
       }
       #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
         cursor: pointer;
@@ -232,6 +235,51 @@
 
       var UTIL = org.gigapan.Util;
 
+      var LocationAndCalendar = {
+        jsonSelectorForLocationTextDiv: "#textTitleLocation",
+        jsonSelectorForCalendarTextDiv: "#textTitleCalendar",
+        uiMobile: true,
+        uiLocationIsOpen: false,
+        uiCalendarIsOpen: false,
+        stringOpen: "▼",
+        stringClose: "▶",
+        stringLocationTextTitle: "",
+        stringCalendarTextTitle: "",
+      };
+
+      function openUiLocation() {
+        $("#location_toggle_container").appendTo("#timeMachine").show();
+      };
+
+      function closeUiLocation() {
+        $("#location_toggle_container").hide();
+      };
+
+      function openUiCalendar() {
+        $("#datepicker").show();
+      };
+
+      function closeUiCalendar() {
+        $("#datepicker").hide();
+      };
+
+      function refreshUiMobile() {
+        if (LocationAndCalendar.uiLocationIsOpen) {
+          openUiLocation();
+        } else {
+          closeUiLocation();
+        }
+        if (LocationAndCalendar.uiCalendarIsOpen) {
+          openUiCalendar();
+        } else {
+          closeUiCalendar();
+        }
+        var locationTextTitle = (LocationAndCalendar.uiLocationIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) + " " + LocationAndCalendar.stringLocationTextTitle;
+        var calendarTextTitle = (LocationAndCalendar.uiCalendarIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) + " " + LocationAndCalendar.stringCalendarTextTitle;
+        $(LocationAndCalendar.jsonSelectorForLocationTextDiv).text(locationTextTitle);
+        $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).text(calendarTextTitle);
+      };
+
       async function tm_init() {
         const camListResponse = await fetch("cameras.json");
         if (!camListResponse.ok) {
@@ -322,7 +370,31 @@
           },
           onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
             // Move to inside timeMachine div so it does not overlap share view box
-            $("#locationTitle").appendTo("#timeMachine .player").show();
+            //$("#locationTitle").appendTo("#timeMachine .player").show();
+            // TODO determine text to display...
+            if (LocationAndCalendar.uiMobile) {
+              // ... old vs new text titles
+              $("#locationTitle").hide();
+              $(LocationAndCalendar.jsonSelectorForLocationTextDiv).appendTo("#timeMachine .player").show();
+              $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).appendTo("#timeMachine .player").show();
+
+              // ... hide extra buttons
+              $(".zoomall").hide();
+              $("#timeMachine_fullScreen").hide();
+
+              // ...(and text click listeners)
+              $(LocationAndCalendar.jsonSelectorForLocationTextDiv).on("click", function () {
+                LocationAndCalendar.uiLocationIsOpen = !LocationAndCalendar.uiLocationIsOpen;
+                LocationAndCalendar.uiCalendarIsOpen = false;
+                refreshUiMobile();
+              });
+              $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).on("click", function () {
+                LocationAndCalendar.uiCalendarIsOpen = !LocationAndCalendar.uiCalendarIsOpen;
+                LocationAndCalendar.uiLocationIsOpen = false;
+                refreshUiMobile();
+              });
+            }
+
             // OLD: This was when using video mode. set 'Fast' to 4x, 'Medium' to 2x and 'Slow' to 1x
             // Now in webgl mode, we set 'Fast' to 1.5x, 'Medium' to 0.75x, and 'Slow' to 0.375x
             timelapse.setMasterPlaybackRate(1.5);
@@ -425,6 +497,7 @@
         };
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
         loadCalendar(startingDate);
+        setDateTitle(startingDate);
         setTimeout(function() {
           timelapse.addDatasetLoadedListener(function() {
             if (!didOnTimeMachinePlayerReady) {
@@ -624,7 +697,22 @@
 
       function setLocationTitle() {
         var locationTitle = $("#location_toggle .location_thumbnail_selected").siblings(".location_title").text();
-        $("#locationTitle").text(locationTitle);
+        // TODO determine text to display (is mobile)
+        if (LocationAndCalendar.uiMobile) {
+          // //$("#locationTitle").text(locationTitle);
+          // $(LocationAndCalendar.jsonSelectorForLocationTextDiv).text(locationTitle);
+          LocationAndCalendar.stringLocationTextTitle = locationTitle;
+          refreshUiMobile();
+        }
+      }
+
+      function setDateTitle(strDate) {
+        var dateArray = strDate.split("-");
+        var date = new Date(dateArray[0], dateArray[1] - 1, dateArray[2]);
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        // $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).text("<> " + date.toLocaleDateString("en-US", options));
+        LocationAndCalendar.stringCalendarTextTitle = date.toLocaleDateString("en-US", options);
+        refreshUiMobile();
       }
 
       function showContent() {
@@ -687,6 +775,7 @@
         setLocationTitle();
         $("#datepicker").datepicker("destroy");
         loadCalendar(startingDate);
+        setDateTitle(startingDate);
       }
 
       function loadCalendar(startingDate) {
@@ -721,6 +810,7 @@
         if (!wasPaused) {
           timelapse.handlePlayPause();
         }
+        setDateTitle(date);
       }
 
       function setLocationThumbnailToggle() {
@@ -764,6 +854,8 @@
     <img id="loadingImg" src="assets/images/loading.gif" width="508" height="381" alt="loading">
   </div>
   <div id="locationTitle"></div>
+  <div id="textTitleLocation"></div>
+  <div id="textTitleCalendar"></div>
   <div id="timelapse_feed" class="timelapse_feed_embed">
     <div id="timeMachine"></div>
     <!--
