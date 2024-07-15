@@ -1373,19 +1373,22 @@ class Compiler
   end
 
   def rsync_tile_tree_if_necessary
-
     remote_symlink_path = "''"
     if $rsync_output_info['symlink_root']
       remote_symlink_path = "#{$rsync_output_info['symlink_root']}/#{$camera_location}"
     end
+
     image_paths_to_delete = "''"
     if $rsync_output_info['delete_input_images']
       image_paths_to_delete = $camera_paths.join(',')
     end
+
     local_img_src_mnt = "''"
     if $rsync_output_info['local_img_src_mnt']
       local_img_src_mnt = $rsync_output_info['local_img_src_mnt']
     end
+
+    rsync_by_increment = !!$rsync_output_info['rsync_by_increment']
 
     dest_path = "#{$rsync_output_info['dest_root']}/#{$camera_location}"
 
@@ -1403,7 +1406,7 @@ class Compiler
       if num_frames > ($future_appending_frames - ($future_appending_frames * $percent_accepted_frame_loss)).round
         puts "Turned over to a new day, #{num_frames} frames were processed. Run rsync script."
         # Note: Assumes no commas in camera paths
-        cmd = "run-one ruby #{$rsync_script} #{$working_dir} #{dest_path} #{$rsync_output_info['host']} #{remote_symlink_path} #{$initial_current_day} #{image_paths_to_delete} #{local_img_src_mnt} #{$rsync_output_info['log_file_root']}/#{$camera_location}-rsync.log"
+        cmd = "run-one ruby #{$rsync_script} #{$working_dir} #{dest_path} #{$rsync_output_info['host']} #{remote_symlink_path} #{$initial_current_day} #{image_paths_to_delete} #{local_img_src_mnt} #{$rsync_output_info['log_file_root']}/#{$camera_location}-rsync.log #{rsync_by_increment}"
         puts cmd
         pid = fork do
           exec(cmd)
@@ -1413,7 +1416,7 @@ class Compiler
       else
         puts "Turned over to a new day, but only #{num_frames} frames were processed. No rsyncing or original image deletion will happen for #{$initial_current_day}."
       end
-    elsif $rsync_output_info['rsync_by_increment']
+    elsif rsync_by_increment
       src_tm_path  = "#{$working_dir}/#{$initial_current_day}.timemachine"
       year_month_day = $initial_current_day.split("-")
       parent_output_path = remote_symlink_path == "''" ? "#{dest_path}" : "#{dest_path}/#{year_month_day[0]}/#{year_month_day[1]}"

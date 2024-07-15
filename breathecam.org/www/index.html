@@ -289,7 +289,7 @@
         var config = await camListResponse.json();
         rootTileUrl = config.rootTileUrl || "";
         locations = config.locations || {};
-        locationMap = locations.map(loc => {return {[loc.id]:loc.name}});
+        locationMap = Object.assign({}, ...locations.map(loc => {return {[loc.id]:loc.name}}));
         var oldLocationIdMapper = config.oldLocationIdMappings || {};
 
         var locationsTemplateSource  = $("#locations-template").html();
