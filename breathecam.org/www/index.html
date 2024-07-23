@@ -11,6 +11,7 @@
     <meta property="fb:app_id" content="342963495886660" />
 
     <meta name="twitter:card" content="summary" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700" rel="stylesheet" type="text/css">
     <!-- <link href="assets/stylesheets/breathecam.css" media="all" rel="stylesheet" type="text/css" /> -->
@@ -52,6 +53,8 @@
         top: 88px;
         right: 0px !important;
         z-index: 5;
+        transform: scale(2);
+        transform-origin: top right;
       }
       #datepicker .ui-datepicker-next, #datepicker .ui-datepicker-prev {
         cursor: pointer;
@@ -173,6 +176,72 @@
         text-align: center;
         margin-top: 5px;
         margin-bottom: 15px;
+      }
+
+      .captureTime {
+        left: 90px !important;
+      }
+
+      .sideToolBar {
+        left: 20px;
+      }
+
+      #textTitleCalendar, #textTitleLocation {
+        z-index: 16;
+      }
+
+      #location_toggle, .location_thumbnail_container {
+        z-index: 11;
+      }
+
+      .controls {
+        z-index: 1;
+      }
+
+      .sideShare.ui-button, .sideToggleSpeed.ui-button {
+        margin-top: 20px;
+      }
+
+      .sideShare .ui-icon-share {
+        background: url(/assets/images/share.png);
+        margin-left: -14px;
+        margin-top: -13px;
+        width: 28px;
+        height: 28px;
+        opacity: 0.7;
+        -webkit-background-size: contain;
+                background-size: contain;
+      }
+
+      .sideToggleSpeed .ui-icon-speed1 {
+        background: url(/assets/images/speed1.png);
+        margin-left: -19px;
+        margin-top: -18px;
+        width: 38px;
+        height: 38px;
+        opacity: 0.7;
+        -webkit-background-size: contain;
+                background-size: contain;
+      }
+      .sideToggleSpeed .ui-icon-speed2 {
+        background: url(/assets/images/speed2.png);
+        margin-left: -19px;
+        margin-top: -18px;
+        width: 38px;
+        height: 38px;
+        opacity: 0.7;
+        -webkit-background-size: contain;
+                background-size: contain;
+      }
+      .sideToggleSpeed .ui-icon-speed3 {
+        background: url(/assets/images/speed3.png);
+        margin-left: -19px;
+        margin-top: -18px;
+        width: 38px;
+        height: 38px;
+        opacity: 0.7;
+        -webkit-background-size: contain;
+                background-size: contain;
       }
     </style>
 
@@ -353,6 +422,7 @@
           enableChangeDetection: false,
           datasetType: "breathecam",
           thumbnailsSupportStartEndTimes: true,
+          defaultMobileUIOverride: true,
           headlessClientHost: location.protocol + '//' + location.host + location.pathname,
           sideControlsInfo: {
             position: "top-left",
@@ -371,7 +441,8 @@
           onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
             // Move to inside timeMachine div so it does not overlap share view box
             //$("#locationTitle").appendTo("#timeMachine .player").show();
-            // TODO determine text to display...
+
+            // TODO (tasota) determine text to display...
             if (LocationAndCalendar.uiMobile) {
               // ... old vs new text titles
               $("#locationTitle").hide();
@@ -381,6 +452,8 @@
               // ... hide extra buttons
               $(".zoomall").hide();
               $("#timeMachine_fullScreen").hide();
+              // hide +/- buttons (they don't appear on mobile width but hide for the mobile site anyways)
+              $(".zoomout, .zoomin").hide();
 
               // ...(and text click listeners)
               $(LocationAndCalendar.jsonSelectorForLocationTextDiv).on("click", function () {
@@ -452,7 +525,45 @@
               $('div').removeClass('no-touch');
             }
 
-            $(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>')
+            // custom button sharePicker
+            $(".sideToolBar").append('<div class="zoom"><button class="sideShare ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Share" role="button"><span class="ui-button-icon-primary ui-icon ui-icon-share"></span></button></div>');
+            $(".sideShare").on("click", function() {
+              // TODO implement share
+              console.log("Share button was clicked.");
+            });
+
+            // custom button toggleSpeed
+            $(".sideToolBar").append('<div class="zoom"><button class="sideToggleSpeed ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Toggle playback speed" role="button"><span class="ui-button-icon-primary ui-icon ui-icon-speed1"></span></button></div>');
+            function initClickListenerForSideToggleSpeed(initValue) {
+              // This variable will persist between calls (closure)
+              let values = "ui-icon-speed1 ui-icon-speed2 ui-icon-speed3";
+              let speed = [0.375, 0.75, 1.5];
+              // initialize with value previous to initValue
+              let persistentVariable = (initValue-1) % speed.length;
+              let updateSpeed = function () {
+                var array = values.split(" ");
+                var length = array.length;
+                persistentVariable = (persistentVariable + 1) % length;
+                var index = persistentVariable;
+                // (actions)
+                $(".sideToggleSpeed span").removeClass(values);
+                $(".sideToggleSpeed span").addClass(array[index]);
+                timelapse.setPlaybackRate(speed[index]);
+                //console.log("timelapse.getPlaybackRate() = " + timelapse.getPlaybackRate());
+                // NOTE: hack here, to avoid the playback button reapparing when setting playback rate
+                $(".toggleSpeed").hide()
+              };
+              // initialize state (note that this will update persistentVariable == initValue)
+              updateSpeed();
+              // return function to be used as click listener
+              return updateSpeed;
+            }
+            $(".sideToggleSpeed").on("click", initClickListenerForSideToggleSpeed(1));
+
+            // button Question mark (tour/help menu)
+            // TODO update the tour/help menu for mobile
+            $(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>');
+
             $(".instructions").append('<span class="tourhelp"><p>Click to view a tour of how to effectively use BreatheCam.</p></span>');
             $(".instructions").append('<span class="fullscreenhelp"><p>Click to go fullscreen, to maximize the explorable area.</p></span>');
 
@@ -493,6 +604,16 @@
 
             didOnTimeMachinePlayerReady = true;
             gFrameGrab.init(timelapse.drawToWebgl, timelapse.setDoManualWebglDraw, timelapseObj, null);
+
+            // TODO (tasota) find better place/way to do this?
+            $(".toggleSpeed, .sharePicker, .helpPlayerLabel").hide();
+            $(".captureTimeMain").text(timelapse.getCaptureTimes()[timelapse.getTimelapseCurrentCaptureTimeIndex()].split(" ")[1]);
+            // TODO quick pdille hack here (find another place for it?)
+            timelapse.addTimeChangeListener(function(t) {
+              var timeval = timelapse.getCaptureTimeByFrameNumber(timelapse.timeToFrameNumber(t)).split(" ")[1];
+              //console.log(timeval);
+              $(".captureTimeMain").text(timeval);
+            });
           }
         };
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
