@@ -1,5 +1,5 @@
 .menu-container {
-  z-index: 2;
+  z-index: 900;
   position: relative;
   width: 100%;
   background-color: #212121;
@@ -44,8 +44,6 @@
 }
 
 .menu-button {
-  width: 40px;
-  height: 40px;
   display: none;
   cursor: pointer;
   margin-right: 20px;
@@ -185,4 +183,93 @@
 
 .text-center {
   text-align: center;
+}
+
+@media screen and (min-width: 900px) {
+  .flex-item-stretch {
+    flex: 1;
+  }
+
+  .flex-item-stretch-2 {
+    flex: 2;
+  }
+
+  .flex-item-stretch-3 {
+    flex: 3;
+  }
+
+  .flex-item-stretch-4 {
+    flex: 4;
+  }
+
+  .flex-item-stretch-5 {
+    flex: 5;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .hamburger-icon {
+    margin-right: 30px;
+  }
+  .branding-logo {
+    display: none;
+  }
+  .branding-logo.hamburger {
+    display: block;
+  }
+  .logo {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .menu-items {
+    display: none;
+    width: 100%;
+  }
+
+  .menu-items a:first-child {
+    margin-top: 10px;
+  }
+
+  .menu-items a {
+    width: 100%;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .menu-button {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    align-content: stretch;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .menu-button:focus {
+    pointer-events: none;
+  }
+
+  .menu-button:focus+.menu-items {
+    display: block;
+  }
+
+  .menu-button:focus+.menu-items a {
+    display: block;
+  }
+
+  .menu-items:hover {
+    display: block;
+  }
+
+  .menu-items>a {
+    display: block;
+  }
+
+  .image-wrap-text {
+    max-width: 100%;
+    margin-bottom: 20px;
+    margin-right: 0;
+  }
 }
