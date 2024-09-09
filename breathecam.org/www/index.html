@@ -526,14 +526,14 @@
             }
 
             // custom button sharePicker
-            $(".sideToolBar").append('<div class="zoom"><button class="sideShare ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Share" role="button"><span class="ui-button-icon-primary ui-icon ui-icon-share"></span></button></div>');
+            $(".sideToolBar").append('<div class="zoom"><button class="sideShare ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Share" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-share"></span></button></div>');
             $(".sideShare").on("click", function() {
               // TODO implement share
               console.log("Share button was clicked.");
             });
 
             // custom button toggleSpeed
-            $(".sideToolBar").append('<div class="zoom"><button class="sideToggleSpeed ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Toggle playback speed" role="button"><span class="ui-button-icon-primary ui-icon ui-icon-speed1"></span></button></div>');
+            $(".sideToolBar").append('<div class="zoom"><button class="sideToggleSpeed ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Toggle playback speed" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-speed1"></span></button></div>');
             function initClickListenerForSideToggleSpeed(initValue) {
               // This variable will persist between calls (closure)
               let values = "ui-icon-speed1 ui-icon-speed2 ui-icon-speed3";
