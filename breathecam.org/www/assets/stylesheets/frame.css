@@ -210,12 +210,14 @@
 @media screen and (max-width: 750px) {
   .hamburger-icon {
     margin-right: 30px;
+    pointer-events: none;
   }
   .branding-logo {
     display: none;
   }
   .branding-logo.hamburger {
     display: block;
+    pointer-events: none;
   }
   .logo {
     -webkit-tap-highlight-color: transparent;
@@ -249,6 +251,7 @@
 
   .menu-button:focus {
     pointer-events: none;
+    outline: none;
   }
 
   .menu-button:focus+.menu-items {

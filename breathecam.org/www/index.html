@@ -840,6 +840,12 @@
         $("#loading").hide();
         $("#content").css("visibility", "visible");
         $("#location_toggle").scrollTop($("#" + locationDivId).offset().top - $("#location_toggle").offset().top);
+        // NOTE handler for menu button, to minimize/close
+        $("body").on("click", function(e) {
+          if ($(document.activeElement).hasClass("menu-button")) {
+            $(".menu-button").blur();
+          }
+        }
       }
 
       function changeLocation(locationId, newDate, newView, newTime, doLoad, callBack, newTimeAsDateObj) {
