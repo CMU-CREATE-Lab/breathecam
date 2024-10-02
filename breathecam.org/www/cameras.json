@@ -10,7 +10,7 @@
 			"is_initial": true
 		},
 		{
-			"id": "vanport2",
+			"id": "vanport3",
 			"name": "Shell Plastics West",
 			"thumbnail_path": "assets/images/vanport2_toggle.png",
 			"live": true,
@@ -104,7 +104,8 @@
 		}
 	],
 	"oldLocationIdMappings": {
-          "vanport1" : "vanport2",
+          "vanport1" : "vanport3",
+          "vanport2" : "vanport3",
           "accan1" : "accan2",
           "braddock1" : "braddock2",
           "clairton2" : "clairton4",
