@@ -278,14 +278,14 @@ a img {
 
 #location_toggle_container {
   position: absolute;
-  bottom: 0px;
+  bottom: 100px;
   right: 0px;
   /* top: 255px; */
   overflow-y: auto;
   overflow-x: auto;
   width: 226px;
-  top: 144px;
-  /* background-color: #000; */
+  top: 100px;
+  background-color: #000;
 }
 
 #location_toggle {
