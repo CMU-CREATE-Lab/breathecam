@@ -303,7 +303,7 @@
         hashVars = UTIL.unpackVars(hash);
         var loadedTimelapse = false;
         if (hashVars) {
-          if (hashVars.minimalUI) {
+          if (hashVars.minimalUI || hashVars.disableUI) {
             $("#timeMachine").addClass("snapshot-mode");
           }
           if (hashVars.d) {
@@ -397,7 +397,9 @@
                 });
               }
             } else {
-              $("#locationTitle").appendTo("#timeMachine .player").show();
+              if (!hashVars.disableUI) {
+                $("#locationTitle").appendTo("#timeMachine .player").show();
+              }
             }
 
             // OLD: This was when using video mode. set 'Fast' to 4x, 'Medium' to 2x and 'Slow' to 1x
@@ -531,7 +533,7 @@
               } else {
                 $(".captureTime").insertBefore(".controls");
               }
-              $(".controls, .sideToolBar, .playbackButton, #locationTitle").addClass("hidden");
+              $(".controls, .sideToolBar, .playbackButton, #locationTitle, .menu-container").addClass("hidden");
             }
 
             // Default to 'Medium' speed in the export GUI
