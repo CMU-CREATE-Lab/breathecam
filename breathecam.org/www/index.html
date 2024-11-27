@@ -460,12 +460,21 @@
             }
 
             if (org.gigapan.Util.isMobileDevice()) {
-              // // custom button sharePicker
-              // $(".sideToolBar").append('<div class="zoom"><button class="sideShare ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Share" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-share"></span></button></div>');
-              // $(".sideShare").on("click", function() {
-              //   // TODO implement share
-              //   console.log("Share button was clicked.");
-              // });
+              // custom button sharePicker
+              $(".sideToolBar").append('<div class="zoom"><button class="sideShare ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Share" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-share"></span></button></div>');
+              // removes click listener (in particular, defined in defaultUI.js)
+              $(".close-share").off("click");
+              // toggle share panel (same behavior for share button and top right close "X")
+              $("button.sideShare, .close-share").on("click", function() {
+                console.log("click inside index.html");
+                // handles location & calendar state (i.e. close them)
+                LocationAndCalendar.uiCalendarIsOpen = false;
+                LocationAndCalendar.uiLocationIsOpen = false;
+                refreshUiMobile();
+                // open the share panel (displays at top)
+                var du = timelapse.getDefaultUI();
+                du.shareOnClickMobile();
+              });
 
               // custom button toggleSpeed
               $(".sideToolBar").append('<div class="zoom"><button class="sideToggleSpeed ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Toggle playback speed" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-speed1"></span></button></div>');
