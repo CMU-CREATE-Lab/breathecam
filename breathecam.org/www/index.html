@@ -235,6 +235,7 @@
       var LocationAndCalendar = {
         jsonSelectorForLocationTextDiv: "#textTitleLocation",
         jsonSelectorForCalendarTextDiv: "#textTitleCalendar",
+        uiIsActive: true,
         uiMobile: true,
         uiLocationIsOpen: false,
         uiCalendarIsOpen: false,
@@ -351,7 +352,7 @@
           datasetType: "breathecam",
           thumbnailsSupportStartEndTimes: true,
           defaultMobileUIOverride: true,
-          headlessClientHost: location.protocol + '//' + location.host + location.pathname,
+          headlessClientHost: "https://breathecam.org",
           sideControlsInfo: {
             position: "top-left",
             showHomeBtn: true,
@@ -364,7 +365,7 @@
           thumbnailToolOptions: {
             watermark: "Breathe Project|CREATE Lab",
             shareUrlDomain: "https://share.createlab.org",
-            shortUrlTopic: "breathecam"
+            shortUrlTopic: "breathecam",
           },
           onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
             if (org.gigapan.Util.isMobileDevice()) {
@@ -386,14 +387,20 @@
 
                 // ...(and text click listeners)
                 $(LocationAndCalendar.jsonSelectorForLocationTextDiv).on("click", function () {
-                  LocationAndCalendar.uiLocationIsOpen = !LocationAndCalendar.uiLocationIsOpen;
-                  LocationAndCalendar.uiCalendarIsOpen = false;
-                  refreshUiMobile();
+                  // disable click actions (in particular, when share view is open)
+                  if (LocationAndCalendar.uiIsActive) {
+                    LocationAndCalendar.uiLocationIsOpen = !LocationAndCalendar.uiLocationIsOpen;
+                    LocationAndCalendar.uiCalendarIsOpen = false;
+                    refreshUiMobile();
+                  }
                 });
                 $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).on("click", function () {
-                  LocationAndCalendar.uiCalendarIsOpen = !LocationAndCalendar.uiCalendarIsOpen;
-                  LocationAndCalendar.uiLocationIsOpen = false;
-                  refreshUiMobile();
+                  // disable click actions (in particular, when share view is open)
+                  if (LocationAndCalendar.uiIsActive) {
+                    LocationAndCalendar.uiCalendarIsOpen = !LocationAndCalendar.uiCalendarIsOpen;
+                    LocationAndCalendar.uiLocationIsOpen = false;
+                    refreshUiMobile();
+                  }
                 });
               }
             } else {
@@ -465,15 +472,31 @@
               // removes click listener (in particular, defined in defaultUI.js)
               $(".close-share").off("click");
               // toggle share panel (same behavior for share button and top right close "X")
-              $("button.sideShare, .close-share").on("click", function() {
-                console.log("click inside index.html");
+              $("button.sideShare").on("click", function() {
                 // handles location & calendar state (i.e. close them)
                 LocationAndCalendar.uiCalendarIsOpen = false;
                 LocationAndCalendar.uiLocationIsOpen = false;
+                // disable calendar/location
+                LocationAndCalendar.uiIsActive = false;
                 refreshUiMobile();
                 // open the share panel (displays at top)
                 var du = timelapse.getDefaultUI();
                 du.shareOnClickMobile();
+                // toggle side buttons
+                $("button.sideShare, button.tour, button.sideToggleSpeed").hide();
+              });
+              $(".close-share").on("click", function() {
+                // location & calendar (should already be closed)
+                LocationAndCalendar.uiCalendarIsOpen = false;
+                LocationAndCalendar.uiLocationIsOpen = false;
+                // enable calendar/location
+                LocationAndCalendar.uiIsActive = true;
+                refreshUiMobile();
+                // toggles share panel (i.e. close in this case)
+                var du = timelapse.getDefaultUI();
+                du.shareOnClickMobile();
+                // toggle side buttons
+                $("button.sideShare, button.tour, button.sideToggleSpeed").show();
               });
 
               // custom button toggleSpeed
@@ -490,8 +513,8 @@
                   persistentVariable = (persistentVariable + 1) % length;
                   var index = persistentVariable;
                   // (actions)
-                  $(".sideToggleSpeed span").removeClass(values);
-                  $(".sideToggleSpeed span").addClass(array[index]);
+                  $("button.sideToggleSpeed span").removeClass(values);
+                  $("button.sideToggleSpeed span").addClass(array[index]);
                   timelapse.setPlaybackRate(speed[index]);
                   //console.log("timelapse.getPlaybackRate() = " + timelapse.getPlaybackRate());
                   // NOTE: hack here, to avoid the playback button reapparing when setting playback rate
@@ -502,12 +525,13 @@
                 // return function to be used as click listener
                 return updateSpeed;
               }
-              $(".sideToggleSpeed").on("click", initClickListenerForSideToggleSpeed(1));
+              $("button.sideToggleSpeed").on("click", initClickListenerForSideToggleSpeed(1));
 
-              // button Question mark (tour/help menu)
-              // TODO update the tour/help menu for mobile
+              //// TODO update the tour/help menu for mobile
               //$(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>');
             }
+
+            // button Question mark (tour/help menu)
             $(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>');
 
             $(".instructions").append('<span class="tourhelp"><p>Click to view a tour of how to effectively use BreatheCam.</p></span>');
@@ -532,7 +556,7 @@
               }
             });
 
-            $(".tour").on("click", function() {
+            $("button.tour").on("click", function() {
               $(".tourModal").dialog('open');
             });
 
@@ -564,6 +588,15 @@
             }
           }
         };
+        // modify crop box padding (for mobile views only)
+        if (org.gigapan.Util.isMobileDevice()) {
+          settings["thumbnailToolOptions"]["defaultBoxPadding"] = {
+            top: 90,
+            bottom: 90,
+            left: 0,
+            right: 0
+          }
+        }
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
         loadCalendar(startingDate);
         setDateTitle(startingDate);
