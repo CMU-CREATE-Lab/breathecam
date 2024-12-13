@@ -272,8 +272,9 @@
         } else {
           closeUiCalendar();
         }
-        var locationTextTitle = (LocationAndCalendar.uiLocationIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) + " " + LocationAndCalendar.stringLocationTextTitle;
-        var calendarTextTitle = (LocationAndCalendar.uiCalendarIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) + " " + LocationAndCalendar.stringCalendarTextTitle;
+        // prepend ▶/▼ for text labels, unless !uiIsActive
+        var locationTextTitle = (LocationAndCalendar.uiIsActive ? (LocationAndCalendar.uiLocationIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) : "") + " " + LocationAndCalendar.stringLocationTextTitle;
+        var calendarTextTitle = (LocationAndCalendar.uiIsActive ? (LocationAndCalendar.uiCalendarIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) : "") + " " + LocationAndCalendar.stringCalendarTextTitle;
         $(LocationAndCalendar.jsonSelectorForLocationTextDiv).text(locationTextTitle);
         $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).text(calendarTextTitle);
       };
@@ -526,9 +527,6 @@
                 return updateSpeed;
               }
               $("button.sideToggleSpeed").on("click", initClickListenerForSideToggleSpeed(1));
-
-              //// TODO update the tour/help menu for mobile
-              //$(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>');
             }
 
             // button Question mark (tour/help menu)
@@ -546,6 +544,7 @@
               modal: true,
               open: function() {
                 $(this).find("video").first().css("height", $("body").height() - 64);
+                $(this).find("video").first().css("width", $("body").width() - 64);
                 $(this).dialog("option", "width", $("body").width());
                 $(this).dialog("option", "height", $("body").height());
               },
