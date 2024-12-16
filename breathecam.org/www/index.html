@@ -461,6 +461,7 @@
             breatheCamThumbnailSetup();
             //createThumbnailChart();
             UTIL.verticalTouchScroll($("#location_toggle_container"));
+            UTIL.verticalTouchScroll($(".shareView"));
             // Elements with hover have the no-touch class and we remove it if we are on a device that supports touch, since we get an annoying effect when we swipe.
             // This is needed mostly for iOS but perhaps other mobile browsers suffer too.
             if ('ontouchstart' in document) {
