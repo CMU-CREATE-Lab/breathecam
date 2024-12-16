@@ -217,6 +217,7 @@
     <script src="assets/javascripts/menu.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/2.3.0/tippy.all.min.js" type="text/javascript"></script>
 
     <script>
       "use strict";
@@ -235,6 +236,7 @@
       var LocationAndCalendar = {
         jsonSelectorForLocationTextDiv: "#textTitleLocation",
         jsonSelectorForCalendarTextDiv: "#textTitleCalendar",
+        uiIsActive: true,
         uiMobile: true,
         uiLocationIsOpen: false,
         uiCalendarIsOpen: false,
@@ -271,8 +273,9 @@
         } else {
           closeUiCalendar();
         }
-        var locationTextTitle = (LocationAndCalendar.uiLocationIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) + " " + LocationAndCalendar.stringLocationTextTitle;
-        var calendarTextTitle = (LocationAndCalendar.uiCalendarIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) + " " + LocationAndCalendar.stringCalendarTextTitle;
+        // prepend ▶/▼ for text labels, unless !uiIsActive
+        var locationTextTitle = (LocationAndCalendar.uiIsActive ? (LocationAndCalendar.uiLocationIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) : "") + " " + LocationAndCalendar.stringLocationTextTitle;
+        var calendarTextTitle = (LocationAndCalendar.uiIsActive ? (LocationAndCalendar.uiCalendarIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) : "") + " " + LocationAndCalendar.stringCalendarTextTitle;
         $(LocationAndCalendar.jsonSelectorForLocationTextDiv).text(locationTextTitle);
         $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).text(calendarTextTitle);
       };
@@ -351,20 +354,20 @@
           datasetType: "breathecam",
           thumbnailsSupportStartEndTimes: true,
           defaultMobileUIOverride: true,
-          headlessClientHost: location.protocol + '//' + location.host + location.pathname,
+          headlessClientHost: "https://breathecam.org",//location.protocol + '//' + location.host + location.pathname,
           sideControlsInfo: {
             position: "top-left",
             showHomeBtn: true,
           },
-          /*socialMedia: {
+          socialMedia: {
             twitterHandle: "BreatheProject",
             facebookAppId: "342963495886660",
             hashTags: ["BreatheCam"]
-          },*/
+          },
           thumbnailToolOptions: {
             watermark: "Breathe Project|CREATE Lab",
             shareUrlDomain: "https://share.createlab.org",
-            shortUrlTopic: "breathecam"
+            shortUrlTopic: "breathecam",
           },
           onTimeMachinePlayerReady: function(viewerDivId, timelapseObj) {
             if (org.gigapan.Util.isMobileDevice()) {
@@ -386,14 +389,20 @@
 
                 // ...(and text click listeners)
                 $(LocationAndCalendar.jsonSelectorForLocationTextDiv).on("click", function () {
-                  LocationAndCalendar.uiLocationIsOpen = !LocationAndCalendar.uiLocationIsOpen;
-                  LocationAndCalendar.uiCalendarIsOpen = false;
-                  refreshUiMobile();
+                  // disable click actions (in particular, when share view is open)
+                  if (LocationAndCalendar.uiIsActive) {
+                    LocationAndCalendar.uiLocationIsOpen = !LocationAndCalendar.uiLocationIsOpen;
+                    LocationAndCalendar.uiCalendarIsOpen = false;
+                    refreshUiMobile();
+                  }
                 });
                 $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).on("click", function () {
-                  LocationAndCalendar.uiCalendarIsOpen = !LocationAndCalendar.uiCalendarIsOpen;
-                  LocationAndCalendar.uiLocationIsOpen = false;
-                  refreshUiMobile();
+                  // disable click actions (in particular, when share view is open)
+                  if (LocationAndCalendar.uiIsActive) {
+                    LocationAndCalendar.uiCalendarIsOpen = !LocationAndCalendar.uiCalendarIsOpen;
+                    LocationAndCalendar.uiLocationIsOpen = false;
+                    refreshUiMobile();
+                  }
                 });
               }
             } else {
@@ -453,6 +462,7 @@
             breatheCamThumbnailSetup();
             //createThumbnailChart();
             UTIL.verticalTouchScroll($("#location_toggle_container"));
+            UTIL.verticalTouchScroll($(".shareView"));
             // Elements with hover have the no-touch class and we remove it if we are on a device that supports touch, since we get an annoying effect when we swipe.
             // This is needed mostly for iOS but perhaps other mobile browsers suffer too.
             if ('ontouchstart' in document) {
@@ -460,12 +470,37 @@
             }
 
             if (org.gigapan.Util.isMobileDevice()) {
-              // // custom button sharePicker
-              // $(".sideToolBar").append('<div class="zoom"><button class="sideShare ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Share" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-share"></span></button></div>');
-              // $(".sideShare").on("click", function() {
-              //   // TODO implement share
-              //   console.log("Share button was clicked.");
-              // });
+              // custom button sharePicker
+              $(".sideToolBar").append('<div class="zoom"><button class="sideShare ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Share" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-share"></span></button></div>');
+              // removes click listener (in particular, defined in defaultUI.js)
+              $(".close-share").off("click");
+              // toggle share panel (same behavior for share button and top right close "X")
+              $("button.sideShare").on("click", function() {
+                // handles location & calendar state (i.e. close them)
+                LocationAndCalendar.uiCalendarIsOpen = false;
+                LocationAndCalendar.uiLocationIsOpen = false;
+                // disable calendar/location
+                LocationAndCalendar.uiIsActive = false;
+                refreshUiMobile();
+                // open the share panel (displays at top)
+                var du = timelapse.getDefaultUI();
+                du.shareOnClickMobile();
+                // toggle side buttons
+                $("button.sideShare, button.tour, button.sideToggleSpeed").hide();
+              });
+              $(".close-share").on("click", function() {
+                // location & calendar (should already be closed)
+                LocationAndCalendar.uiCalendarIsOpen = false;
+                LocationAndCalendar.uiLocationIsOpen = false;
+                // enable calendar/location
+                LocationAndCalendar.uiIsActive = true;
+                refreshUiMobile();
+                // toggles share panel (i.e. close in this case)
+                var du = timelapse.getDefaultUI();
+                du.shareOnClickMobile();
+                // toggle side buttons
+                $("button.sideShare, button.tour, button.sideToggleSpeed").show();
+              });
 
               // custom button toggleSpeed
               $(".sideToolBar").append('<div class="zoom"><button class="sideToggleSpeed ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Toggle playback speed" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-speed1"></span></button></div>');
@@ -481,8 +516,8 @@
                   persistentVariable = (persistentVariable + 1) % length;
                   var index = persistentVariable;
                   // (actions)
-                  $(".sideToggleSpeed span").removeClass(values);
-                  $(".sideToggleSpeed span").addClass(array[index]);
+                  $("button.sideToggleSpeed span").removeClass(values);
+                  $("button.sideToggleSpeed span").addClass(array[index]);
                   timelapse.setPlaybackRate(speed[index]);
                   //console.log("timelapse.getPlaybackRate() = " + timelapse.getPlaybackRate());
                   // NOTE: hack here, to avoid the playback button reapparing when setting playback rate
@@ -493,12 +528,10 @@
                 // return function to be used as click listener
                 return updateSpeed;
               }
-              $(".sideToggleSpeed").on("click", initClickListenerForSideToggleSpeed(1));
-
-              // button Question mark (tour/help menu)
-              // TODO update the tour/help menu for mobile
-              //$(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>');
+              $("button.sideToggleSpeed").on("click", initClickListenerForSideToggleSpeed(1));
             }
+
+            // button Question mark (tour/help menu)
             $(".sideToolBar").append('<div class="tour"><button class="tour ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="Tour" role="button" style="margin-top: 20px !important;border-radius: 4px;"><span class="ui-button-icon-primary ui-icon ui-icon-tour"></span><span class="ui-button-text"></span></button></div>');
 
             $(".instructions").append('<span class="tourhelp"><p>Click to view a tour of how to effectively use BreatheCam.</p></span>');
@@ -513,6 +546,7 @@
               modal: true,
               open: function() {
                 $(this).find("video").first().css("height", $("body").height() - 64);
+                $(this).find("video").first().css("width", $("body").width() - 64);
                 $(this).dialog("option", "width", $("body").width());
                 $(this).dialog("option", "height", $("body").height());
               },
@@ -523,7 +557,7 @@
               }
             });
 
-            $(".tour").on("click", function() {
+            $("button.tour").on("click", function() {
               $(".tourModal").dialog('open');
             });
 
@@ -555,6 +589,15 @@
             }
           }
         };
+        // modify crop box padding (for mobile views only)
+        if (org.gigapan.Util.isMobileDevice()) {
+          settings["thumbnailToolOptions"]["defaultBoxPadding"] = {
+            top: 90,
+            bottom: 90,
+            left: 0,
+            right: 0
+          }
+        }
         timelapse = new org.gigapan.timelapse.Timelapse("timeMachine", settings);
         loadCalendar(startingDate);
         setDateTitle(startingDate);
@@ -734,8 +777,6 @@
             });
           });
         }
-        var thumbnailToolRow = $(".thumbnail-processing-time-warning").closest("tr");
-        $("<tr><td>Comments:</td><td><textarea id='camera-findings-comment' rows='4' cols='21' placeholder='Optionally enter any comments about what you found.'></textarea></td></tr>").insertBefore(thumbnailToolRow);
       }
 
       function selectTimelapseFeed() {
