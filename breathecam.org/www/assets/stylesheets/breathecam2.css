@@ -610,17 +610,13 @@ button.tour {
 }
 
 #textTitleLocation {
-  position: absolute;
-  top: 18px;
-  right: 20px;
+  position: relative;
   font-size: 18px;
   z-index: 6;
   color: white;
 }
 #textTitleCalendar {
-  position: absolute;
-  top: 48px;
-  right: 20px;
+  position: relative;
   font-size: 18px;
   z-index: 6;
   color: white;

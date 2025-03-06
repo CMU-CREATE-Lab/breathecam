@@ -240,14 +240,15 @@
       var UTIL = org.gigapan.Util;
 
       var LocationAndCalendar = {
+        jsonSelectorForTextTitleDivs: "#textTitlesDiv",
         jsonSelectorForLocationTextDiv: "#textTitleLocation",
         jsonSelectorForCalendarTextDiv: "#textTitleCalendar",
         uiIsActive: true,
         uiMobile: true,
         uiLocationIsOpen: false,
         uiCalendarIsOpen: false,
-        stringOpen: "▼",
-        stringClose: "▶",
+        stringOpen: "&#9660;",
+        stringClose: "&#9658;",
         stringLocationTextTitle: "",
         stringCalendarTextTitle: "",
       };
@@ -282,8 +283,8 @@
         // prepend ▶/▼ for text labels, unless !uiIsActive
         var locationTextTitle = (LocationAndCalendar.uiIsActive ? (LocationAndCalendar.uiLocationIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) : "") + " " + LocationAndCalendar.stringLocationTextTitle;
         var calendarTextTitle = (LocationAndCalendar.uiIsActive ? (LocationAndCalendar.uiCalendarIsOpen ? LocationAndCalendar.stringOpen : LocationAndCalendar.stringClose) : "") + " " + LocationAndCalendar.stringCalendarTextTitle;
-        $(LocationAndCalendar.jsonSelectorForLocationTextDiv).text(locationTextTitle);
-        $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).text(calendarTextTitle);
+        $(LocationAndCalendar.jsonSelectorForLocationTextDiv).html(locationTextTitle);
+        $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).html(calendarTextTitle);
       };
 
       async function tm_init() {
@@ -384,8 +385,7 @@
               if (LocationAndCalendar.uiMobile) {
                 // ... old vs new text titles
                 $("#locationTitle").hide();
-                $(LocationAndCalendar.jsonSelectorForLocationTextDiv).appendTo("#timeMachine .player").show();
-                $(LocationAndCalendar.jsonSelectorForCalendarTextDiv).appendTo("#timeMachine .player").show();
+                $(LocationAndCalendar.jsonSelectorForTextTitleDivs).appendTo("#timeMachine .player").show();
 
                 // ... hide extra buttons
                 $(".zoomall").hide();
@@ -1001,8 +1001,10 @@
     <img id="loadingImg" src="assets/images/loading.gif" width="508" height="381" alt="loading">
   </div>
   <div id="locationTitle"></div>
-  <div id="textTitleLocation"></div>
-  <div id="textTitleCalendar"></div>
+  <div id="textTitlesDiv">
+    <div id="textTitleLocation"></div>
+    <div id="textTitleCalendar"></div>
+  </div>
   <div id="timelapse_feed" class="timelapse_feed_embed">
     <div id="timeMachine"></div>
     <!--
