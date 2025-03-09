@@ -27,14 +27,15 @@
 
 #textTitlesDiv {
   position: absolute;
-  top: 18px;
-  right: 20px;
-  margin-left: 100px;
+  top: 28px;
+  right: 4px;
+  width: 238px;
 }
 
 #textTitleCalendar, #textTitleLocation {
   z-index: 16;
   margin: 10px;
+  text-align: left;
 }
 
 #location_toggle, .location_thumbnail_container {

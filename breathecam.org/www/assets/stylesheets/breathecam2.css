@@ -278,14 +278,15 @@ a img {
 
 #location_toggle_container {
   position: absolute;
-  bottom: 100px;
+  bottom: 0px;
   right: 0px;
-  /* top: 255px; */
   overflow-y: auto;
   overflow-x: auto;
-  width: 226px;
-  top: 100px;
+  width: 231px;
+  top: 60px;
   background-color: #000;
+  border: 1px solid #3b3b3b;
+  z-index: 999;
 }
 
 #location_toggle {
@@ -384,7 +385,7 @@ a img {
 .location_thumbnail {
   display: block;
   z-index: 1;
-  width: 211px;
+  width: 217px;
   height: 111px;
 }
 
@@ -395,7 +396,7 @@ a img {
   padding-top: 1px;
   padding-bottom: 2px;
   font-size: 14px;
-  width: 211px;
+  width: 217px;
   overflow: hidden;
   color: rgba(255,255,255,0.8);
   background-color: rgba(0,0,0,0.7);
@@ -408,7 +409,7 @@ a img {
   position: absolute;
   left: 0px;
   top: 0px;
-  width: 211px;
+  width: 217px;
   height: 111px;
   z-index: 4;
 }
@@ -505,7 +506,7 @@ a img {
   padding-top: 4px;
   padding-bottom: 2px;
   font-size: 9px;
-  width: 211px;
+  width: 217px;
   overflow: hidden;
   color: rgba(255,255,255,0.8);
   background-color: rgba(0,0,0,0.7);
